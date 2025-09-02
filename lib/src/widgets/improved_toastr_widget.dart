@@ -445,12 +445,6 @@ class _ImprovedToastrWidgetState extends State<ImprovedToastrWidget>
 }
 
 class _ToastrColorScheme {
-  final Color backgroundColor;
-  final Color iconColor;
-  final Color titleColor;
-  final Color textColor;
-  final Color closeButtonColor;
-  final Color progressColor;
 
   const _ToastrColorScheme({
     required this.backgroundColor,
@@ -460,4 +454,10 @@ class _ToastrColorScheme {
     required this.closeButtonColor,
     required this.progressColor,
   });
+  final Color backgroundColor;
+  final Color iconColor;
+  final Color titleColor;
+  final Color textColor;
+  final Color closeButtonColor;
+  final Color progressColor;
 }

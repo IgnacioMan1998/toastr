@@ -254,7 +254,7 @@ class _ToastrWidgetState extends State<ToastrWidget>
             value: _progressAnimation.value,
             backgroundColor: Colors.transparent,
             valueColor: AlwaysStoppedAnimation<Color>(
-              (widget.config.textColor ?? Colors.white).withValues(alpha: 0.7),
+              _getColorWithAlpha(widget.config.textColor ?? Colors.white, 0.7),
             ),
             minHeight: 3,
           ),
@@ -280,7 +280,7 @@ class _ToastrWidgetState extends State<ToastrWidget>
             borderRadius: BorderRadius.circular(4),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.3),
+                color: _getColorWithAlpha(Colors.black, 0.3),
                 blurRadius: 6,
                 offset: const Offset(0, 3),
               ),
@@ -291,7 +291,7 @@ class _ToastrWidgetState extends State<ToastrWidget>
               Padding(
                 padding: const EdgeInsets.all(15),
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     _buildIcon(),
                     const SizedBox(width: 10),
@@ -301,21 +301,20 @@ class _ToastrWidgetState extends State<ToastrWidget>
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           if (widget.config.title != null) ...[
-                            Text(
-                              widget.config.title!,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: widget.config.textColor ?? Colors.white,
+                            Container(
+                              color: _getBackgroundColor(),
+                              child: Text(
+                                widget.config.title!,
+                                style: _getTextStyle(isTitle: true),
                               ),
                             ),
                             const SizedBox(height: 4),
                           ],
-                          Text(
-                            widget.config.message,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: widget.config.textColor ?? Colors.white,
+                          Container(
+                            color: _getBackgroundColor(),
+                            child: Text(
+                              widget.config.message,
+                              style: _getTextStyle(isTitle: false),
                             ),
                           ),
                         ],
@@ -336,12 +335,10 @@ class _ToastrWidgetState extends State<ToastrWidget>
     if (widget.config.showMethod == ToastrShowMethod.fadeIn) {
       toast = AnimatedBuilder(
         animation: _showAnimation,
-        builder: (context, child) {
-          return Opacity(
+        builder: (context, child) => Opacity(
             opacity: _showAnimation.value,
             child: child!,
-          );
-        },
+          ),
         child: toast,
       );
     } else if (_shouldUseSlideShow()) {
@@ -379,6 +376,23 @@ class _ToastrWidgetState extends State<ToastrWidget>
            widget.config.showMethod == ToastrShowMethod.slideUp ||
            widget.config.showMethod == ToastrShowMethod.slideLeft ||
            widget.config.showMethod == ToastrShowMethod.slideRight;
+
+  /// Helper method to create a color with alpha transparency
+  Color _getColorWithAlpha(Color color, double alpha) => Color.fromRGBO(
+      (color.r * 255.0).round() & 0xff,
+      (color.g * 255.0).round() & 0xff,
+      (color.b * 255.0).round() & 0xff,
+      alpha,
+    );
+
+  /// Helper method to get consistent text styles
+  TextStyle _getTextStyle({bool isTitle = false}) => TextStyle(
+    fontSize: isTitle ? 16 : 14,
+    fontWeight: isTitle ? FontWeight.bold : FontWeight.normal,
+    color: widget.config.textColor ?? Colors.white,
+    decoration: TextDecoration.none, // Sin subrayado
+    // Otras propiedades que quieras mantener consistentes
+  );
 
   @override
   void dispose() {
