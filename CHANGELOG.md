@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2025-09-02
 
 ### Added
-- 🎉 **Initial release** of the Toastr Flutter package
+- 🎉 **Initial release** of the Toastr Flutter package (published as `toastr_flutter`)
 - ✨ **Four notification types**: success, error, warning, and info with predefined colors and icons
 - 🎨 **Multiple positioning options**: topLeft, topCenter, topRight, bottomLeft, bottomCenter, bottomRight, and center
 - 🎭 **Rich animation support**:

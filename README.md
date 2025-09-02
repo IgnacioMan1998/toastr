@@ -1,8 +1,8 @@
-# Toastr 🍞
+# Toastr Flutter 🍞
 
 A highly customizable Flutter package for displaying beautiful toast notifications with smooth animations, multiple types, and flexible positioning.
 
-[![pub package](https://img.shields.io/pub/v/toastr.svg)](https://pub.dev/packages/toastr)
+[![pub package](https://img.shields.io/pub/v/toastr_flutter.svg)](https://pub.dev/packages/toastr_flutter)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Features ✨
@@ -22,7 +22,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  toastr: ^1.0.0
+  toastr_flutter: ^1.0.0
 ```
 
 Then run:
@@ -39,7 +39,7 @@ In your main app widget, initialize the toastr service with the overlay state:
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:toastr/toastr.dart';
+import 'package:toastr_flutter/toastr.dart';
 
 class MyApp extends StatelessWidget {
   @override

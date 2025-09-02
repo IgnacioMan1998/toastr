@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:toastr/toastr.dart';
+import 'package:toastr_flutter/toastr.dart';
 
 void main() {
   runApp(const ToastrExampleApp());

@@ -184,7 +184,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.6"
-  toastr:
+  toastr_flutter:
     dependency: "direct main"
     description:
       path: ".."

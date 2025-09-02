@@ -1,5 +1,5 @@
-name: toastr_example
-description: Example app for the toastr package.
+name: toastr_flutter_example
+description: Example app for the toastr_flutter package.
 version: 1.0.0+1
 publish_to: none
 
@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  toastr:
+  toastr_flutter:
     path: ../
 
 dev_dependencies:
