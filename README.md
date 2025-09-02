@@ -228,10 +228,10 @@ See [CHANGELOG.md](CHANGELOG.md) for a list of changes in each version.
 
 If you have any questions or need help, please:
 
-1. Check the [documentation](https://github.com/yourusername/toastr#readme)
+1. Check the [documentation](https://github.com/IgnacioMan1998/toastr#readme)
 2. Look at the [example](example/)
-3. Open an [issue](https://github.com/yourusername/toastr/issues)
+3. Open an [issue](https://github.com/IgnacioMan1998/toastr/issues)
 
 ---
 
-Made with ❤️ by [Your Name](https://github.com/yourusername)
+Made with ❤️ by Ignacio Manchu(https://github.com/IgnacioMan1998)
