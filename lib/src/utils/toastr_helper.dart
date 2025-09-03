@@ -69,7 +69,7 @@ class ToastrHelper {
       type: ToastrType.error,
       message: message,
       title: title,
-      duration: duration ?? const Duration(seconds: 0),
+      duration: duration, // Remove the invalid default of 0 seconds
       position: position,
       showMethod: showMethod,
       hideMethod: hideMethod,
