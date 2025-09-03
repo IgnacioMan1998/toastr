@@ -1,6 +1,6 @@
 # Toastr Flutter 🍞
 
-A highly customizable Flutter package for displaying beautiful toast notifications with smooth animations, multiple types, and flexible positioning.
+A highly customizable Flutter package for displaying beautiful toast notifications with smooth animations, multiple types, and flexible positioning. Works like Flutter's SnackBar - no initialization required!
 
 [![pub package](https://img.shields.io/pub/v/toastr_flutter.svg)](https://pub.dev/packages/toastr_flutter)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -8,13 +8,14 @@ A highly customizable Flutter package for displaying beautiful toast notificatio
 ## Features ✨
 
 - 🎨 **Multiple notification types**: Success, Error, Warning, Info
-- 📍 **Flexible positioning**: Top, Bottom, Center
-- 🎭 **Smooth animations**: Fade and slide animations
-- 🎯 **Highly customizable**: Colors, icons, duration, and more
-- 👆 **Interactive**: Tap to dismiss functionality
+- 📍 **Flexible positioning**: Top/Bottom with Left/Center/Right alignment
+- 🎭 **Smooth animations**: Fade and slide animations with custom easing
+- 🎯 **Highly customizable**: Colors, icons, duration, progress bars, and more
+- 👆 **Interactive**: Tap to dismiss and close button functionality
 - 🧪 **Well tested**: Comprehensive test coverage
-- 📱 **Responsive**: Works on all screen sizes
-- 🚀 **Easy to use**: Simple API with helper methods
+- 📱 **Responsive**: Adaptive design for mobile, tablet, and desktop
+- 🚀 **Zero setup**: Just pass context like SnackBar - no initialization needed!
+- 🔒 **Secure**: No auto-detection, no performance overhead
 
 ## Installation 📦
 
@@ -33,71 +34,68 @@ flutter pub get
 
 ## Quick Start 🚀
 
-### 1. Initialize the service
+### Basic Usage
 
-In your main app widget, initialize the toastr service with the overlay state:
+Simply import the package and start using it anywhere in your app with BuildContext:
 
 ```dart
 import 'package:flutter/material.dart';
 import 'package:toastr_flutter/toastr.dart';
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: MyHomePage(),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Initialize the toastr service
-    ToastrService.instance.initialize(Overlay.of(context));
-  }
-
+class MyWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Your app content
+      appBar: AppBar(title: Text('Toastr Example')),
+      body: Center(
+        child: Column(
+          children: [
+            ElevatedButton(
+              onPressed: () => ToastrHelper.success(context, 'Success!'),
+              child: Text('Show Success'),
+            ),
+            ElevatedButton(
+              onPressed: () => ToastrHelper.error(context, 'Error occurred!'),
+              child: Text('Show Error'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
 ```
 
-### 2. Show notifications
-
-Use the helper methods to show different types of notifications:
+### All Available Methods
 
 ```dart
-// Success notification
-ToastrHelper.success('Operation completed successfully!');
+// Success notification (green)
+ToastrHelper.success(context, 'Operation completed successfully!');
 
-// Error notification
-ToastrHelper.error('Something went wrong!');
+// Error notification (red)
+ToastrHelper.error(context, 'Something went wrong!');
 
-// Warning notification
-ToastrHelper.warning('Please check your input');
+// Warning notification (orange)
+ToastrHelper.warning(context, 'Please check your input');
 
-// Info notification
-ToastrHelper.info('Here is some useful information');
+// Info notification (blue)
+ToastrHelper.info(context, 'Here is some useful information');
+
+// Auto-detect type from message content
+ToastrHelper.show(context, 'Success! Operation completed'); // Automatically shows green success
+
+// Custom configuration
+ToastrHelper.custom(context, ToastrConfig(...));
 ```
 
 ## Advanced Usage 🔧
 
 ### Custom Configuration
 
-For more control over the appearance and behavior:
+For complete control over appearance and behavior:
 
 ```dart
-ToastrHelper.custom(
+ToastrHelper.custom(context, ToastrConfig(
   ToastrConfig(
     type: ToastrType.success,
     message: 'Custom styled notification',

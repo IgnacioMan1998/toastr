@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import '../models/toastr_config.dart';
 import '../models/toastr_type.dart';
 import '../services/toastr_service.dart';
@@ -7,21 +8,21 @@ class ToastrHelper {
   static final ToastrService _service = ToastrService.instance;
 
   /// Quick method to show a toast with just a message (auto-detects type from message content)
-  static void show(String message, {ToastrType? type}) {
+  static void show(BuildContext context, String message, {ToastrType? type}) {
     final toastType = type ?? _detectTypeFromMessage(message);
     
     switch (toastType) {
       case ToastrType.success:
-        success(message);
+        success(context, message);
         break;
       case ToastrType.error:
-        error(message);
+        error(context, message);
         break;
       case ToastrType.warning:
-        warning(message);
+        warning(context, message);
         break;
       case ToastrType.info:
-        info(message);
+        info(context, message);
         break;
     }
   }
@@ -70,6 +71,7 @@ class ToastrHelper {
 
   /// Show a success toastr with the given message
   static void success(
+    BuildContext context,
     String message, {
     String? title,
     Duration? duration,
@@ -95,11 +97,12 @@ class ToastrHelper {
       showProgressBar: showProgressBar,
       showCloseButton: showCloseButton,
       preventDuplicates: preventDuplicates,
-    ));
+    ), context);
   }
 
   /// Show an error toastr with the given message
   static void error(
+    BuildContext context,
     String message, {
     String? title,
     Duration? duration,
@@ -125,11 +128,12 @@ class ToastrHelper {
       showProgressBar: showProgressBar,
       showCloseButton: showCloseButton ?? true, // Show close button for errors
       preventDuplicates: preventDuplicates,
-    ));
+    ), context);
   }
 
   /// Show a warning toastr with the given message
   static void warning(
+    BuildContext context,
     String message, {
     String? title,
     Duration? duration,
@@ -155,11 +159,12 @@ class ToastrHelper {
       showProgressBar: showProgressBar,
       showCloseButton: showCloseButton,
       preventDuplicates: preventDuplicates,
-    ));
+    ), context);
   }
 
   /// Show an info toastr with the given message
   static void info(
+    BuildContext context,
     String message, {
     String? title,
     Duration? duration,
@@ -185,12 +190,12 @@ class ToastrHelper {
       showProgressBar: showProgressBar,
       showCloseButton: showCloseButton,
       preventDuplicates: preventDuplicates,
-    ));
+    ), context);
   }
 
   /// Show a custom toastr with full configuration options
-  static void custom(ToastrConfig config) {
-    _service.show(config);
+  static void custom(BuildContext context, ToastrConfig config) {
+    _service.show(config, context);
   }
 
   /// Clear all active toastrs

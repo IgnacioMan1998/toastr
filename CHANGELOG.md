@@ -7,27 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0+3] - 2025-09-03
 
-### Added
-- 🚀 **Smart Auto-Initialization**: Package now works "plug and play" without manual setup
-  - Automatically detects and initializes with available Overlay context
-  - Lightweight detection methods that don't consume excessive resources
-  - Intelligent fallback mechanisms for different app architectures
-- 🧠 **Smart Toast Detection**: New `ToastrHelper.show()` method with automatic type detection
-  - Analyzes message content to determine appropriate toast type (success, error, warning, info)
-  - Simplifies usage: `ToastrHelper.show('Success!')` automatically shows green success toast
-- 📱 **Mobile-Optimized Performance**: Designed specifically for mobile device efficiency
-  - Maximum 3 auto-initialization attempts to prevent resource drain
-  - Cached failure states to avoid repeated expensive operations
-  - Automatic cleanup of invalid overlay states
+### BREAKING CHANGES
+- � **Context-Based Architecture**: Reverted auto-initialization approach for better performance and security
+  - All methods now require `BuildContext` parameter (similar to SnackBar)
+  - `ToastrHelper.success(context, 'message')` instead of `ToastrHelper.success('message')`
+  - Removes performance overhead and security vulnerabilities of auto-detection
+  - No more manual initialization required - context passed directly to each method
 
-### Enhanced
-- 🔒 **Advanced Security Features**:
-  - Validation of overlay mounting state before initialization
-  - Resource consumption limits to prevent memory leaks
-  - Health check system for service state monitoring
-  - Automatic cleanup of expired or invalid notification states
-- ⚡ **Performance Optimizations**:
-  - Lightweight context detection (no expensive widget tree traversal)
+### Changed
+- **API Updates**: All ToastrHelper methods now require BuildContext as first parameter:
+  - `ToastrHelper.show(context, message)` 
+  - `ToastrHelper.success(context, message)`
+  - `ToastrHelper.error(context, message)`
+  - `ToastrHelper.warning(context, message)`
+  - `ToastrHelper.info(context, message)`
+  - `ToastrHelper.custom(context, config)`
+
+### Removed
+- Auto-initialization system and related methods
+- Resource-intensive overlay detection
+- Health check system (no longer needed)
+- Smart auto-detection features (replaced with explicit context)
   - Failed initialization caching to prevent repeated attempts
   - Smart overlay validation with automatic recovery
   - Reduced memory footprint for background processes

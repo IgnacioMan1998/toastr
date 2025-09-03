@@ -50,13 +50,6 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
   bool _showCloseButton = false;
   bool _preventDuplicates = false;
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Initialize the toastr service with the overlay state
-    ToastrService.instance.initialize(Overlay.of(context));
-  }
-
   void _showToast() {
     final config = ToastrConfig(
       type: _selectedType,
@@ -76,7 +69,7 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
       preventDuplicates: _preventDuplicates,
     );
 
-    ToastrHelper.custom(config);
+    ToastrHelper.custom(context, config);
   }
 
   Widget _buildFormField(String label, Widget child) => Padding(
@@ -374,22 +367,22 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
               runSpacing: 8,
               children: [
                 ElevatedButton.icon(
-                  onPressed: () => ToastrHelper.success('Operation completed successfully!'),
+                  onPressed: () => ToastrHelper.success(context, 'Operation completed successfully!'),
                   icon: const Icon(Icons.check_circle, color: Colors.green),
                   label: const Text('Success'),
                 ),
                 ElevatedButton.icon(
-                  onPressed: () => ToastrHelper.error('Something went wrong!'),
+                  onPressed: () => ToastrHelper.error(context, 'Something went wrong!'),
                   icon: const Icon(Icons.error, color: Colors.red),
                   label: const Text('Error'),
                 ),
                 ElevatedButton.icon(
-                  onPressed: () => ToastrHelper.warning('Please check your input'),
+                  onPressed: () => ToastrHelper.warning(context, 'Please check your input'),
                   icon: const Icon(Icons.warning, color: Colors.orange),
                   label: const Text('Warning'),
                 ),
                 ElevatedButton.icon(
-                  onPressed: () => ToastrHelper.info('Here is some information'),
+                  onPressed: () => ToastrHelper.info(context, 'Here is some information'),
                   icon: const Icon(Icons.info, color: Colors.blue),
                   label: const Text('Info'),
                 ),
