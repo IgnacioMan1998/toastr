@@ -210,13 +210,16 @@ class _ToastrWidgetState extends State<ToastrWidget>
   }
 
   Widget _buildIcon() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final iconSize = screenWidth >= 1024 ? 22.0 : (screenWidth >= 768 ? 21.0 : 20.0);
+    
     if (widget.config.customIcon != null) {
       return widget.config.customIcon!;
     }
 
     return Icon(
       widget.config.type.defaultIcon,
-      size: 20,
+      size: iconSize,
       color: widget.config.textColor ?? Colors.white,
     );
   }
@@ -226,13 +229,17 @@ class _ToastrWidgetState extends State<ToastrWidget>
       return const SizedBox.shrink();
     }
 
+    final screenWidth = MediaQuery.of(context).size.width;
+    final iconSize = screenWidth >= 1024 ? 18.0 : (screenWidth >= 768 ? 17.0 : 16.0);
+    final padding = screenWidth >= 1024 ? 5.0 : (screenWidth >= 768 ? 4.5 : 4.0);
+
     return GestureDetector(
       onTap: _dismiss,
       child: Container(
-        padding: const EdgeInsets.all(4),
+        padding: EdgeInsets.all(padding),
         child: Icon(
           Icons.close,
-          size: 16,
+          size: iconSize,
           color: widget.config.textColor ?? Colors.white,
         ),
       ),
@@ -264,57 +271,62 @@ class _ToastrWidgetState extends State<ToastrWidget>
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth >= 1024;
+    final isTablet = screenWidth >= 768 && screenWidth < 1024;
+    
     Widget toast = MouseRegion(
       onEnter: (_) => _onHover(true),
       onExit: (_) => _onHover(false),
       child: GestureDetector(
         onTap: widget.config.dismissible ? _dismiss : null,
         child: Container(
-          constraints: const BoxConstraints(
-            minWidth: 200,
-            maxWidth: 350,
+          constraints: BoxConstraints(
+            minWidth: isDesktop ? 300 : (isTablet ? 250 : 200),
+            maxWidth: isDesktop ? 450 : (isTablet ? 400 : 350),
           ),
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          margin: EdgeInsets.symmetric(
+            horizontal: isDesktop ? 20 : (isTablet ? 18 : 16), 
+            vertical: isDesktop ? 10 : (isTablet ? 9 : 8),
+          ),
           decoration: BoxDecoration(
             color: _getBackgroundColor(),
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(isDesktop ? 6 : (isTablet ? 5 : 4)),
             boxShadow: [
               BoxShadow(
-                color: _getColorWithAlpha(Colors.black, 0.3),
-                blurRadius: 6,
-                offset: const Offset(0, 3),
+                color: _getColorWithAlpha(Colors.black, _isHovering ? 0.4 : 0.3),
+                blurRadius: _isHovering ? 8 : 6,
+                offset: Offset(0, _isHovering ? 4 : 3),
               ),
             ],
           ),
           child: Stack(
             children: [
               Padding(
-                padding: const EdgeInsets.all(15),
+                padding: EdgeInsets.all(isDesktop ? 18 : (isTablet ? 16 : 15)),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     _buildIcon(),
-                    const SizedBox(width: 10),
+                    SizedBox(width: isDesktop ? 12 : (isTablet ? 11 : 10)),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           if (widget.config.title != null) ...[
-                            Container(
-                              color: _getBackgroundColor(),
-                              child: Text(
-                                widget.config.title!,
-                                style: _getTextStyle(isTitle: true),
+                            Text(
+                              widget.config.title!,
+                              style: _getTextStyle(isTitle: true).copyWith(
+                                fontSize: isDesktop ? 18 : (isTablet ? 17 : 16),
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            SizedBox(height: isDesktop ? 6 : (isTablet ? 5 : 4)),
                           ],
-                          Container(
-                            color: _getBackgroundColor(),
-                            child: Text(
-                              widget.config.message,
-                              style: _getTextStyle(isTitle: false),
+                          Text(
+                            widget.config.message,
+                            style: _getTextStyle(isTitle: false).copyWith(
+                              fontSize: isDesktop ? 15 : (isTablet ? 14.5 : 14),
                             ),
                           ),
                         ],
@@ -390,8 +402,7 @@ class _ToastrWidgetState extends State<ToastrWidget>
     fontSize: isTitle ? 16 : 14,
     fontWeight: isTitle ? FontWeight.bold : FontWeight.normal,
     color: widget.config.textColor ?? Colors.white,
-    decoration: TextDecoration.none, // Sin subrayado
-    // Otras propiedades que quieras mantener consistentes
+    decoration: TextDecoration.none,
   );
 
   @override
