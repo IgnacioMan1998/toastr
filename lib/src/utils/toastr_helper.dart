@@ -6,6 +6,53 @@ import '../services/toastr_service.dart';
 class ToastrHelper {
   static final ToastrService _service = ToastrService.instance;
 
+  /// Quick method to show a toast with just a message (auto-detects type from message content)
+  static void show(String message, {ToastrType? type}) {
+    final toastType = type ?? _detectTypeFromMessage(message);
+    
+    switch (toastType) {
+      case ToastrType.success:
+        success(message);
+        break;
+      case ToastrType.error:
+        error(message);
+        break;
+      case ToastrType.warning:
+        warning(message);
+        break;
+      case ToastrType.info:
+        info(message);
+        break;
+    }
+  }
+
+  /// Auto-detect toast type from message content
+  static ToastrType _detectTypeFromMessage(String message) {
+    final lowerMessage = message.toLowerCase();
+    
+    if (lowerMessage.contains('error') || 
+        lowerMessage.contains('failed') || 
+        lowerMessage.contains('wrong') ||
+        lowerMessage.contains('invalid')) {
+      return ToastrType.error;
+    }
+    
+    if (lowerMessage.contains('success') || 
+        lowerMessage.contains('completed') || 
+        lowerMessage.contains('done') ||
+        lowerMessage.contains('created')) {
+      return ToastrType.success;
+    }
+    
+    if (lowerMessage.contains('warning') || 
+        lowerMessage.contains('caution') || 
+        lowerMessage.contains('attention')) {
+      return ToastrType.warning;
+    }
+    
+    return ToastrType.info;
+  }
+
   /// Default configuration that can be customized globally
   static ToastrConfig defaultConfig = const ToastrConfig(
     type: ToastrType.info,
