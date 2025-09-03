@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0+2] - 2025-09-03
+
+### Fixed
+- 🐛 **Error notification issue**: Fixed `ArgumentError` exception when showing error notifications
+  - Removed invalid default duration of 0 seconds that violated minimum duration security constraint
+  - Error notifications now properly inherit the default duration (5 seconds) when not specified
+- 🔒 **Security validation**: Enhanced duration validation to prevent configurations below minimum threshold (100ms)
+- 📝 **Code documentation**: Added comprehensive documentation for all public members to eliminate warnings
+- 🛠️ **Parameter ordering**: Fixed constructor parameter ordering to follow Flutter conventions (required parameters first)
+
+### Enhanced
+- 📚 **Complete API documentation**: All public classes, methods, and properties now have detailed documentation
+- 🧹 **Code quality improvements**: 
+  - Replaced `print` statements with `debugPrint` for better production behavior
+  - Enhanced exception handling with specific exception types
+  - Improved code organization and formatting
+- ✅ **Zero analysis warnings**: Achieved clean code analysis with no warnings or issues
+- 🎯 **Better developer experience**: Improved IntelliSense and documentation tooltips in IDEs
+
+### Technical Improvements
+- Enhanced `ToastrHelper.error()` method to use proper default duration
+- Improved security validation in `ToastrValidator` with better error messaging
+- Added proper imports for Flutter foundation framework
+- Refined enum documentation for better API clarity
+
 ## [1.0.0+1] - 2025-09-02
 
 ### Added
