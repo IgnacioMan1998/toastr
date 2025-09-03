@@ -211,7 +211,7 @@ class _ToastrWidgetState extends State<ToastrWidget>
 
   Widget _buildIcon() {
     final screenWidth = MediaQuery.of(context).size.width;
-    final iconSize = screenWidth >= 1024 ? 22.0 : (screenWidth >= 768 ? 21.0 : 20.0);
+    final iconSize = screenWidth >= 1024 ? 26.0 : (screenWidth >= 768 ? 24.0 : 20.0);
     
     if (widget.config.customIcon != null) {
       return widget.config.customIcon!;
@@ -230,8 +230,8 @@ class _ToastrWidgetState extends State<ToastrWidget>
     }
 
     final screenWidth = MediaQuery.of(context).size.width;
-    final iconSize = screenWidth >= 1024 ? 18.0 : (screenWidth >= 768 ? 17.0 : 16.0);
-    final padding = screenWidth >= 1024 ? 5.0 : (screenWidth >= 768 ? 4.5 : 4.0);
+    final iconSize = screenWidth >= 1024 ? 22.0 : (screenWidth >= 768 ? 20.0 : 16.0);
+    final padding = screenWidth >= 1024 ? 6.0 : (screenWidth >= 768 ? 5.0 : 4.0);
 
     return GestureDetector(
       onTap: _dismiss,
@@ -282,16 +282,16 @@ class _ToastrWidgetState extends State<ToastrWidget>
         onTap: widget.config.dismissible ? _dismiss : null,
         child: Container(
           constraints: BoxConstraints(
-            minWidth: isDesktop ? 300 : (isTablet ? 250 : 200),
-            maxWidth: isDesktop ? 450 : (isTablet ? 400 : 350),
+            minWidth: isDesktop ? 350 : (isTablet ? 300 : 200),
+            maxWidth: isDesktop ? 550 : (isTablet ? 450 : 350),
           ),
           margin: EdgeInsets.symmetric(
-            horizontal: isDesktop ? 20 : (isTablet ? 18 : 16), 
-            vertical: isDesktop ? 10 : (isTablet ? 9 : 8),
+            horizontal: isDesktop ? 24 : (isTablet ? 20 : 16), 
+            vertical: isDesktop ? 12 : (isTablet ? 10 : 8),
           ),
           decoration: BoxDecoration(
             color: _getBackgroundColor(),
-            borderRadius: BorderRadius.circular(isDesktop ? 6 : (isTablet ? 5 : 4)),
+            borderRadius: BorderRadius.circular(isDesktop ? 8 : (isTablet ? 6 : 4)),
             boxShadow: [
               BoxShadow(
                 color: _getColorWithAlpha(Colors.black, _isHovering ? 0.4 : 0.3),
@@ -303,12 +303,12 @@ class _ToastrWidgetState extends State<ToastrWidget>
           child: Stack(
             children: [
               Padding(
-                padding: EdgeInsets.all(isDesktop ? 18 : (isTablet ? 16 : 15)),
+                padding: EdgeInsets.all(isDesktop ? 20 : (isTablet ? 18 : 15)),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     _buildIcon(),
-                    SizedBox(width: isDesktop ? 12 : (isTablet ? 11 : 10)),
+                    SizedBox(width: isDesktop ? 14 : (isTablet ? 12 : 10)),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -318,15 +318,15 @@ class _ToastrWidgetState extends State<ToastrWidget>
                             Text(
                               widget.config.title!,
                               style: _getTextStyle(isTitle: true).copyWith(
-                                fontSize: isDesktop ? 18 : (isTablet ? 17 : 16),
+                                fontSize: isDesktop ? 23 : (isTablet ? 19 : 16),
                               ),
                             ),
-                            SizedBox(height: isDesktop ? 6 : (isTablet ? 5 : 4)),
+                            SizedBox(height: isDesktop ? 8 : (isTablet ? 6 : 4)),
                           ],
                           Text(
                             widget.config.message,
                             style: _getTextStyle(isTitle: false).copyWith(
-                              fontSize: isDesktop ? 15 : (isTablet ? 14.5 : 14),
+                              fontSize: isDesktop ? 20 : (isTablet ? 18 : 15),
                             ),
                           ),
                         ],
