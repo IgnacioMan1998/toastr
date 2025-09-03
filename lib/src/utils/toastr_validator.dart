@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import '../models/toastr_config.dart';
 import '../models/toastr_type.dart';
 
@@ -196,6 +197,11 @@ class ToastrValidator {
   /// Security audit log entry for suspicious activity
   static void logSecurityEvent(String event, String details) {
     // In a real implementation, this would log to a security monitoring system
-    print('TOASTR_SECURITY_EVENT: $event - $details');
+    // print('TOASTR_SECURITY_EVENT: $event - $details');
+    assert(() {
+      // Only log in debug mode
+      debugPrint('TOASTR_SECURITY_EVENT: $event - $details');
+      return true;
+    }());
   }
 }

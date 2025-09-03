@@ -5,13 +5,20 @@ import '../models/toastr_type.dart';
 
 /// Widget mejorado para mostrar notificaciones toastr con gestión robusta del ciclo de vida
 class ImprovedToastrWidget extends StatefulWidget {
-
+  /// Creates an improved toastr widget with the given configuration
+  ///
+  /// The [config] parameter is required and defines the appearance and behavior.
+  /// The [onDismiss] callback is called when the toast is dismissed.
   const ImprovedToastrWidget({
-    super.key,
     required this.config,
+    super.key,
     this.onDismiss,
   });
+
+  /// Configuration for the toastr notification
   final ToastrConfig config;
+  
+  /// Callback called when the toast is dismissed
   final VoidCallback? onDismiss;
 
   @override
@@ -60,7 +67,7 @@ class _ImprovedToastrWidgetState extends State<ImprovedToastrWidget>
       );
       
       _isInitialized = true;
-    } catch (e) {
+    } on Exception catch (e) {
       // Log error pero no crash
       debugPrint('ToastrWidget initialization error: $e');
     }

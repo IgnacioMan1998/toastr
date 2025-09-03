@@ -5,12 +5,16 @@ import '../models/toastr_type.dart';
 
 /// The main toastr widget that displays the notification
 class ToastrWidget extends StatefulWidget {
-
+  /// Creates a toastr widget with the given configuration
+  ///
+  /// The [config] parameter is required and defines the appearance and behavior.
+  /// The [onDismiss] callback is called when the toast is dismissed.
   const ToastrWidget({
-    super.key,
     required this.config,
+    super.key,
     this.onDismiss,
   });
+
   /// Configuration for this toastr
   final ToastrConfig config;
   

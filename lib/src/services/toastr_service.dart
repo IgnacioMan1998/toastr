@@ -6,6 +6,7 @@ import '../widgets/toastr_widget.dart';
 
 /// Service to manage and display toastr notifications with security features
 class ToastrService {
+  /// Factory constructor that returns the singleton instance
   factory ToastrService() => _instance;
   ToastrService._internal();
   static final ToastrService _instance = ToastrService._internal();

@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'toastr_type.dart';
 
 /// Configuration class for toastr notifications.
+/// Configuration class for toastr notifications.
 /// 
 /// Contains all settings for customizing the appearance, behavior,
 /// and animation of toastr notifications.
 class ToastrConfig {
-
+  /// Creates a new ToastrConfig with the specified parameters.
+  ///
+  /// The [type] and [message] parameters are required.
+  /// All other parameters have sensible defaults.
   const ToastrConfig({
     required this.type,
     required this.message,
@@ -164,20 +168,32 @@ enum ToastrPosition {
 
 /// Show animation methods similar to original toastr
 enum ToastrShowMethod {
+  /// Fade in animation
   fadeIn,
+  /// Slide down animation  
   slideDown,
+  /// Slide up animation
   slideUp,
+  /// Slide left animation
   slideLeft,
+  /// Slide right animation
   slideRight,
+  /// Simple show animation
   show,
 }
 
 /// Hide animation methods similar to original toastr
 enum ToastrHideMethod {
+  /// Fade out animation
   fadeOut,
+  /// Slide up animation
   slideUp,
+  /// Slide down animation
   slideDown,
+  /// Slide left animation
   slideLeft,
+  /// Slide right animation
   slideRight,
+  /// Simple hide animation
   hide,
 }
