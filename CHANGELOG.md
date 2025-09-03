@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0+3] - 2025-09-03
+## [1.0.0+3]
 
 ### BREAKING CHANGES
 - � **Context-Based Architecture**: Reverted auto-initialization approach for better performance and security
@@ -27,38 +27,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Auto-initialization system and related methods
 - Resource-intensive overlay detection
 - Health check system (no longer needed)
+### Removed
+- Auto-initialization system and related methods
+- Resource-intensive overlay detection
+- Health check system (no longer needed)
 - Smart auto-detection features (replaced with explicit context)
-  - Failed initialization caching to prevent repeated attempts
-  - Smart overlay validation with automatic recovery
-  - Reduced memory footprint for background processes
-- 🛡️ **Enhanced Error Handling**:
-  - More descriptive error messages with troubleshooting guidance
-  - Graceful degradation when auto-initialization fails
-  - Automatic recovery from overlay state changes
+- `initialize()` method (no longer needed)
+- `resetAutoInitialization()` method (no longer needed)
+- `isHealthy` getter (no longer needed)
 
-### Technical Improvements
-- Added `isHealthy` getter for service state monitoring
-- Implemented `dispose()` method for proper resource cleanup
-- Enhanced overlay state validation with mounting checks
-- Added `resetAutoInitialization()` for manual reset capability
-- Optimized security validations to reduce unnecessary computations
-- Improved CupertinoApp support alongside MaterialApp
+### Benefits of New Approach
+- **Better Performance**: No background scanning or auto-detection overhead
+- **Enhanced Security**: No automatic context detection reduces potential vulnerabilities
+- **Simpler Architecture**: Direct context passing eliminates complex initialization logic
+- **Improved Reliability**: No dependency on auto-detection mechanisms
+- **Flutter-like API**: Consistent with SnackBar and other Flutter APIs
 
-### Breaking Changes
-- None (fully backward compatible)
+### Migration
+Update your code to pass `BuildContext` as the first parameter:
 
-### Usage Examples
 ```dart
-// New simplified usage (auto-detects type)
-ToastrHelper.show('Operation completed successfully!'); // Shows success toast
-ToastrHelper.show('An error occurred'); // Shows error toast
+// Before (v1.0.0+2)
+ToastrHelper.success('Message');
+ToastrService.instance.initialize(Overlay.of(context)); // Manual initialization
 
-// Traditional usage (still supported)
-ToastrHelper.success('Success message');
-ToastrHelper.error('Error message');
+// After (v1.0.0+3)
+ToastrHelper.success(context, 'Message'); // No initialization needed
 ```
 
-## [1.0.0+2] - 2025-09-03
+## [1.0.0+2]
 
 ### Fixed
 - 🐛 **Error notification issue**: Fixed `ArgumentError` exception when showing error notifications
@@ -83,7 +80,7 @@ ToastrHelper.error('Error message');
 - Added proper imports for Flutter foundation framework
 - Refined enum documentation for better API clarity
 
-## [1.0.0+1] - 2025-09-02
+## [1.0.0+1]
 
 ### Added
 - 📱 **Responsive design support**: Optimized layouts for mobile, tablet, and desktop devices
@@ -110,7 +107,7 @@ ToastrHelper.error('Error message');
 - Enhanced positioning service with responsive margins
 - Better adaptation to high DPI displays
 
-## [1.0.0] - 2025-09-02
+## [1.0.0]
 
 ### Added
 - 🎉 **Initial release** of the Toastr Flutter package (published as `toastr_flutter`)
