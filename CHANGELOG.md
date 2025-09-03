@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0+1] - 2025-09-02
+
+### Added
+- 📱 **Responsive design support**: Optimized layouts for mobile, tablet, and desktop devices
+- 🎯 **Device-specific sizing**: 
+  - **Mobile**: Compact layout with appropriate touch targets
+  - **Tablet**: Medium-sized notifications with enhanced readability
+  - **Desktop**: Larger notifications with increased text and icon sizes
+- 🔧 **Smart layout adjustments**:
+  - Dynamic width constraints based on screen size
+  - Responsive margins and padding
+  - Scalable font sizes for better readability
+  - Adaptive icon sizes (20px mobile, 24px tablet, 26px desktop)
+  - Responsive close button sizing
+
+### Enhanced
+- 🎨 **Improved visual hierarchy**: Better text scaling across different devices
+- 📐 **Adaptive spacing**: Container padding and margins adjust based on screen size
+- 🎯 **Better touch targets**: Larger interactive elements on mobile devices
+- 🖥️ **Desktop optimization**: Enhanced hover effects and larger content for desktop users
+
+### Technical Improvements
+- Added `ResponsiveDimensions` class for better dimension management
+- Improved breakpoint logic (Mobile: <768px, Tablet: 768-1024px, Desktop: >1024px)
+- Enhanced positioning service with responsive margins
+- Better adaptation to high DPI displays
+
 ## [1.0.0] - 2025-09-02
 
 ### Added
