@@ -5,6 +5,59 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0+3] - 2025-09-03
+
+### Added
+- 🚀 **Smart Auto-Initialization**: Package now works "plug and play" without manual setup
+  - Automatically detects and initializes with available Overlay context
+  - Lightweight detection methods that don't consume excessive resources
+  - Intelligent fallback mechanisms for different app architectures
+- 🧠 **Smart Toast Detection**: New `ToastrHelper.show()` method with automatic type detection
+  - Analyzes message content to determine appropriate toast type (success, error, warning, info)
+  - Simplifies usage: `ToastrHelper.show('Success!')` automatically shows green success toast
+- 📱 **Mobile-Optimized Performance**: Designed specifically for mobile device efficiency
+  - Maximum 3 auto-initialization attempts to prevent resource drain
+  - Cached failure states to avoid repeated expensive operations
+  - Automatic cleanup of invalid overlay states
+
+### Enhanced
+- 🔒 **Advanced Security Features**:
+  - Validation of overlay mounting state before initialization
+  - Resource consumption limits to prevent memory leaks
+  - Health check system for service state monitoring
+  - Automatic cleanup of expired or invalid notification states
+- ⚡ **Performance Optimizations**:
+  - Lightweight context detection (no expensive widget tree traversal)
+  - Failed initialization caching to prevent repeated attempts
+  - Smart overlay validation with automatic recovery
+  - Reduced memory footprint for background processes
+- 🛡️ **Enhanced Error Handling**:
+  - More descriptive error messages with troubleshooting guidance
+  - Graceful degradation when auto-initialization fails
+  - Automatic recovery from overlay state changes
+
+### Technical Improvements
+- Added `isHealthy` getter for service state monitoring
+- Implemented `dispose()` method for proper resource cleanup
+- Enhanced overlay state validation with mounting checks
+- Added `resetAutoInitialization()` for manual reset capability
+- Optimized security validations to reduce unnecessary computations
+- Improved CupertinoApp support alongside MaterialApp
+
+### Breaking Changes
+- None (fully backward compatible)
+
+### Usage Examples
+```dart
+// New simplified usage (auto-detects type)
+ToastrHelper.show('Operation completed successfully!'); // Shows success toast
+ToastrHelper.show('An error occurred'); // Shows error toast
+
+// Traditional usage (still supported)
+ToastrHelper.success('Success message');
+ToastrHelper.error('Error message');
+```
+
 ## [1.0.0+2] - 2025-09-03
 
 ### Fixed
