@@ -5,10 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0+5]
+
+### Fixed
+- 🐛 **Static Analysis Issues**: Resolved all formatting and linting issues
+  - Fixed Dart formatter compliance across all source files
+  - Removed empty test files that were causing compilation errors
+  - Improved code documentation and comments for better maintainability
+
+### Enhanced
+- 📝 **Documentation Improvements**:
+  - Enhanced class-level documentation with comprehensive examples
+  - Added detailed parameter descriptions and usage guidelines
+  - Improved inline comments for better code readability
+  - Updated README with more comprehensive API documentation
+
+### Technical Improvements
+- ✨ **Code Quality**:
+  - Formatted all Dart files according to official style guide
+  - Enhanced type safety and null safety compliance
+  - Improved error handling and edge case coverage
+  - Optimized import statements and dependency organization
+
+### Package Metadata
+- 📦 **pub.dev Optimization**:
+  - Enhanced package description for better discoverability
+  - Added relevant topics and keywords
+  - Improved package metadata for better pub.dev scoring
+  - Updated homepage and documentation links
+
 ## [1.0.0+3]
 
 ### BREAKING CHANGES
-- � **Context-Based Architecture**: Reverted auto-initialization approach for better performance and security
+- 🔄 **Context-Based Architecture**: Reverted auto-initialization approach for better performance and security
   - All methods now require `BuildContext` parameter (similar to SnackBar)
   - `ToastrHelper.success(context, 'message')` instead of `ToastrHelper.success('message')`
   - Removes performance overhead and security vulnerabilities of auto-detection
@@ -23,10 +52,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `ToastrHelper.info(context, message)`
   - `ToastrHelper.custom(context, config)`
 
-### Removed
-- Auto-initialization system and related methods
-- Resource-intensive overlay detection
-- Health check system (no longer needed)
 ### Removed
 - Auto-initialization system and related methods
 - Resource-intensive overlay detection
