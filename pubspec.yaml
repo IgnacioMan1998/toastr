@@ -11,10 +11,7 @@ topics:
   - notification
   - snackbar
   - alert
-  - popup
-  - flutter-package
   - ui
-  - material-design
 
 environment:
   sdk: ^3.9.0
