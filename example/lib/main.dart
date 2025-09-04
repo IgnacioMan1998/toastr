@@ -61,7 +61,7 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
       hideEasing: _selectedHideEasing,
       showDuration: Duration(milliseconds: _showDuration),
       hideDuration: Duration(milliseconds: _hideDuration),
-      duration: _timeout > 0 ? Duration(milliseconds: _timeout) : Duration.zero,
+      duration: _timeout > 0 ? Duration(milliseconds: _timeout) : const Duration(milliseconds: 100), // Minimum required duration
       extendedTimeout: Duration(milliseconds: _extendedTimeout),
       showProgressBar: _showProgressBar,
       showCloseButton: _showCloseButton,
@@ -289,7 +289,7 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                   _buildSlider(
                     'Timeout',
                     _timeout,
-                    0,
+                    100, // Minimum valid duration (100ms)
                     10000,
                     (value) => setState(() => _timeout = value.round()),
                   ),
