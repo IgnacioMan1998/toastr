@@ -5,7 +5,18 @@ import '../models/toastr_config.dart';
 import '../utils/toastr_validator.dart';
 import '../widgets/toastr_widget.dart';
 
-/// Service to manage and display toastr notifications with security features
+/// Service to manage and display toastr notifications with security features.
+///
+/// This is the core service that handles displaying, positioning, and managing
+/// toast notifications. It uses a singleton pattern to maintain state across
+/// the application. Most users should use [ToastrHelper] instead of this service directly.
+///
+/// The service handles:
+/// - Overlay management for toast display
+/// - Animation control
+/// - Rate limiting and security validation
+/// - Duplicate prevention
+/// - Queue management for multiple toasts
 class ToastrService {
   /// Factory constructor that returns the singleton instance
   factory ToastrService() => _instance;
@@ -17,7 +28,7 @@ class ToastrService {
 
   final Map<String, OverlayEntry> _activeToastrs = {};
   final Set<String> _duplicateKeys = {};
-  
+
   // Security tracking
   int _notificationCount = 0;
   DateTime _lastResetTime = DateTime.now();
@@ -26,10 +37,13 @@ class ToastrService {
   void show(ToastrConfig config, BuildContext context) {
     // Get overlay from the provided context
     final overlay = Overlay.of(context);
-    
+
     // Security validations
     if (!ToastrValidator.isValidConfig(config)) {
-      ToastrValidator.logSecurityEvent('INVALID_CONFIG', 'Configuration failed validation');
+      ToastrValidator.logSecurityEvent(
+        'INVALID_CONFIG',
+        'Configuration failed validation',
+      );
       throw ArgumentError('Invalid toastr configuration');
     }
 
@@ -41,7 +55,10 @@ class ToastrService {
 
     // Limit active notifications for security
     if (_activeToastrs.length >= ToastrSecurityConfig.maxActiveNotifications) {
-      ToastrValidator.logSecurityEvent('MAX_NOTIFICATIONS', 'Maximum active notifications reached');
+      ToastrValidator.logSecurityEvent(
+        'MAX_NOTIFICATIONS',
+        'Maximum active notifications reached',
+      );
       // Remove oldest notification
       _removeOldestToastr();
     }
@@ -50,12 +67,13 @@ class ToastrService {
     final secureConfig = _sanitizeConfig(config);
 
     // Check for duplicates
-    if (secureConfig.preventDuplicates && _duplicateKeys.contains(secureConfig.key)) {
+    if (secureConfig.preventDuplicates &&
+        _duplicateKeys.contains(secureConfig.key)) {
       return;
     }
 
     final toastId = DateTime.now().millisecondsSinceEpoch.toString();
-    
+
     late OverlayEntry overlayEntry;
     overlayEntry = OverlayEntry(
       builder: (overlayContext) => _buildPositionedToastr(
@@ -79,7 +97,11 @@ class ToastrService {
     });
   }
 
-  Widget _buildPositionedToastr(ToastrConfig config, VoidCallback onDismiss, BuildContext context) {
+  Widget _buildPositionedToastr(
+    ToastrConfig config,
+    VoidCallback onDismiss,
+    BuildContext context,
+  ) {
     final Widget toastr = ToastrWidget(
       config: config,
       onDismiss: () {
@@ -176,7 +198,7 @@ class ToastrService {
       _notificationCount = 0;
       _lastResetTime = now;
     }
-    
+
     // Allow maximum 50 notifications per minute
     return _notificationCount > 50;
   }
@@ -190,13 +212,14 @@ class ToastrService {
   }
 
   /// Sanitize configuration for security
-  ToastrConfig _sanitizeConfig(ToastrConfig config) => ToastrValidator.createSecureConfig(
-      type: config.type,
-      message: config.message,
-      title: config.title,
-      duration: config.duration,
-      baseConfig: config,
-    );
+  ToastrConfig _sanitizeConfig(ToastrConfig config) =>
+      ToastrValidator.createSecureConfig(
+        type: config.type,
+        message: config.message,
+        title: config.title,
+        duration: config.duration,
+        baseConfig: config,
+      );
 
   /// Clean up resources and clear all active notifications
   void dispose() {
@@ -206,10 +229,9 @@ class ToastrService {
     }
     _activeToastrs.clear();
     _duplicateKeys.clear();
-    
+
     // Reset state
     _notificationCount = 0;
     _lastResetTime = DateTime.now();
   }
-
 }

@@ -10,16 +10,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:toastr_flutter_example/main.dart';
 
 void main() {
-  testWidgets('Toastr example app loads successfully', (WidgetTester tester) async {
+  testWidgets('Toastr example app loads successfully', (
+    WidgetTester tester,
+  ) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const ToastrExampleApp());
 
     // Verify that our app loads with the expected title
     expect(find.text('Toastr Demo'), findsOneWidget);
-    
+
     // Verify that the success button is present
     expect(find.text('Success'), findsOneWidget);
-    
+
     // Verify that other toast type buttons are present
     expect(find.text('Error'), findsOneWidget);
     expect(find.text('Warning'), findsOneWidget);

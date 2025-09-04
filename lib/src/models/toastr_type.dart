@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 enum ToastrType {
   /// Success notification - typically green
   success,
-  
+
   /// Error notification - typically red
   error,
-  
+
   /// Warning notification - typically orange/yellow
   warning,
-  
+
   /// Info notification - typically blue
   info;
 

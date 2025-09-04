@@ -1,4 +1,3 @@
-
 // Export all public APIs
 export 'src/models/toastr_config.dart';
 export 'src/models/toastr_type.dart';

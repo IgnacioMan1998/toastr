@@ -1,10 +1,20 @@
 name: toastr_flutter
-description: A highly customizable Flutter package for displaying beautiful toast notifications with animations, multiple types, and flexible positioning.
-version: 1.0.0+4
+description: A highly customizable Flutter package for displaying beautiful toast notifications with smooth animations, multiple types, and flexible positioning. Works like SnackBar with no initialization required.
+version: 1.0.0+5
 homepage: https://github.com/IgnacioMan1998/toastr
 repository: https://github.com/IgnacioMan1998/toastr
 issue_tracker: https://github.com/IgnacioMan1998/toastr/issues
 documentation: https://github.com/IgnacioMan1998/toastr#readme
+
+topics:
+  - toast
+  - notification
+  - snackbar
+  - alert
+  - popup
+  - flutter-package
+  - ui
+  - material-design
 
 environment:
   sdk: ^3.9.0

@@ -3,14 +3,26 @@ import '../models/toastr_config.dart';
 import '../models/toastr_type.dart';
 import '../services/toastr_service.dart';
 
-/// Helper class with convenient methods for showing different types of toastrs
+/// Helper class with convenient methods for showing different types of toastrs.
+///
+/// This class provides static methods for quickly displaying toast notifications
+/// without needing to create ToastrConfig objects manually. All methods require
+/// a BuildContext as the first parameter, similar to Flutter's SnackBar.
+///
+/// Example usage:
+/// ```dart
+/// ToastrHelper.success(context, 'Operation completed!');
+/// ToastrHelper.error(context, 'Something went wrong!');
+/// ToastrHelper.warning(context, 'Please check your input');
+/// ToastrHelper.info(context, 'Here is some information');
+/// ```
 class ToastrHelper {
   static final ToastrService _service = ToastrService.instance;
 
   /// Quick method to show a toast with just a message (auto-detects type from message content)
   static void show(BuildContext context, String message, {ToastrType? type}) {
     final toastType = type ?? _detectTypeFromMessage(message);
-    
+
     switch (toastType) {
       case ToastrType.success:
         success(context, message);
@@ -30,27 +42,27 @@ class ToastrHelper {
   /// Auto-detect toast type from message content
   static ToastrType _detectTypeFromMessage(String message) {
     final lowerMessage = message.toLowerCase();
-    
-    if (lowerMessage.contains('error') || 
-        lowerMessage.contains('failed') || 
+
+    if (lowerMessage.contains('error') ||
+        lowerMessage.contains('failed') ||
         lowerMessage.contains('wrong') ||
         lowerMessage.contains('invalid')) {
       return ToastrType.error;
     }
-    
-    if (lowerMessage.contains('success') || 
-        lowerMessage.contains('completed') || 
+
+    if (lowerMessage.contains('success') ||
+        lowerMessage.contains('completed') ||
         lowerMessage.contains('done') ||
         lowerMessage.contains('created')) {
       return ToastrType.success;
     }
-    
-    if (lowerMessage.contains('warning') || 
-        lowerMessage.contains('caution') || 
+
+    if (lowerMessage.contains('warning') ||
+        lowerMessage.contains('caution') ||
         lowerMessage.contains('attention')) {
       return ToastrType.warning;
     }
-    
+
     return ToastrType.info;
   }
 
@@ -84,20 +96,23 @@ class ToastrHelper {
     bool? showCloseButton,
     bool? preventDuplicates,
   }) {
-    _service.show(defaultConfig.copyWith(
-      type: ToastrType.success,
-      message: message,
-      title: title,
-      duration: duration,
-      position: position,
-      showMethod: showMethod,
-      hideMethod: hideMethod,
-      showDuration: showDuration,
-      hideDuration: hideDuration,
-      showProgressBar: showProgressBar,
-      showCloseButton: showCloseButton,
-      preventDuplicates: preventDuplicates,
-    ), context);
+    _service.show(
+      defaultConfig.copyWith(
+        type: ToastrType.success,
+        message: message,
+        title: title,
+        duration: duration,
+        position: position,
+        showMethod: showMethod,
+        hideMethod: hideMethod,
+        showDuration: showDuration,
+        hideDuration: hideDuration,
+        showProgressBar: showProgressBar,
+        showCloseButton: showCloseButton,
+        preventDuplicates: preventDuplicates,
+      ),
+      context,
+    );
   }
 
   /// Show an error toastr with the given message
@@ -115,20 +130,24 @@ class ToastrHelper {
     bool? showCloseButton,
     bool? preventDuplicates,
   }) {
-    _service.show(defaultConfig.copyWith(
-      type: ToastrType.error,
-      message: message,
-      title: title,
-      duration: duration, // Remove the invalid default of 0 seconds
-      position: position,
-      showMethod: showMethod,
-      hideMethod: hideMethod,
-      showDuration: showDuration,
-      hideDuration: hideDuration,
-      showProgressBar: showProgressBar,
-      showCloseButton: showCloseButton ?? true, // Show close button for errors
-      preventDuplicates: preventDuplicates,
-    ), context);
+    _service.show(
+      defaultConfig.copyWith(
+        type: ToastrType.error,
+        message: message,
+        title: title,
+        duration: duration, // Remove the invalid default of 0 seconds
+        position: position,
+        showMethod: showMethod,
+        hideMethod: hideMethod,
+        showDuration: showDuration,
+        hideDuration: hideDuration,
+        showProgressBar: showProgressBar,
+        showCloseButton:
+            showCloseButton ?? true, // Show close button for errors
+        preventDuplicates: preventDuplicates,
+      ),
+      context,
+    );
   }
 
   /// Show a warning toastr with the given message
@@ -146,20 +165,23 @@ class ToastrHelper {
     bool? showCloseButton,
     bool? preventDuplicates,
   }) {
-    _service.show(defaultConfig.copyWith(
-      type: ToastrType.warning,
-      message: message,
-      title: title,
-      duration: duration,
-      position: position,
-      showMethod: showMethod,
-      hideMethod: hideMethod,
-      showDuration: showDuration,
-      hideDuration: hideDuration,
-      showProgressBar: showProgressBar,
-      showCloseButton: showCloseButton,
-      preventDuplicates: preventDuplicates,
-    ), context);
+    _service.show(
+      defaultConfig.copyWith(
+        type: ToastrType.warning,
+        message: message,
+        title: title,
+        duration: duration,
+        position: position,
+        showMethod: showMethod,
+        hideMethod: hideMethod,
+        showDuration: showDuration,
+        hideDuration: hideDuration,
+        showProgressBar: showProgressBar,
+        showCloseButton: showCloseButton,
+        preventDuplicates: preventDuplicates,
+      ),
+      context,
+    );
   }
 
   /// Show an info toastr with the given message
@@ -177,20 +199,23 @@ class ToastrHelper {
     bool? showCloseButton,
     bool? preventDuplicates,
   }) {
-    _service.show(defaultConfig.copyWith(
-      type: ToastrType.info,
-      message: message,
-      title: title,
-      duration: duration,
-      position: position,
-      showMethod: showMethod,
-      hideMethod: hideMethod,
-      showDuration: showDuration,
-      hideDuration: hideDuration,
-      showProgressBar: showProgressBar,
-      showCloseButton: showCloseButton,
-      preventDuplicates: preventDuplicates,
-    ), context);
+    _service.show(
+      defaultConfig.copyWith(
+        type: ToastrType.info,
+        message: message,
+        title: title,
+        duration: duration,
+        position: position,
+        showMethod: showMethod,
+        hideMethod: hideMethod,
+        showDuration: showDuration,
+        hideDuration: hideDuration,
+        showProgressBar: showProgressBar,
+        showCloseButton: showCloseButton,
+        preventDuplicates: preventDuplicates,
+      ),
+      context,
+    );
   }
 
   /// Show a custom toastr with full configuration options
