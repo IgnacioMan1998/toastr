@@ -13,6 +13,14 @@ topics:
   - alert
   - ui
 
+screenshots:
+  - description: 'Desktop configuration panel with all customization options'
+    path: screenshots/desktop01.png
+  - description: 'Desktop toast notifications in action'
+    path: screenshots/desktop02.png
+  - description: 'Mobile-responsive interface and configuration'
+    path: screenshots/phone01.png
+
 environment:
   sdk: ^3.9.0
   flutter: ">=3.0.0"

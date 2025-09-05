@@ -3,7 +3,7 @@
 A highly customizable Flutter package for displaying beautiful toast notifications with smooth animations, multiple types, and flexible positioning. Works like Flutter's SnackBar - no initialization required!
 
 [![pub package](https://img.shields.io/pub/v/toastr_flutter.svg)](https://pub.dev/packages/toastr_flutter)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ## Features ✨
 
@@ -16,6 +16,7 @@ A highly customizable Flutter package for displaying beautiful toast notificatio
 - 📱 **Responsive**: Adaptive design for mobile, tablet, and desktop
 - 🚀 **Zero setup**: Just pass context like SnackBar - no initialization needed!
 - 🔒 **Secure**: No auto-detection, no performance overhead
+
 
 ## Installation 📦
 
@@ -256,6 +257,51 @@ ToastrHelper.custom(context, ToastrConfig(
 ));
 ```
 
+## Screenshots 📸
+
+<div align="center">
+
+### 🖥️ Desktop Experience
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <b>Configuration Panel</b><br><br>
+      <img src="screenshots/desktop01.png" alt="Desktop Configuration Panel" 
+           style="border: 3px solid #6B7280; border-radius: 12px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); max-width: 100%; height: auto;">
+      <br><em>Comprehensive customization options</em>
+    </td>
+    <td align="center" width="50%">
+      <b>Toast Notifications</b><br><br>
+      <img src="screenshots/desktop02.png" alt="Desktop Toast Notifications" 
+           style="border: 3px solid #6B7280; border-radius: 12px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); max-width: 100%; height: auto;">
+      <br><em>Beautiful notifications in action</em>
+    </td>
+  </tr>
+</table>
+
+### 📱 Mobile Experience  
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <b>Mobile Interface</b><br><br>
+      <img src="screenshots/phone01.png" alt="Mobile Interface" 
+           style="border: 3px solid #6B7280; border-radius: 12px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); max-width: 100%; height: auto;">
+      <br><em>Responsive mobile design</em>
+    </td>
+    <td align="center" width="50%">
+      <b>Mobile Toasts</b><br><br>
+      <img src="screenshots/phone02.png" alt="Mobile Toast Notifications" 
+           style="border: 3px solid #6B7280; border-radius: 12px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); max-width: 100%; height: auto;">
+      <br><em>Perfect mobile adaptation</em>
+    </td>
+  </tr>
+</table>
+
+</div>
+
+> 🎨 **Responsive Design**: Automatically adapts to different screen sizes - from mobile phones to desktop computers with consistent behavior and beautiful animations.
+
+
 ## Migration Guide 🔄
 
 ### From v1.0.0+2 to v1.0.0+3
@@ -282,7 +328,7 @@ ToastrHelper.error(context, 'Error');
 
 ## License 📄
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
 
 ## Contributing 🤝
 
