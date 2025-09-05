@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0+6] - 2025-09-04
+
+### Changed
+- 📄 **License Update**: Migrated from MIT License to Apache License 2.0
+  - Updated LICENSE file to Apache License 2.0, January 2004
+  - Updated README.md badges and license section to reflect Apache 2.0
+  - Ensures better compatibility with enterprise and commercial usage
+
+### Enhanced
+- 🎨 **Documentation Visual Improvements**:
+  - Added professional screenshot section with styled borders and shadows
+  - Implemented responsive HTML tables for better screenshot presentation
+  - Enhanced visual appeal with device-like gray borders (`#6B7280`)
+  - Added comprehensive visual documentation for desktop and mobile experiences
+
+### Fixed
+- 🔧 **Badge and Link Corrections**:
+  - Fixed malformed license badge syntax in README.md
+  - Corrected all external links to point to proper Apache License resources
+  - Ensured consistency between documentation and actual license file
+
+### Technical
+- 📦 **Package Metadata**:
+  - Updated package version to 1.0.0+6
+  - Maintained compatibility with existing API
+  - No breaking changes - purely metadata and documentation updates
+
 ## [1.0.0+5]
 
 ### Fixed
