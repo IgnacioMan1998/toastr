@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0+7] - 2025-09-04
+
+### Fixed
+- 🖼️ **Screenshots Visibility on pub.dev**: Fixed images not displaying on pub.dev
+  - Updated all screenshot paths from local `screenshots/` to GitHub Raw URLs
+  - Changed image sources to use `https://raw.githubusercontent.com/IgnacioMan1998/toastr/main/screenshots/`
+  - Ensures screenshots are publicly accessible and display correctly on pub.dev package page
+
+### Enhanced
+- 📦 **Package Distribution**: Improved package presentation on pub.dev
+  - Screenshots now properly visible to potential users browsing pub.dev
+  - Enhanced package discoverability with visual documentation
+  - Professional appearance with working image gallery
+
+### Technical
+- 🔗 **URL Management**: Migrated from relative to absolute image URLs
+  - All screenshot references now use GitHub Raw CDN
+  - Improved reliability for documentation across different platforms
+  - Future-proof image hosting solution
+
 ## [1.0.0+6] - 2025-09-04
 
 ### Changed
