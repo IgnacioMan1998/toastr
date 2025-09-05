@@ -266,13 +266,13 @@ ToastrHelper.custom(context, ToastrConfig(
   <tr>
     <td align="center" width="50%">
       <b>Configuration Panel</b><br><br>
-      <img src="screenshots/desktop01.png" alt="Desktop Configuration Panel" 
+      <img src="https://raw.githubusercontent.com/IgnacioMan1998/toastr/main/screenshots/desktop01.png" alt="Desktop Configuration Panel" 
            style="border: 3px solid #6B7280; border-radius: 12px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); max-width: 100%; height: auto;">
       <br><em>Comprehensive customization options</em>
     </td>
     <td align="center" width="50%">
       <b>Toast Notifications</b><br><br>
-      <img src="screenshots/desktop02.png" alt="Desktop Toast Notifications" 
+      <img src="https://raw.githubusercontent.com/IgnacioMan1998/toastr/main/screenshots/desktop02.png" alt="Desktop Toast Notifications" 
            style="border: 3px solid #6B7280; border-radius: 12px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); max-width: 100%; height: auto;">
       <br><em>Beautiful notifications in action</em>
     </td>
@@ -284,13 +284,13 @@ ToastrHelper.custom(context, ToastrConfig(
   <tr>
     <td align="center" width="50%">
       <b>Mobile Interface</b><br><br>
-      <img src="screenshots/phone01.png" alt="Mobile Interface" 
+      <img src="https://raw.githubusercontent.com/IgnacioMan1998/toastr/main/screenshots/phone01.png" alt="Mobile Interface" 
            style="border: 3px solid #6B7280; border-radius: 12px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); max-width: 100%; height: auto;">
       <br><em>Responsive mobile design</em>
     </td>
     <td align="center" width="50%">
       <b>Mobile Toasts</b><br><br>
-      <img src="screenshots/phone02.png" alt="Mobile Toast Notifications" 
+      <img src="https://raw.githubusercontent.com/IgnacioMan1998/toastr/main/screenshots/phone02.png" alt="Mobile Toast Notifications" 
            style="border: 3px solid #6B7280; border-radius: 12px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); max-width: 100%; height: auto;">
       <br><em>Perfect mobile adaptation</em>
     </td>
