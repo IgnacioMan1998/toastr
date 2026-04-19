@@ -17,14 +17,26 @@ import '../models/toastr_type.dart';
 /// - Loader: 12px border spinner (`#e0e0e0` / `#616161`)
 /// - Blank: no icon
 class ToastrWidget extends StatefulWidget {
-  /// Creates a toastr widget with the given [config] and optional [onDismiss] callback.
-  const ToastrWidget({required this.config, super.key, this.onDismiss});
+  /// Creates a toastr widget with the given [config] and optional callbacks.
+  const ToastrWidget({
+    required this.config,
+    super.key,
+    this.onDismiss,
+    this.onHoverStart,
+    this.onHoverEnd,
+  });
 
   /// Configuration for this toastr notification.
   final ToastrConfig config;
 
   /// Callback invoked when the toastr is dismissed.
   final VoidCallback? onDismiss;
+
+  /// Callback when the user starts hovering (for timer pause).
+  final VoidCallback? onHoverStart;
+
+  /// Callback when the user stops hovering (for timer resume).
+  final VoidCallback? onHoverEnd;
 
   @override
   State<ToastrWidget> createState() => _ToastrWidgetState();
@@ -289,11 +301,13 @@ class _ToastrWidgetState extends State<ToastrWidget>
     if (hovering) {
       _autoDismissTimer?.cancel();
       _progressController.stop();
+      widget.onHoverStart?.call();
     } else {
       _scheduleAutoDismiss();
       if (widget.config.showProgressBar) {
         _progressController.forward();
       }
+      widget.onHoverEnd?.call();
     }
   }
 
@@ -614,13 +628,35 @@ class _ToastrWidgetState extends State<ToastrWidget>
         (isDark ? const Color(0xFFF5F5F4) : const Color(0xFF363636));
     final closeColor = isDark ? const Color(0xFF78716C) : const Color(0xFFD1D5DB);
 
+    final swipeDir = widget.config.swipeDismissDirection;
+    final canSwipeH = widget.config.dismissible &&
+        (swipeDir == SwipeDismissDirection.horizontal ||
+            swipeDir == SwipeDismissDirection.both);
+    final canSwipeV = widget.config.dismissible &&
+        (swipeDir == SwipeDismissDirection.vertical ||
+            swipeDir == SwipeDismissDirection.both);
+
     Widget toast = GestureDetector(
-      onHorizontalDragUpdate: widget.config.dismissible
+      onHorizontalDragUpdate: canSwipeH
           ? (details) {
               setState(() => _dragOffset += details.delta.dx);
             }
           : null,
-      onHorizontalDragEnd: widget.config.dismissible
+      onHorizontalDragEnd: canSwipeH
+          ? (details) {
+              if (_dragOffset.abs() > 80) {
+                _dismiss();
+              } else {
+                setState(() => _dragOffset = 0);
+              }
+            }
+          : null,
+      onVerticalDragUpdate: canSwipeV
+          ? (details) {
+              setState(() => _dragOffset += details.delta.dy);
+            }
+          : null,
+      onVerticalDragEnd: canSwipeV
           ? (details) {
               if (_dragOffset.abs() > 80) {
                 _dismiss();
@@ -635,7 +671,9 @@ class _ToastrWidgetState extends State<ToastrWidget>
         onExit: (_) => _onHover(false),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          transform: Matrix4.translationValues(_dragOffset, 0, 0),
+          transform: canSwipeV
+              ? Matrix4.translationValues(0, _dragOffset, 0)
+              : Matrix4.translationValues(_dragOffset, 0, 0),
           constraints: BoxConstraints(maxWidth: widget.config.maxWidth),
           margin: widget.config.margin ?? const EdgeInsets.symmetric(vertical: 4),
           decoration: widget.config.containerDecoration ?? BoxDecoration(
@@ -707,6 +745,8 @@ class _ToastrWidgetState extends State<ToastrWidget>
                           ),
                         ),
                       ),
+                      if (widget.config.action != null)
+                        _buildActionButton(textColor),
                       _buildCloseButton(closeColor),
                     ],
                   ),
@@ -719,42 +759,116 @@ class _ToastrWidgetState extends State<ToastrWidget>
       ),
     );
 
-    toast = AnimatedBuilder(
-      animation: _enterController,
-      builder: (context, child) {
-        if (_isDismissing) return child!;
-        return Opacity(
-          opacity: _enterOpacity.value.clamp(0.0, 1.0),
-          child: Transform(
-            transform: Matrix4.identity()
-              ..translateByDouble(0.0, _enterTranslateY.value, 0.0, 1.0)
-              ..scaleByDouble(_enterScale.value, _enterScale.value, 1.0, 1.0),
-            alignment: Alignment.center,
-            child: child,
-          ),
-        );
-      },
-      child: toast,
-    );
-
-    if (_isDismissing) {
+    // Enter animation — or use custom builder if provided
+    if (widget.config.enterAnimationBuilder != null) {
       toast = AnimatedBuilder(
-        animation: _exitController,
-        builder: (context, child) => Opacity(
-          opacity: _exitOpacity.value.clamp(0.0, 1.0),
-          child: Transform(
-            transform: Matrix4.identity()
-              ..translateByDouble(0.0, _exitTranslateY.value, 0.0, 1.0)
-              ..scaleByDouble(_exitScale.value, _exitScale.value, 1.0, 1.0),
-            alignment: Alignment.center,
-            child: child,
-          ),
-        ),
+        animation: _enterController,
+        builder: (context, child) {
+          if (_isDismissing) return child!;
+          return widget.config.enterAnimationBuilder!(child!, _enterController);
+        },
+        child: toast,
+      );
+    } else {
+      toast = AnimatedBuilder(
+        animation: _enterController,
+        builder: (context, child) {
+          if (_isDismissing) return child!;
+          return Opacity(
+            opacity: _enterOpacity.value.clamp(0.0, 1.0),
+            child: Transform(
+              transform: Matrix4.identity()
+                ..translateByDouble(0.0, _enterTranslateY.value, 0.0, 1.0)
+                ..scaleByDouble(_enterScale.value, _enterScale.value, 1.0, 1.0),
+              alignment: Alignment.center,
+              child: child,
+            ),
+          );
+        },
         child: toast,
       );
     }
 
-    return Material(color: Colors.transparent, child: toast);
+    // Exit animation — or use custom builder if provided
+    if (_isDismissing) {
+      if (widget.config.exitAnimationBuilder != null) {
+        toast = AnimatedBuilder(
+          animation: _exitController,
+          builder: (context, child) =>
+              widget.config.exitAnimationBuilder!(child!, _exitController),
+          child: toast,
+        );
+      } else {
+        toast = AnimatedBuilder(
+          animation: _exitController,
+          builder: (context, child) => Opacity(
+            opacity: _exitOpacity.value.clamp(0.0, 1.0),
+            child: Transform(
+              transform: Matrix4.identity()
+                ..translateByDouble(0.0, _exitTranslateY.value, 0.0, 1.0)
+                ..scaleByDouble(_exitScale.value, _exitScale.value, 1.0, 1.0),
+              alignment: Alignment.center,
+              child: child,
+            ),
+          ),
+          child: toast,
+        );
+      }
+    }
+
+    // Accessibility wrapper
+    final semanticLabel = _buildSemanticLabel();
+
+    return Semantics(
+      label: semanticLabel,
+      liveRegion: true,
+      child: Material(color: Colors.transparent, child: toast),
+    );
+  }
+
+  String _buildSemanticLabel() {
+    final parts = <String>[];
+    final type = widget.config.type;
+    if (type != ToastrType.blank) {
+      parts.add(type.name);
+    }
+    if (widget.config.title != null) {
+      parts.add(widget.config.title!);
+    }
+    parts.add(widget.config.message);
+    if (widget.config.action != null) {
+      parts.add('Action: ${widget.config.action!.label}');
+    }
+    return parts.join('. ');
+  }
+
+  Widget _buildActionButton(Color textColor) {
+    final action = widget.config.action!;
+    return Padding(
+      padding: const EdgeInsets.only(left: 8),
+      child: GestureDetector(
+        onTap: () {
+          action.onPressed();
+          if (action.dismissOnPressed) _dismiss();
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: action.backgroundColor ?? _getAccentColor().withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Text(
+            action.label,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: action.textColor ?? _getAccentColor(),
+              decoration: TextDecoration.none,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override

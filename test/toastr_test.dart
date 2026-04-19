@@ -832,4 +832,211 @@ void main() {
       // Reset — use copyWith to clear margin
     });
   });
+
+  // ===== New Features Tests (v2.3.0) =====
+  group('ToastrConfig v2.3.0 properties', () {
+    test('defaults for v2.3.0 properties', () {
+      const config = ToastrConfig(
+        type: ToastrType.success,
+        message: 'Test',
+      );
+      expect(config.action, isNull);
+      expect(config.enableHapticFeedback, isFalse);
+      expect(config.hapticFeedbackType, HapticFeedbackType.light);
+      expect(config.swipeDismissDirection, SwipeDismissDirection.horizontal);
+      expect(config.enterAnimationBuilder, isNull);
+      expect(config.exitAnimationBuilder, isNull);
+    });
+
+    test('copyWith preserves v2.3.0 properties', () {
+      final config = ToastrConfig(
+        type: ToastrType.success,
+        message: 'Test',
+        enableHapticFeedback: true,
+        hapticFeedbackType: HapticFeedbackType.heavy,
+        swipeDismissDirection: SwipeDismissDirection.vertical,
+        action: const ToastrAction(
+          label: 'Undo',
+          onPressed: _noOp,
+        ),
+      );
+      final copy = config.copyWith(message: 'Updated');
+      expect(copy.enableHapticFeedback, isTrue);
+      expect(copy.hapticFeedbackType, HapticFeedbackType.heavy);
+      expect(copy.swipeDismissDirection, SwipeDismissDirection.vertical);
+      expect(copy.action?.label, 'Undo');
+    });
+
+    test('copyWith overrides v2.3.0 properties', () {
+      const config = ToastrConfig(
+        type: ToastrType.info,
+        message: 'Test',
+      );
+      final copy = config.copyWith(
+        enableHapticFeedback: true,
+        hapticFeedbackType: HapticFeedbackType.medium,
+        swipeDismissDirection: SwipeDismissDirection.none,
+      );
+      expect(copy.enableHapticFeedback, isTrue);
+      expect(copy.hapticFeedbackType, HapticFeedbackType.medium);
+      expect(copy.swipeDismissDirection, SwipeDismissDirection.none);
+    });
+  });
+
+  group('ToastrAction', () {
+    test('creates with required parameters', () {
+      const action = ToastrAction(label: 'Retry', onPressed: _noOp);
+      expect(action.label, 'Retry');
+      expect(action.textColor, isNull);
+      expect(action.backgroundColor, isNull);
+      expect(action.dismissOnPressed, isTrue);
+    });
+
+    test('creates with all parameters', () {
+      const action = ToastrAction(
+        label: 'Undo',
+        onPressed: _noOp,
+        textColor: Colors.white,
+        backgroundColor: Colors.red,
+        dismissOnPressed: false,
+      );
+      expect(action.label, 'Undo');
+      expect(action.textColor, Colors.white);
+      expect(action.backgroundColor, Colors.red);
+      expect(action.dismissOnPressed, isFalse);
+    });
+  });
+
+  group('SwipeDismissDirection', () {
+    test('has all expected values', () {
+      expect(SwipeDismissDirection.values, hasLength(4));
+      expect(SwipeDismissDirection.values, contains(SwipeDismissDirection.horizontal));
+      expect(SwipeDismissDirection.values, contains(SwipeDismissDirection.vertical));
+      expect(SwipeDismissDirection.values, contains(SwipeDismissDirection.both));
+      expect(SwipeDismissDirection.values, contains(SwipeDismissDirection.none));
+    });
+  });
+
+  group('HapticFeedbackType', () {
+    test('has all expected values', () {
+      expect(HapticFeedbackType.values, hasLength(4));
+      expect(HapticFeedbackType.values, contains(HapticFeedbackType.light));
+      expect(HapticFeedbackType.values, contains(HapticFeedbackType.medium));
+      expect(HapticFeedbackType.values, contains(HapticFeedbackType.heavy));
+      expect(HapticFeedbackType.values, contains(HapticFeedbackType.selection));
+    });
+  });
+
+  group('ToastrWidget v2.3.0 features', () {
+    Widget buildApp({required ToastrConfig config, VoidCallback? onDismiss}) =>
+        MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: ToastrWidget(config: config, onDismiss: onDismiss),
+            ),
+          ),
+        );
+
+    testWidgets('renders action button when provided', (tester) async {
+      await tester.pumpWidget(buildApp(
+        config: ToastrConfig(
+          type: ToastrType.success,
+          message: 'Deleted',
+          action: const ToastrAction(label: 'Undo', onPressed: _noOp),
+        ),
+      ));
+      await tester.pump(const Duration(milliseconds: 350));
+      expect(find.text('Undo'), findsOneWidget);
+    });
+
+    testWidgets('action button callback is called', (tester) async {
+      bool pressed = false;
+      await tester.pumpWidget(buildApp(
+        config: ToastrConfig(
+          type: ToastrType.info,
+          message: 'Action toast',
+          action: ToastrAction(
+            label: 'Do it',
+            onPressed: () => pressed = true,
+            dismissOnPressed: false,
+          ),
+        ),
+      ));
+      await tester.pump(const Duration(milliseconds: 350));
+      await tester.tap(find.text('Do it'));
+      await tester.pump();
+      expect(pressed, isTrue);
+    });
+
+    testWidgets('semantics widget wraps toast', (tester) async {
+      await tester.pumpWidget(buildApp(
+        config: const ToastrConfig(
+          type: ToastrType.error,
+          message: 'Something failed',
+          title: 'Error Title',
+        ),
+      ));
+      await tester.pump(const Duration(milliseconds: 350));
+
+      // Verify Semantics widget is in the tree
+      expect(find.byType(Semantics), findsWidgets);
+    });
+
+    testWidgets('swipe none disables horizontal swipe', (tester) async {
+      bool dismissed = false;
+      await tester.pumpWidget(buildApp(
+        config: const ToastrConfig(
+          type: ToastrType.info,
+          message: 'No swipe',
+          swipeDismissDirection: SwipeDismissDirection.none,
+          dismissible: true,
+        ),
+        onDismiss: () => dismissed = true,
+      ));
+      await tester.pump(const Duration(milliseconds: 350));
+
+      // Try horizontal swipe — should NOT dismiss because direction is none
+      await tester.drag(find.text('No swipe'), const Offset(200, 0));
+      await tester.pumpAndSettle();
+      expect(dismissed, isFalse);
+    });
+  });
+
+  group('ToastrHelper configure v2.3.0 options', () {
+    test('configure sets haptic feedback', () {
+      ToastrHelper.configure(enableHapticFeedback: true);
+      expect(ToastrHelper.defaultConfig.enableHapticFeedback, isTrue);
+      ToastrHelper.configure(enableHapticFeedback: false);
+    });
+
+    test('configure sets haptic type', () {
+      ToastrHelper.configure(hapticFeedbackType: HapticFeedbackType.heavy);
+      expect(
+        ToastrHelper.defaultConfig.hapticFeedbackType,
+        HapticFeedbackType.heavy,
+      );
+      ToastrHelper.configure(hapticFeedbackType: HapticFeedbackType.light);
+    });
+
+    test('configure sets swipe direction', () {
+      ToastrHelper.configure(
+        swipeDismissDirection: SwipeDismissDirection.vertical,
+      );
+      expect(
+        ToastrHelper.defaultConfig.swipeDismissDirection,
+        SwipeDismissDirection.vertical,
+      );
+      ToastrHelper.configure(
+        swipeDismissDirection: SwipeDismissDirection.horizontal,
+      );
+    });
+
+    test('configure sets maxVisible', () {
+      ToastrHelper.configure(maxVisible: 3);
+      expect(ToastrService.instance.maxVisible, 3);
+      ToastrHelper.configure(maxVisible: 5);
+    });
+  });
 }
+
+void _noOp() {}

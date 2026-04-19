@@ -51,6 +51,12 @@ class ToastrConfig {
     this.containerDecoration,
     this.theme = ToastrTheme.light,
     this.reverseOrder = false,
+    this.action,
+    this.enableHapticFeedback = false,
+    this.hapticFeedbackType = HapticFeedbackType.light,
+    this.swipeDismissDirection = SwipeDismissDirection.horizontal,
+    this.enterAnimationBuilder,
+    this.exitAnimationBuilder,
   });
 
   /// The type of toastr notification
@@ -140,6 +146,26 @@ class ToastrConfig {
   /// Whether new toasts should appear at the bottom of the stack
   final bool reverseOrder;
 
+  /// Optional action button displayed inside the toast
+  final ToastrAction? action;
+
+  /// Whether to trigger haptic feedback when the toast appears
+  final bool enableHapticFeedback;
+
+  /// Type of haptic feedback to trigger
+  final HapticFeedbackType hapticFeedbackType;
+
+  /// Direction in which the toast can be swiped to dismiss
+  final SwipeDismissDirection swipeDismissDirection;
+
+  /// Custom enter animation builder. Receives the child widget and animation value (0→1).
+  final Widget Function(Widget child, Animation<double> animation)?
+      enterAnimationBuilder;
+
+  /// Custom exit animation builder. Receives the child widget and animation value (0→1).
+  final Widget Function(Widget child, Animation<double> animation)?
+      exitAnimationBuilder;
+
   /// Creates a copy of this config with updated values
   ToastrConfig copyWith({
     ToastrType? type,
@@ -171,6 +197,14 @@ class ToastrConfig {
     BoxDecoration? containerDecoration,
     ToastrTheme? theme,
     bool? reverseOrder,
+    ToastrAction? action,
+    bool? enableHapticFeedback,
+    HapticFeedbackType? hapticFeedbackType,
+    SwipeDismissDirection? swipeDismissDirection,
+    Widget Function(Widget child, Animation<double> animation)?
+        enterAnimationBuilder,
+    Widget Function(Widget child, Animation<double> animation)?
+        exitAnimationBuilder,
   }) => ToastrConfig(
     type: type ?? this.type,
     message: message ?? this.message,
@@ -201,6 +235,15 @@ class ToastrConfig {
     containerDecoration: containerDecoration ?? this.containerDecoration,
     theme: theme ?? this.theme,
     reverseOrder: reverseOrder ?? this.reverseOrder,
+    action: action ?? this.action,
+    enableHapticFeedback: enableHapticFeedback ?? this.enableHapticFeedback,
+    hapticFeedbackType: hapticFeedbackType ?? this.hapticFeedbackType,
+    swipeDismissDirection:
+        swipeDismissDirection ?? this.swipeDismissDirection,
+    enterAnimationBuilder:
+        enterAnimationBuilder ?? this.enterAnimationBuilder,
+    exitAnimationBuilder:
+        exitAnimationBuilder ?? this.exitAnimationBuilder,
   );
 
   /// Generates a key for duplicate detection
@@ -280,4 +323,67 @@ enum ToastrTheme {
 
   /// Dark theme: dark background, light text
   dark,
+}
+
+/// Direction in which a toast can be swiped to dismiss
+enum SwipeDismissDirection {
+  /// Swipe left or right to dismiss
+  horizontal,
+
+  /// Swipe up or down to dismiss
+  vertical,
+
+  /// Swipe in any direction to dismiss
+  both,
+
+  /// Disable swipe-to-dismiss
+  none,
+}
+
+/// Type of haptic feedback to trigger
+enum HapticFeedbackType {
+  /// Light impact
+  light,
+
+  /// Medium impact
+  medium,
+
+  /// Heavy impact
+  heavy,
+
+  /// Selection click
+  selection,
+}
+
+/// Action button configuration for toasts.
+///
+/// ```dart
+/// Toastr.success('Deleted',
+///   action: ToastrAction(label: 'Undo', onPressed: () => restore()),
+/// );
+/// ```
+class ToastrAction {
+  /// Creates a toast action button.
+  const ToastrAction({
+    required this.label,
+    required this.onPressed,
+    this.textColor,
+    this.backgroundColor,
+    this.dismissOnPressed = true,
+  });
+
+  /// Button label text
+  final String label;
+
+  /// Callback when button is pressed
+  final VoidCallback onPressed;
+
+  /// Custom text color for the button
+  final Color? textColor;
+
+  /// Custom background color for the button
+  final Color? backgroundColor;
+
+  /// Whether tapping the action also dismisses the toast
+  final bool dismissOnPressed;
 }

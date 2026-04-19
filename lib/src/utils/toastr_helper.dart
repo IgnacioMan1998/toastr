@@ -122,6 +122,14 @@ class ToastrHelper {
     Color? accentColor,
     BoxDecoration? containerDecoration,
     ToastrTheme? theme,
+    ToastrAction? action,
+    bool? enableHapticFeedback,
+    HapticFeedbackType? hapticFeedbackType,
+    SwipeDismissDirection? swipeDismissDirection,
+    Widget Function(Widget child, Animation<double> animation)?
+        enterAnimationBuilder,
+    Widget Function(Widget child, Animation<double> animation)?
+        exitAnimationBuilder,
   }) =>
       _service.show(
         _defaultConfig.copyWith(
@@ -145,6 +153,12 @@ class ToastrHelper {
           accentColor: accentColor,
           containerDecoration: containerDecoration,
           theme: theme,
+          action: action,
+          enableHapticFeedback: enableHapticFeedback,
+          hapticFeedbackType: hapticFeedbackType,
+          swipeDismissDirection: swipeDismissDirection,
+          enterAnimationBuilder: enterAnimationBuilder,
+          exitAnimationBuilder: exitAnimationBuilder,
         ),
       );
 
@@ -171,6 +185,14 @@ class ToastrHelper {
     Color? accentColor,
     BoxDecoration? containerDecoration,
     ToastrTheme? theme,
+    ToastrAction? action,
+    bool? enableHapticFeedback,
+    HapticFeedbackType? hapticFeedbackType,
+    SwipeDismissDirection? swipeDismissDirection,
+    Widget Function(Widget child, Animation<double> animation)?
+        enterAnimationBuilder,
+    Widget Function(Widget child, Animation<double> animation)?
+        exitAnimationBuilder,
   }) =>
       _service.show(
         _defaultConfig.copyWith(
@@ -195,6 +217,12 @@ class ToastrHelper {
           accentColor: accentColor,
           containerDecoration: containerDecoration,
           theme: theme,
+          action: action,
+          enableHapticFeedback: enableHapticFeedback,
+          hapticFeedbackType: hapticFeedbackType,
+          swipeDismissDirection: swipeDismissDirection,
+          enterAnimationBuilder: enterAnimationBuilder,
+          exitAnimationBuilder: exitAnimationBuilder,
         ),
       );
 
@@ -221,6 +249,14 @@ class ToastrHelper {
     Color? accentColor,
     BoxDecoration? containerDecoration,
     ToastrTheme? theme,
+    ToastrAction? action,
+    bool? enableHapticFeedback,
+    HapticFeedbackType? hapticFeedbackType,
+    SwipeDismissDirection? swipeDismissDirection,
+    Widget Function(Widget child, Animation<double> animation)?
+        enterAnimationBuilder,
+    Widget Function(Widget child, Animation<double> animation)?
+        exitAnimationBuilder,
   }) =>
       _service.show(
         _defaultConfig.copyWith(
@@ -244,6 +280,12 @@ class ToastrHelper {
           accentColor: accentColor,
           containerDecoration: containerDecoration,
           theme: theme,
+          action: action,
+          enableHapticFeedback: enableHapticFeedback,
+          hapticFeedbackType: hapticFeedbackType,
+          swipeDismissDirection: swipeDismissDirection,
+          enterAnimationBuilder: enterAnimationBuilder,
+          exitAnimationBuilder: exitAnimationBuilder,
         ),
       );
 
@@ -270,6 +312,14 @@ class ToastrHelper {
     Color? accentColor,
     BoxDecoration? containerDecoration,
     ToastrTheme? theme,
+    ToastrAction? action,
+    bool? enableHapticFeedback,
+    HapticFeedbackType? hapticFeedbackType,
+    SwipeDismissDirection? swipeDismissDirection,
+    Widget Function(Widget child, Animation<double> animation)?
+        enterAnimationBuilder,
+    Widget Function(Widget child, Animation<double> animation)?
+        exitAnimationBuilder,
   }) =>
       _service.show(
         _defaultConfig.copyWith(
@@ -293,6 +343,12 @@ class ToastrHelper {
           accentColor: accentColor,
           containerDecoration: containerDecoration,
           theme: theme,
+          action: action,
+          enableHapticFeedback: enableHapticFeedback,
+          hapticFeedbackType: hapticFeedbackType,
+          swipeDismissDirection: swipeDismissDirection,
+          enterAnimationBuilder: enterAnimationBuilder,
+          exitAnimationBuilder: exitAnimationBuilder,
         ),
       );
 
@@ -323,6 +379,14 @@ class ToastrHelper {
     Color? accentColor,
     BoxDecoration? containerDecoration,
     ToastrTheme? theme,
+    ToastrAction? action,
+    bool? enableHapticFeedback,
+    HapticFeedbackType? hapticFeedbackType,
+    SwipeDismissDirection? swipeDismissDirection,
+    Widget Function(Widget child, Animation<double> animation)?
+        enterAnimationBuilder,
+    Widget Function(Widget child, Animation<double> animation)?
+        exitAnimationBuilder,
   }) =>
       _service.show(
         _defaultConfig.copyWith(
@@ -346,6 +410,12 @@ class ToastrHelper {
         accentColor: accentColor,
         containerDecoration: containerDecoration,
         theme: theme,
+        action: action,
+        enableHapticFeedback: enableHapticFeedback,
+        hapticFeedbackType: hapticFeedbackType,
+        swipeDismissDirection: swipeDismissDirection,
+        enterAnimationBuilder: enterAnimationBuilder,
+        exitAnimationBuilder: exitAnimationBuilder,
       ),
     );
 
@@ -372,6 +442,14 @@ class ToastrHelper {
     Color? accentColor,
     BoxDecoration? containerDecoration,
     ToastrTheme? theme,
+    ToastrAction? action,
+    bool? enableHapticFeedback,
+    HapticFeedbackType? hapticFeedbackType,
+    SwipeDismissDirection? swipeDismissDirection,
+    Widget Function(Widget child, Animation<double> animation)?
+        enterAnimationBuilder,
+    Widget Function(Widget child, Animation<double> animation)?
+        exitAnimationBuilder,
   }) =>
       _service.show(
         _defaultConfig.copyWith(
@@ -395,6 +473,12 @@ class ToastrHelper {
           accentColor: accentColor,
           containerDecoration: containerDecoration,
           theme: theme,
+          action: action,
+          enableHapticFeedback: enableHapticFeedback,
+          hapticFeedbackType: hapticFeedbackType,
+          swipeDismissDirection: swipeDismissDirection,
+          enterAnimationBuilder: enterAnimationBuilder,
+          exitAnimationBuilder: exitAnimationBuilder,
         ),
       );
 
@@ -507,6 +591,10 @@ class ToastrHelper {
     EdgeInsets? margin,
     ToastrTheme? theme,
     bool? reverseOrder,
+    bool? enableHapticFeedback,
+    HapticFeedbackType? hapticFeedbackType,
+    SwipeDismissDirection? swipeDismissDirection,
+    int? maxVisible,
   }) {
     _defaultConfig = _defaultConfig.copyWith(
       position: position,
@@ -522,6 +610,12 @@ class ToastrHelper {
       margin: margin,
       theme: theme,
       reverseOrder: reverseOrder,
+      enableHapticFeedback: enableHapticFeedback,
+      hapticFeedbackType: hapticFeedbackType,
+      swipeDismissDirection: swipeDismissDirection,
     );
+    if (maxVisible != null) {
+      _service.maxVisible = maxVisible;
+    }
   }
 }

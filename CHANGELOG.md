@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2026-04-19
+
+### Added
+
+- 📚 **Toast stacking system**: Toasts now stack in a single overlay container instead of separate overlays — no more overlapping
+- 📥 **Toast queue with `maxVisible`**: Configure max visible toasts (default 5). Excess toasts queue and appear when space opens — `Toastr.configure(maxVisible: 3)`
+- 🔘 **Action buttons**: Add action buttons inside toasts — `Toastr.success('Deleted', action: ToastrAction(label: 'Undo', onPressed: () => restore()))`
+- ♿ **Accessibility (a11y)**: Toasts wrapped in `Semantics(liveRegion: true)` with descriptive labels for screen readers
+- 📳 **Haptic feedback**: Trigger haptic feedback on toast appearance — `enableHapticFeedback: true, hapticFeedbackType: HapticFeedbackType.heavy`
+- ↕️ **Configurable swipe direction**: Control swipe-to-dismiss direction — `swipeDismissDirection: SwipeDismissDirection.vertical` (horizontal, vertical, both, none)
+- 🎬 **Custom animation builders**: Provide custom enter/exit animations — `enterAnimationBuilder: (child, animation) => FadeTransition(...)`
+- ⏸️ **Lifecycle awareness**: Timers pause when app goes to background and resume when app returns
+- ⏯️ **Hover timer pause/resume**: Timer remaining is tracked precisely and resumes from where it left off
+- 🆕 **New types**: `ToastrAction`, `SwipeDismissDirection` enum, `HapticFeedbackType` enum
+- 🧪 **15 new tests** (91 total) covering all new features
+
+### Changed
+
+- `ToastrService` now uses a single overlay container with stacked toasts (was one overlay per toast)
+- `ToastrService` is now a `WidgetsBindingObserver` for lifecycle-aware timer management
+- Swipe-to-dismiss respects `swipeDismissDirection` config (was always horizontal)
+
 ## [2.2.0] - 2026-04-19
 
 ### Added
