@@ -844,27 +844,22 @@ class _ToastrWidgetState extends State<ToastrWidget>
 
   Widget _buildActionButton(Color textColor) {
     final action = widget.config.action!;
+    final accentColor = action.textColor ?? _getAccentColor();
     return Padding(
-      padding: const EdgeInsets.only(left: 8),
+      padding: const EdgeInsets.only(left: 12),
       child: GestureDetector(
         onTap: () {
           action.onPressed();
           if (action.dismissOnPressed) _dismiss();
         },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: action.backgroundColor ?? _getAccentColor().withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Text(
-            action.label,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: action.textColor ?? _getAccentColor(),
-              decoration: TextDecoration.none,
-            ),
+        child: Text(
+          action.label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: accentColor,
+            decoration: TextDecoration.underline,
+            decorationColor: accentColor.withValues(alpha: 0.4),
           ),
         ),
       ),
