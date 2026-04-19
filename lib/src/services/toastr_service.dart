@@ -8,16 +8,26 @@ import '../widgets/toastr_widget.dart';
 
 /// Service to manage and display toastr notifications with security features.
 ///
-/// This is the core service that handles displaying, positioning, and managing
-/// toast notifications. It uses a singleton pattern to maintain state across
-/// the application. Most users should use [ToastrHelper] instead of this service directly.
+/// This service works **without a BuildContext**. Initialize it once with a
+/// [GlobalKey<NavigatorState>] and then show toasts from anywhere in your app.
 ///
-/// The service handles:
-/// - Overlay management for toast display
-/// - Animation control
-/// - Rate limiting and security validation
-/// - Duplicate prevention
-/// - Queue management for multiple toasts
+/// ## Setup
+///
+/// ```dart
+/// final navigatorKey = GlobalKey<NavigatorState>();
+///
+/// MaterialApp(
+///   navigatorKey: navigatorKey,
+///   builder: ToastrService.init(navigatorKey),
+///   // ...
+/// );
+/// ```
+///
+/// After that, call [show] or use [ToastrHelper] methods without context:
+///
+/// ```dart
+/// ToastrHelper.success('Done!');
+/// ```
 class ToastrService {
   /// Factory constructor that returns the singleton instance
   factory ToastrService() => _instance;
@@ -27,6 +37,8 @@ class ToastrService {
   /// Global instance for easy access
   static ToastrService get instance => _instance;
 
+  GlobalKey<NavigatorState>? _navigatorKey;
+
   final Map<String, OverlayEntry> _activeToastrs = {};
   final Map<String, Timer> _autoDismissTimers = {};
   final Set<String> _duplicateKeys = {};
@@ -35,11 +47,44 @@ class ToastrService {
   int _notificationCount = 0;
   DateTime _lastResetTime = DateTime.now();
 
-  /// Show a toastr notification with the given configuration and context
-  void show(ToastrConfig config, BuildContext context) {
-    // Get overlay from the provided context
-    final overlay = Overlay.of(context);
+  /// Returns a [TransitionBuilder] that captures the navigator's overlay.
+  ///
+  /// Pass this as the `builder` parameter of [MaterialApp] together with the
+  /// same [navigatorKey] used for [MaterialApp.navigatorKey]:
+  ///
+  /// ```dart
+  /// final navigatorKey = GlobalKey<NavigatorState>();
+  ///
+  /// MaterialApp(
+  ///   navigatorKey: navigatorKey,
+  ///   builder: ToastrService.init(navigatorKey),
+  /// );
+  /// ```
+  static TransitionBuilder init(GlobalKey<NavigatorState> navigatorKey) {
+    _instance._navigatorKey = navigatorKey;
+    return (context, child) => child ?? const SizedBox.shrink();
+  }
 
+  OverlayState get _overlay {
+    assert(
+      _navigatorKey != null,
+      'ToastrService not initialised. '
+      'Call ToastrService.init(navigatorKey) in your MaterialApp builder.',
+    );
+    final overlay = _navigatorKey!.currentState?.overlay;
+    assert(
+      overlay != null,
+      'Navigator overlay not available. '
+      'Ensure MaterialApp uses the same navigatorKey passed to init().',
+    );
+    return overlay!;
+  }
+
+  /// Show a toastr notification with the given configuration.
+  ///
+  /// No [BuildContext] is required — the service uses the navigator key
+  /// provided during [init].
+  void show(ToastrConfig config) {
     // Security validations
     if (!ToastrValidator.isValidConfig(config)) {
       ToastrValidator.logSecurityEvent(
@@ -78,10 +123,9 @@ class ToastrService {
 
     late OverlayEntry overlayEntry;
     overlayEntry = OverlayEntry(
-      builder: (overlayContext) => _buildPositionedToastr(
+      builder: (_) => _buildPositionedToastr(
         secureConfig,
         () => _removeToastr(toastId),
-        context,
       ),
     );
 
@@ -90,7 +134,7 @@ class ToastrService {
       _duplicateKeys.add(secureConfig.key);
     }
 
-    overlay.insert(overlayEntry);
+    _overlay.insert(overlayEntry);
     _notificationCount++;
 
     // Auto-remove after duration (cancellable to prevent memory leaks)
@@ -102,7 +146,6 @@ class ToastrService {
   Widget _buildPositionedToastr(
     ToastrConfig config,
     VoidCallback onDismiss,
-    BuildContext context,
   ) {
     final Widget toastr = ToastrWidget(
       config: config,
@@ -114,54 +157,59 @@ class ToastrService {
       },
     );
 
-    switch (config.position) {
-      case ToastrPosition.topLeft:
-        return Positioned(
-          top: MediaQuery.of(context).padding.top + 16,
-          left: 16,
-          child: toastr,
-        );
-      case ToastrPosition.topCenter:
-        return Positioned(
-          top: MediaQuery.of(context).padding.top + 16,
-          left: 0,
-          right: 0,
-          child: Center(child: toastr),
-        );
-      case ToastrPosition.topRight:
-        return Positioned(
-          top: MediaQuery.of(context).padding.top + 16,
-          right: 16,
-          child: toastr,
-        );
-      case ToastrPosition.bottomLeft:
-        return Positioned(
-          bottom: MediaQuery.of(context).padding.bottom + 16,
-          left: 16,
-          child: toastr,
-        );
-      case ToastrPosition.bottomCenter:
-        return Positioned(
-          bottom: MediaQuery.of(context).padding.bottom + 16,
-          left: 0,
-          right: 0,
-          child: Center(child: toastr),
-        );
-      case ToastrPosition.bottomRight:
-        return Positioned(
-          bottom: MediaQuery.of(context).padding.bottom + 16,
-          right: 16,
-          child: toastr,
-        );
-      case ToastrPosition.center:
-        return Positioned(
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: Center(child: toastr),
-        );
-    }
+    // Use a Builder to get MediaQuery from the overlay context
+    return Builder(builder: (overlayContext) {
+      final padding = MediaQuery.of(overlayContext).padding;
+
+      switch (config.position) {
+        case ToastrPosition.topLeft:
+          return Positioned(
+            top: padding.top + 16,
+            left: 16,
+            child: toastr,
+          );
+        case ToastrPosition.topCenter:
+          return Positioned(
+            top: padding.top + 16,
+            left: 0,
+            right: 0,
+            child: Center(child: toastr),
+          );
+        case ToastrPosition.topRight:
+          return Positioned(
+            top: padding.top + 16,
+            right: 16,
+            child: toastr,
+          );
+        case ToastrPosition.bottomLeft:
+          return Positioned(
+            bottom: padding.bottom + 16,
+            left: 16,
+            child: toastr,
+          );
+        case ToastrPosition.bottomCenter:
+          return Positioned(
+            bottom: padding.bottom + 16,
+            left: 0,
+            right: 0,
+            child: Center(child: toastr),
+          );
+        case ToastrPosition.bottomRight:
+          return Positioned(
+            bottom: padding.bottom + 16,
+            right: 16,
+            child: toastr,
+          );
+        case ToastrPosition.center:
+          return Positioned(
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Center(child: toastr),
+          );
+      }
+    });
   }
 
   void _removeToastr(String toastId) {

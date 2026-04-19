@@ -5,36 +5,60 @@ import '../services/toastr_service.dart';
 
 /// Helper class with convenient methods for showing different types of toastrs.
 ///
-/// This class provides static methods for quickly displaying toast notifications
-/// without needing to create ToastrConfig objects manually. All methods require
-/// a BuildContext as the first parameter, similar to Flutter's SnackBar.
+/// **No BuildContext required.** Initialize once with [init] and then call
+/// static methods from anywhere in your app.
 ///
-/// Example usage:
+/// ## Setup
+///
 /// ```dart
-/// ToastrHelper.success(context, 'Operation completed!');
-/// ToastrHelper.error(context, 'Something went wrong!');
-/// ToastrHelper.warning(context, 'Please check your input');
-/// ToastrHelper.info(context, 'Here is some information');
+/// final navigato rKey = GlobalKey<NavigatorState>();
+///
+/// MaterialApp(
+///   navigatorKey: navigatorKey,
+///   builder: ToastrHelper.init(navigatorKey),
+/// );
+/// ```
+///
+/// ## Usage
+///
+/// ```dart
+/// ToastrHelper.success('Operation completed!');
+/// ToastrHelper.error('Something went wrong!');
+/// ToastrHelper.warning('Please check your input');
+/// ToastrHelper.info('Here is some information');
 /// ```
 class ToastrHelper {
   static final ToastrService _service = ToastrService.instance;
 
+  /// Initializes the toastr system. Returns a [TransitionBuilder] to pass as
+  /// the `builder` parameter of [MaterialApp].
+  ///
+  /// ```dart
+  /// final navigatorKey = GlobalKey<NavigatorState>();
+  ///
+  /// MaterialApp(
+  ///   navigatorKey: navigatorKey,
+  ///   builder: ToastrHelper.init(navigatorKey),
+  /// );
+  /// ```
+  static TransitionBuilder init(GlobalKey<NavigatorState> navigatorKey) => ToastrService.init(navigatorKey);
+
   /// Quick method to show a toast with just a message (auto-detects type from message content)
-  static void show(BuildContext context, String message, {ToastrType? type}) {
+  static void show(String message, {ToastrType? type}) {
     final toastType = type ?? _detectTypeFromMessage(message);
 
     switch (toastType) {
       case ToastrType.success:
-        success(context, message);
+        success(message);
         break;
       case ToastrType.error:
-        error(context, message);
+        error(message);
         break;
       case ToastrType.warning:
-        warning(context, message);
+        warning(message);
         break;
       case ToastrType.info:
-        info(context, message);
+        info(message);
         break;
     }
   }
@@ -98,7 +122,6 @@ class ToastrHelper {
 
   /// Show a success toastr with the given message
   static void success(
-    BuildContext context,
     String message, {
     String? title,
     Duration? duration,
@@ -126,13 +149,11 @@ class ToastrHelper {
         showCloseButton: showCloseButton,
         preventDuplicates: preventDuplicates,
       ),
-      context,
     );
   }
 
   /// Show an error toastr with the given message
   static void error(
-    BuildContext context,
     String message, {
     String? title,
     Duration? duration,
@@ -150,7 +171,7 @@ class ToastrHelper {
         type: ToastrType.error,
         message: message,
         title: title,
-        duration: duration, // Remove the invalid default of 0 seconds
+        duration: duration,
         position: position,
         showMethod: showMethod,
         hideMethod: hideMethod,
@@ -161,13 +182,11 @@ class ToastrHelper {
             showCloseButton ?? true, // Show close button for errors
         preventDuplicates: preventDuplicates,
       ),
-      context,
     );
   }
 
   /// Show a warning toastr with the given message
   static void warning(
-    BuildContext context,
     String message, {
     String? title,
     Duration? duration,
@@ -195,13 +214,11 @@ class ToastrHelper {
         showCloseButton: showCloseButton,
         preventDuplicates: preventDuplicates,
       ),
-      context,
     );
   }
 
   /// Show an info toastr with the given message
   static void info(
-    BuildContext context,
     String message, {
     String? title,
     Duration? duration,
@@ -229,13 +246,12 @@ class ToastrHelper {
         showCloseButton: showCloseButton,
         preventDuplicates: preventDuplicates,
       ),
-      context,
     );
   }
 
   /// Show a custom toastr with full configuration options
-  static void custom(BuildContext context, ToastrConfig config) {
-    _service.show(config, context);
+  static void custom(ToastrConfig config) {
+    _service.show(config);
   }
 
   /// Clear all active toastrs

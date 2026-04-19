@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:toastr_flutter/toastr.dart';
 
+final _navigatorKey = GlobalKey<NavigatorState>();
+
 void main() {
   runApp(const ToastrExampleApp());
 }
@@ -11,6 +13,8 @@ class ToastrExampleApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: _navigatorKey,
+      builder: ToastrHelper.init(_navigatorKey),
       title: 'Toastr Example',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -72,7 +76,7 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
       preventDuplicates: _preventDuplicates,
     );
 
-    ToastrHelper.custom(context, config);
+    ToastrHelper.custom(config);
   }
 
   @override
@@ -121,7 +125,6 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                         icon: Icons.check_circle_rounded,
                         color: const Color(0xFF16A34A),
                         onTap: () => ToastrHelper.success(
-                          context,
                           'Operation completed successfully!',
                           title: 'Success',
                           showProgressBar: true,
@@ -132,7 +135,6 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                         icon: Icons.cancel_rounded,
                         color: const Color(0xFFDC2626),
                         onTap: () => ToastrHelper.error(
-                          context,
                           'Something went wrong. Please try again.',
                           title: 'Error',
                         ),
@@ -142,7 +144,6 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                         icon: Icons.warning_rounded,
                         color: const Color(0xFFD97706),
                         onTap: () => ToastrHelper.warning(
-                          context,
                           'Please check your input before continuing.',
                           title: 'Warning',
                         ),
@@ -152,7 +153,6 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                         icon: Icons.info_rounded,
                         color: const Color(0xFF2563EB),
                         onTap: () => ToastrHelper.info(
-                          context,
                           'Here is some useful information for you.',
                           title: 'Info',
                         ),
