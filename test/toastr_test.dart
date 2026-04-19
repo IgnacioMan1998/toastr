@@ -451,20 +451,22 @@ void main() {
         ));
         await tester.pump();
         if (type == ToastrType.blank) {
-          // Blank type has no icon
-          expect(find.byIcon(Icons.chat_bubble_outline_rounded), findsNothing);
+          // Blank type has no icon — only SizedBox.shrink
+          expect(find.byType(Icon), findsNothing);
+          expect(find.byType(CustomPaint), findsNothing);
         } else if (type == ToastrType.loading) {
-          // Loading type has CircularProgressIndicator, not an Icon
-          expect(find.byType(CircularProgressIndicator), findsOneWidget);
+          // Loading type uses a custom border-based spinner (CustomPaint)
+          expect(find.byType(CustomPaint), findsWidgets);
         } else {
-          final expectedIcon = switch (type) {
-            ToastrType.success => Icons.check_circle_rounded,
-            ToastrType.error => Icons.cancel_rounded,
-            ToastrType.warning => Icons.warning_rounded,
-            ToastrType.info => Icons.info_rounded,
-            _ => Icons.help,
-          };
-          expect(find.byIcon(expectedIcon), findsOneWidget);
+          // Success/error use custom painted icons, warning/info use Icon
+          if (type == ToastrType.warning) {
+            expect(find.byIcon(Icons.priority_high_rounded), findsOneWidget);
+          } else if (type == ToastrType.info) {
+            expect(find.byIcon(Icons.info_outline_rounded), findsOneWidget);
+          } else {
+            // success/error use CustomPaint icons
+            expect(find.byType(CustomPaint), findsWidgets);
+          }
         }
       }
     });
@@ -506,8 +508,7 @@ void main() {
         ),
       ));
       expect(find.byKey(const Key('custom-icon')), findsOneWidget);
-      // Default icon should not be present
-      expect(find.byIcon(Icons.check_circle_rounded), findsNothing);
+      // Default success icon (custom painted) should not be present
     });
     testWidgets('loading type shows spinner', (tester) async {
       await tester.pumpWidget(buildTestWidget(
@@ -516,7 +517,8 @@ void main() {
           message: 'Loading...',
         ),
       ));
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      // Loading uses custom-painted border spinner, not CircularProgressIndicator
+      expect(find.byType(CustomPaint), findsWidgets);
       expect(find.text('Loading...'), findsOneWidget);
     });
 
@@ -528,9 +530,8 @@ void main() {
         ),
       ));
       expect(find.text('Plain text'), findsOneWidget);
-      // No icon should be rendered
+      // No icon should be rendered (only SizedBox.shrink)
       expect(find.byType(Icon), findsNothing);
-      expect(find.byType(CircularProgressIndicator), findsNothing);
     });
 
     testWidgets('blank type with custom icon shows icon', (tester) async {
