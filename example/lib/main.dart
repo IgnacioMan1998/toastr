@@ -122,8 +122,6 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                         color: const Color(0xFF16A34A),
                         onTap: () => ToastrHelper.success(
                           'Operation completed successfully!',
-                          title: 'Success',
-                          showProgressBar: true,
                         ),
                       ),
                       _QuickActionChip(

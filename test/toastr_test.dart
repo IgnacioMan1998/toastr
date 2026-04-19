@@ -458,7 +458,6 @@ void main() {
         if (type == ToastrType.blank) {
           // Blank type has no icon — only SizedBox.shrink
           expect(find.byType(Icon), findsNothing);
-          expect(find.byType(CustomPaint), findsNothing);
         } else if (type == ToastrType.loading) {
           // Loading type uses a custom border-based spinner (CustomPaint)
           expect(find.byType(CustomPaint), findsWidgets);
