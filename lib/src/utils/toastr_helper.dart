@@ -1,25 +1,10 @@
-import 'package:flutter/material.dart';
 import '../models/toastr_config.dart';
 import '../models/toastr_type.dart';
 import '../services/toastr_service.dart';
 
 /// Helper class with convenient methods for showing different types of toastrs.
 ///
-/// **No BuildContext required.** Initialize once with [init] and then call
-/// static methods from anywhere in your app.
-///
-/// ## Setup
-///
-/// ```dart
-/// final navigato rKey = GlobalKey<NavigatorState>();
-///
-/// MaterialApp(
-///   navigatorKey: navigatorKey,
-///   builder: ToastrHelper.init(navigatorKey),
-/// );
-/// ```
-///
-/// ## Usage
+/// **Zero setup required.** Just call static methods from anywhere:
 ///
 /// ```dart
 /// ToastrHelper.success('Operation completed!');
@@ -29,19 +14,6 @@ import '../services/toastr_service.dart';
 /// ```
 class ToastrHelper {
   static final ToastrService _service = ToastrService.instance;
-
-  /// Initializes the toastr system. Returns a [TransitionBuilder] to pass as
-  /// the `builder` parameter of [MaterialApp].
-  ///
-  /// ```dart
-  /// final navigatorKey = GlobalKey<NavigatorState>();
-  ///
-  /// MaterialApp(
-  ///   navigatorKey: navigatorKey,
-  ///   builder: ToastrHelper.init(navigatorKey),
-  /// );
-  /// ```
-  static TransitionBuilder init(GlobalKey<NavigatorState> navigatorKey) => ToastrService.init(navigatorKey);
 
   /// Quick method to show a toast with just a message (auto-detects type from message content)
   static void show(String message, {ToastrType? type}) {

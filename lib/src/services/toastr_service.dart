@@ -8,26 +8,15 @@ import '../widgets/toastr_widget.dart';
 
 /// Service to manage and display toastr notifications with security features.
 ///
-/// This service works **without a BuildContext**. Initialize it once with a
-/// [GlobalKey<NavigatorState>] and then show toasts from anywhere in your app.
-///
-/// ## Setup
-///
-/// ```dart
-/// final navigatorKey = GlobalKey<NavigatorState>();
-///
-/// MaterialApp(
-///   navigatorKey: navigatorKey,
-///   builder: ToastrService.init(navigatorKey),
-///   // ...
-/// );
-/// ```
-///
-/// After that, call [show] or use [ToastrHelper] methods without context:
+/// **Zero setup required.** Just install the package and call methods directly:
 ///
 /// ```dart
 /// ToastrHelper.success('Done!');
+/// ToastrHelper.error('Something went wrong');
 /// ```
+///
+/// The service automatically finds the app's overlay — no `BuildContext`,
+/// no `navigatorKey`, and no `init()` needed.
 class ToastrService {
   /// Factory constructor that returns the singleton instance
   factory ToastrService() => _instance;
@@ -37,8 +26,6 @@ class ToastrService {
   /// Global instance for easy access
   static ToastrService get instance => _instance;
 
-  GlobalKey<NavigatorState>? _navigatorKey;
-
   final Map<String, OverlayEntry> _activeToastrs = {};
   final Map<String, Timer> _autoDismissTimers = {};
   final Set<String> _duplicateKeys = {};
@@ -47,35 +34,31 @@ class ToastrService {
   int _notificationCount = 0;
   DateTime _lastResetTime = DateTime.now();
 
-  /// Returns a [TransitionBuilder] that captures the navigator's overlay.
-  ///
-  /// Pass this as the `builder` parameter of [MaterialApp] together with the
-  /// same [navigatorKey] used for [MaterialApp.navigatorKey]:
-  ///
-  /// ```dart
-  /// final navigatorKey = GlobalKey<NavigatorState>();
-  ///
-  /// MaterialApp(
-  ///   navigatorKey: navigatorKey,
-  ///   builder: ToastrService.init(navigatorKey),
-  /// );
-  /// ```
-  static TransitionBuilder init(GlobalKey<NavigatorState> navigatorKey) {
-    _instance._navigatorKey = navigatorKey;
-    return (context, child) => child ?? const SizedBox.shrink();
-  }
-
+  /// Finds the app's [OverlayState] by traversing the element tree.
+  /// No initialization or setup is needed.
   OverlayState get _overlay {
+    OverlayState? overlay;
+    void visitor(Element element) {
+      if (overlay != null) return;
+      if (element is StatefulElement && element.state is OverlayState) {
+        overlay = element.state as OverlayState;
+      } else {
+        element.visitChildren(visitor);
+      }
+    }
+
+    final rootElement = WidgetsBinding.instance.rootElement;
     assert(
-      _navigatorKey != null,
-      'ToastrService not initialised. '
-      'Call ToastrService.init(navigatorKey) in your MaterialApp builder.',
+      rootElement != null,
+      'Toastr: No root element found. '
+      'Ensure you call toastr methods after the app has been built '
+      '(e.g. after the first frame).',
     );
-    final overlay = _navigatorKey!.currentState?.overlay;
+    rootElement!.visitChildren(visitor);
     assert(
       overlay != null,
-      'Navigator overlay not available. '
-      'Ensure MaterialApp uses the same navigatorKey passed to init().',
+      'Toastr: No Overlay found in the widget tree. '
+      'Ensure your app uses MaterialApp, CupertinoApp, or has an Overlay widget.',
     );
     return overlay!;
   }

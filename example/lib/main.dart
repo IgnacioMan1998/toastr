@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:toastr_flutter/toastr.dart';
 
-final _navigatorKey = GlobalKey<NavigatorState>();
-
 void main() {
   runApp(const ToastrExampleApp());
 }
@@ -13,8 +11,6 @@ class ToastrExampleApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      navigatorKey: _navigatorKey,
-      builder: ToastrHelper.init(_navigatorKey),
       title: 'Toastr Example',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
