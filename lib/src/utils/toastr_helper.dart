@@ -7,31 +7,36 @@ import '../services/toastr_service.dart';
 /// **Zero setup required.** Just call static methods from anywhere:
 ///
 /// ```dart
-/// ToastrHelper.success('Operation completed!');
-/// ToastrHelper.error('Something went wrong!');
-/// ToastrHelper.warning('Please check your input');
-/// ToastrHelper.info('Here is some information');
+/// Toastr.success('Operation completed!');
+/// Toastr.error('Something went wrong!');
+/// Toastr.loading('Please wait...');
+/// Toastr.promise(myFuture, loading: 'Loading...', success: 'Done!', error: 'Failed');
 /// ```
+///
+/// All methods return a `String` toast ID that can be used
+/// with [dismiss] or [update].
 class ToastrHelper {
   static final ToastrService _service = ToastrService.instance;
 
-  /// Quick method to show a toast with just a message (auto-detects type from message content)
-  static void show(String message, {ToastrType? type}) {
+  /// Quick method to show a toast with just a message (auto-detects type from message content).
+  ///
+  /// Returns the toast ID.
+  static String show(String message, {ToastrType? type}) {
     final toastType = type ?? _detectTypeFromMessage(message);
 
     switch (toastType) {
       case ToastrType.success:
-        success(message);
-        break;
+        return success(message);
       case ToastrType.error:
-        error(message);
-        break;
+        return error(message);
       case ToastrType.warning:
-        warning(message);
-        break;
+        return warning(message);
       case ToastrType.info:
-        info(message);
-        break;
+        return info(message);
+      case ToastrType.loading:
+        return loading(message);
+      case ToastrType.blank:
+        return blank(message);
     }
   }
 
@@ -92,8 +97,10 @@ class ToastrHelper {
   /// Returns the current default configuration (read-only).
   static ToastrConfig get defaultConfig => _defaultConfig;
 
-  /// Show a success toastr with the given message
-  static void success(
+  /// Show a success toastr with the given message.
+  ///
+  /// Returns the toast ID.
+  static String success(
     String message, {
     String? title,
     Duration? duration,
@@ -105,27 +112,28 @@ class ToastrHelper {
     bool? showProgressBar,
     bool? showCloseButton,
     bool? preventDuplicates,
-  }) {
-    _service.show(
-      _defaultConfig.copyWith(
-        type: ToastrType.success,
-        message: message,
-        title: title,
-        duration: duration,
-        position: position,
-        showMethod: showMethod,
-        hideMethod: hideMethod,
-        showDuration: showDuration,
-        hideDuration: hideDuration,
-        showProgressBar: showProgressBar,
-        showCloseButton: showCloseButton,
-        preventDuplicates: preventDuplicates,
-      ),
-    );
-  }
+  }) =>
+      _service.show(
+        _defaultConfig.copyWith(
+          type: ToastrType.success,
+          message: message,
+          title: title,
+          duration: duration,
+          position: position,
+          showMethod: showMethod,
+          hideMethod: hideMethod,
+          showDuration: showDuration,
+          hideDuration: hideDuration,
+          showProgressBar: showProgressBar,
+          showCloseButton: showCloseButton,
+          preventDuplicates: preventDuplicates,
+        ),
+      );
 
-  /// Show an error toastr with the given message
-  static void error(
+  /// Show an error toastr with the given message.
+  ///
+  /// Returns the toast ID.
+  static String error(
     String message, {
     String? title,
     Duration? duration,
@@ -137,28 +145,29 @@ class ToastrHelper {
     bool? showProgressBar,
     bool? showCloseButton,
     bool? preventDuplicates,
-  }) {
-    _service.show(
-      _defaultConfig.copyWith(
-        type: ToastrType.error,
-        message: message,
-        title: title,
-        duration: duration,
-        position: position,
-        showMethod: showMethod,
-        hideMethod: hideMethod,
-        showDuration: showDuration,
-        hideDuration: hideDuration,
-        showProgressBar: showProgressBar,
-        showCloseButton:
-            showCloseButton ?? true, // Show close button for errors
-        preventDuplicates: preventDuplicates,
-      ),
-    );
-  }
+  }) =>
+      _service.show(
+        _defaultConfig.copyWith(
+          type: ToastrType.error,
+          message: message,
+          title: title,
+          duration: duration,
+          position: position,
+          showMethod: showMethod,
+          hideMethod: hideMethod,
+          showDuration: showDuration,
+          hideDuration: hideDuration,
+          showProgressBar: showProgressBar,
+          showCloseButton:
+              showCloseButton ?? true, // Show close button for errors
+          preventDuplicates: preventDuplicates,
+        ),
+      );
 
-  /// Show a warning toastr with the given message
-  static void warning(
+  /// Show a warning toastr with the given message.
+  ///
+  /// Returns the toast ID.
+  static String warning(
     String message, {
     String? title,
     Duration? duration,
@@ -170,27 +179,28 @@ class ToastrHelper {
     bool? showProgressBar,
     bool? showCloseButton,
     bool? preventDuplicates,
-  }) {
-    _service.show(
-      _defaultConfig.copyWith(
-        type: ToastrType.warning,
-        message: message,
-        title: title,
-        duration: duration,
-        position: position,
-        showMethod: showMethod,
-        hideMethod: hideMethod,
-        showDuration: showDuration,
-        hideDuration: hideDuration,
-        showProgressBar: showProgressBar,
-        showCloseButton: showCloseButton,
-        preventDuplicates: preventDuplicates,
-      ),
-    );
-  }
+  }) =>
+      _service.show(
+        _defaultConfig.copyWith(
+          type: ToastrType.warning,
+          message: message,
+          title: title,
+          duration: duration,
+          position: position,
+          showMethod: showMethod,
+          hideMethod: hideMethod,
+          showDuration: showDuration,
+          hideDuration: hideDuration,
+          showProgressBar: showProgressBar,
+          showCloseButton: showCloseButton,
+          preventDuplicates: preventDuplicates,
+        ),
+      );
 
-  /// Show an info toastr with the given message
-  static void info(
+  /// Show an info toastr with the given message.
+  ///
+  /// Returns the toast ID.
+  static String info(
     String message, {
     String? title,
     Duration? duration,
@@ -202,28 +212,176 @@ class ToastrHelper {
     bool? showProgressBar,
     bool? showCloseButton,
     bool? preventDuplicates,
-  }) {
-    _service.show(
-      _defaultConfig.copyWith(
-        type: ToastrType.info,
+  }) =>
+      _service.show(
+        _defaultConfig.copyWith(
+          type: ToastrType.info,
+          message: message,
+          title: title,
+          duration: duration,
+          position: position,
+          showMethod: showMethod,
+          hideMethod: hideMethod,
+          showDuration: showDuration,
+          hideDuration: hideDuration,
+          showProgressBar: showProgressBar,
+          showCloseButton: showCloseButton,
+          preventDuplicates: preventDuplicates,
+        ),
+      );
+
+  /// Show a loading toastr with an animated spinner.
+  ///
+  /// Loading toasts persist until manually dismissed or updated.
+  /// Returns the toast ID — use it with [dismiss] or [update].
+  ///
+  /// ```dart
+  /// final id = Toastr.loading('Uploading...');
+  /// await uploadFile();
+  /// Toastr.dismiss(id);
+  /// ```
+  static String loading(
+    String message, {
+    String? title,
+    ToastrPosition? position,
+    ToastrShowMethod? showMethod,
+    ToastrHideMethod? hideMethod,
+    Duration? showDuration,
+    Duration? hideDuration,
+    bool? showCloseButton,
+  }) =>
+      _service.show(
+        _defaultConfig.copyWith(
+          type: ToastrType.loading,
         message: message,
         title: title,
-        duration: duration,
+        duration: const Duration(days: 365), // Persist until dismissed
         position: position,
         showMethod: showMethod,
         hideMethod: hideMethod,
         showDuration: showDuration,
         hideDuration: hideDuration,
-        showProgressBar: showProgressBar,
-        showCloseButton: showCloseButton,
-        preventDuplicates: preventDuplicates,
+        showProgressBar: false,
+        showCloseButton: showCloseButton ?? false,
+        preventDuplicates: false,
       ),
     );
+
+  /// Show a blank toastr (plain text, no icon).
+  ///
+  /// Returns the toast ID.
+  static String blank(
+    String message, {
+    String? title,
+    Duration? duration,
+    ToastrPosition? position,
+    ToastrShowMethod? showMethod,
+    ToastrHideMethod? hideMethod,
+    Duration? showDuration,
+    Duration? hideDuration,
+    bool? showProgressBar,
+    bool? showCloseButton,
+    bool? preventDuplicates,
+  }) =>
+      _service.show(
+        _defaultConfig.copyWith(
+          type: ToastrType.blank,
+          message: message,
+          title: title,
+          duration: duration,
+          position: position,
+          showMethod: showMethod,
+          hideMethod: hideMethod,
+          showDuration: showDuration,
+          hideDuration: hideDuration,
+          showProgressBar: showProgressBar,
+          showCloseButton: showCloseButton,
+          preventDuplicates: preventDuplicates,
+        ),
+      );
+
+  /// Show a toast that automatically tracks a [Future].
+  ///
+  /// Displays a loading toast, then updates to success or error
+  /// based on the Future's result — just like react-hot-toast's `toast.promise()`.
+  ///
+  /// ```dart
+  /// final result = await Toastr.promise(
+  ///   fetchData(),
+  ///   loading: 'Fetching data...',
+  ///   success: 'Data loaded!',
+  ///   error: 'Failed to load data',
+  /// );
+  /// ```
+  ///
+  /// You can also provide functions for dynamic messages:
+  /// ```dart
+  /// await Toastr.promise<User>(
+  ///   fetchUser(),
+  ///   loading: 'Loading user...',
+  ///   successBuilder: (user) => 'Welcome, ${user.name}!',
+  ///   errorBuilder: (e) => 'Error: ${e.toString()}',
+  /// );
+  /// ```
+  static Future<T> promise<T>(
+    Future<T> future, {
+    String loading = 'Loading...',
+    String success = 'Success!',
+    String error = 'Something went wrong',
+    String Function(T data)? successBuilder,
+    String Function(Object error)? errorBuilder,
+    ToastrPosition? position,
+    Duration? successDuration,
+    Duration? errorDuration,
+  }) async {
+    final toastId = ToastrHelper.loading(
+      loading,
+      position: position,
+    );
+
+    try {
+      final result = await future;
+      final successMsg = successBuilder?.call(result) ?? success;
+      _service.update(
+        toastId,
+        _defaultConfig.copyWith(
+          type: ToastrType.success,
+          message: successMsg,
+          duration: successDuration ?? const Duration(seconds: 2),
+          position: position,
+        ),
+      );
+      return result;
+    } catch (e) {
+      final errorMsg = errorBuilder?.call(e) ?? error;
+      _service.update(
+        toastId,
+        _defaultConfig.copyWith(
+          type: ToastrType.error,
+          message: errorMsg,
+          duration: errorDuration ?? const Duration(seconds: 4),
+          position: position,
+          showCloseButton: true,
+        ),
+      );
+      rethrow;
+    }
   }
 
-  /// Show a custom toastr with full configuration options
-  static void custom(ToastrConfig config) {
-    _service.show(config);
+  /// Show a custom toastr with full configuration options.
+  ///
+  /// Returns the toast ID.
+  static String custom(ToastrConfig config) => _service.show(config);
+
+  /// Dismiss a specific toast by its [id].
+  ///
+  /// If no [id] is provided, dismisses all toasts.
+  static void dismiss([String? id]) {
+    if (id == null) {
+      _service.clearAll();
+    } else {
+      _service.dismiss(id);
+    }
   }
 
   /// Clear all active toastrs

@@ -153,6 +153,59 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                           title: 'Info',
                         ),
                       ),
+                      _QuickActionChip(
+                        label: 'Loading',
+                        icon: Icons.hourglass_empty_rounded,
+                        color: const Color(0xFF64748B),
+                        onTap: () {
+                          final id = Toastr.loading('Uploading file...');
+                          Future.delayed(const Duration(seconds: 3), () {
+                            Toastr.dismiss(id);
+                          });
+                        },
+                      ),
+                      _QuickActionChip(
+                        label: 'Promise',
+                        icon: Icons.sync_rounded,
+                        color: const Color(0xFF8B5CF6),
+                        onTap: () {
+                          Toastr.promise(
+                            Future.delayed(
+                              const Duration(seconds: 2),
+                              () => 'User data',
+                            ),
+                            loading: 'Fetching data...',
+                            success: 'Data loaded successfully!',
+                            error: 'Failed to load data',
+                          );
+                        },
+                      ),
+                      _QuickActionChip(
+                        label: 'Blank',
+                        icon: Icons.chat_bubble_outline_rounded,
+                        color: const Color(0xFF94A3B8),
+                        onTap: () => Toastr.blank(
+                          'This is a plain notification without an icon.',
+                        ),
+                      ),
+                      _QuickActionChip(
+                        label: 'Emoji',
+                        icon: Icons.emoji_emotions_rounded,
+                        color: const Color(0xFFF59E0B),
+                        onTap: () => Toastr.blank(
+                          'Good job! 🎉',
+                          title: '🍕 Pizza arrived!',
+                        ),
+                      ),
+                      _QuickActionChip(
+                        label: 'Multi Line',
+                        icon: Icons.format_align_left_rounded,
+                        color: const Color(0xFF0EA5E9),
+                        onTap: () => Toastr.info(
+                          'This is a longer notification that spans multiple lines to demonstrate text wrapping behavior.',
+                          title: 'Multi-line Toast',
+                        ),
+                      ),
                     ],
                   ),
                 ],

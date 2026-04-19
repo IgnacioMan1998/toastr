@@ -100,10 +100,12 @@ class ToastrValidator {
       return false;
     }
 
-    // Duration should be within safe limits
-    if (config.duration < ToastrSecurityConfig.minDuration ||
-        config.duration > ToastrSecurityConfig.maxDuration) {
-      return false;
+    // Duration should be within safe limits (loading toasts are exempt)
+    if (config.type != ToastrType.loading) {
+      if (config.duration < ToastrSecurityConfig.minDuration ||
+          config.duration > ToastrSecurityConfig.maxDuration) {
+        return false;
+      }
     }
 
     // Animation durations should be reasonable
@@ -224,6 +226,8 @@ class ToastrValidator {
               ToastrType.warning => 4, // Warnings need attention
               ToastrType.success => 3, // Success can be shorter
               ToastrType.info => 3, // Info can be shorter
+              ToastrType.loading => 0, // Loading persists until dismissed
+              ToastrType.blank => 4, // Blank similar to default
             } +
             (message.length / 50).ceil(),
       );

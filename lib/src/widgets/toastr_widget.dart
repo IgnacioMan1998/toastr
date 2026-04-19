@@ -253,12 +253,42 @@ class _ToastrWidgetState extends State<ToastrWidget>
           progressFill: Color(0xFF2563EB),
           progressTrack: Color(0xFFBFDBFE),
         );
+      case ToastrType.loading:
+        return const _ToastrColors(
+          background: Color(0xFFF8FAFC),
+          accent: Color(0xFF64748B),
+          icon: Color(0xFF64748B),
+          iconBackground: Color(0xFFF1F5F9),
+          title: Color(0xFF1E293B),
+          message: Color(0xFF475569),
+          closeButton: Color(0xFFCBD5E1),
+          progressFill: Color(0xFF64748B),
+          progressTrack: Color(0xFFE2E8F0),
+        );
+      case ToastrType.blank:
+        return const _ToastrColors(
+          background: Color(0xFFFFFFFF),
+          accent: Color(0xFF94A3B8),
+          icon: Color(0xFF94A3B8),
+          iconBackground: Color(0xFFF8FAFC),
+          title: Color(0xFF1E293B),
+          message: Color(0xFF475569),
+          closeButton: Color(0xFFCBD5E1),
+          progressFill: Color(0xFF94A3B8),
+          progressTrack: Color(0xFFE2E8F0),
+        );
     }
   }
 
   // --- Build methods ---
 
   Widget _buildIcon(_ToastrColors colors) {
+    // Blank type has no icon
+    if (widget.config.type == ToastrType.blank &&
+        widget.config.customIcon == null) {
+      return const SizedBox.shrink();
+    }
+
     final screenWidth = MediaQuery.of(context).size.width;
     final size = screenWidth >= 1024
         ? 40.0
@@ -276,11 +306,20 @@ class _ToastrWidgetState extends State<ToastrWidget>
       ),
       child: Center(
         child: widget.config.customIcon ??
-            Icon(
-              _getModernIcon(),
-              size: iconSize,
-              color: colors.icon,
-            ),
+            (widget.config.type == ToastrType.loading
+                ? SizedBox(
+                    width: iconSize,
+                    height: iconSize,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: colors.icon,
+                    ),
+                  )
+                : Icon(
+                    _getModernIcon(),
+                    size: iconSize,
+                    color: colors.icon,
+                  )),
       ),
     );
   }
@@ -295,6 +334,10 @@ class _ToastrWidgetState extends State<ToastrWidget>
         return Icons.warning_rounded;
       case ToastrType.info:
         return Icons.info_rounded;
+      case ToastrType.loading:
+        return Icons.hourglass_empty_rounded;
+      case ToastrType.blank:
+        return Icons.chat_bubble_outline_rounded;
     }
   }
 
@@ -322,26 +365,21 @@ class _ToastrWidgetState extends State<ToastrWidget>
     return AnimatedBuilder(
       animation: _progressAnimation,
       builder: (context, _) => Container(
-        height: 3,
+        height: 2,
         decoration: BoxDecoration(
           borderRadius: const BorderRadius.only(
             bottomLeft: Radius.circular(12),
             bottomRight: Radius.circular(12),
           ),
-          color: colors.progressTrack,
+          color: _withAlpha(colors.accent, 0.08),
         ),
         alignment: Alignment.centerLeft,
         child: FractionallySizedBox(
           widthFactor: _progressAnimation.value,
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(3),
-              gradient: LinearGradient(
-                colors: [
-                  colors.progressFill,
-                  _withAlpha(colors.progressFill, 0.7),
-                ],
-              ),
+              borderRadius: BorderRadius.circular(2),
+              color: _withAlpha(colors.accent, 0.35),
             ),
           ),
         ),
@@ -422,18 +460,6 @@ class _ToastrWidgetState extends State<ToastrWidget>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Accent stripe at top
-                  Container(
-                    height: 3,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          colors.accent,
-                          _withAlpha(colors.accent, 0.6),
-                        ],
-                      ),
-                    ),
-                  ),
                   // Content
                   Padding(
                     padding: padding,
@@ -441,7 +467,9 @@ class _ToastrWidgetState extends State<ToastrWidget>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildIcon(colors),
-                        SizedBox(width: isDesktop ? 14 : 12),
+                        if (widget.config.type != ToastrType.blank ||
+                            widget.config.customIcon != null)
+                          SizedBox(width: isDesktop ? 14 : 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,

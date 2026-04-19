@@ -12,7 +12,13 @@ enum ToastrType {
   warning,
 
   /// Info notification - typically blue
-  info;
+  info,
+
+  /// Loading notification - shows an animated spinner
+  loading,
+
+  /// Blank notification - plain text, no icon
+  blank;
 
   /// Returns the default icon for each toastr type
   IconData get defaultIcon {
@@ -25,6 +31,10 @@ enum ToastrType {
         return Icons.warning;
       case ToastrType.info:
         return Icons.info;
+      case ToastrType.loading:
+        return Icons.hourglass_empty;
+      case ToastrType.blank:
+        return Icons.chat_bubble_outline;
     }
   }
 }

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../models/toastr_config.dart';
+import '../models/toastr_type.dart';
 import '../utils/toastr_validator.dart';
 import '../widgets/toastr_widget.dart';
 
@@ -65,9 +66,8 @@ class ToastrService {
 
   /// Show a toastr notification with the given configuration.
   ///
-  /// No [BuildContext] is required — the service uses the navigator key
-  /// provided during [init].
-  void show(ToastrConfig config) {
+  /// Returns a unique toast ID that can be used to [dismiss] or [update] it.
+  String show(ToastrConfig config) {
     // Security validations
     if (!ToastrValidator.isValidConfig(config)) {
       ToastrValidator.logSecurityEvent(
@@ -80,7 +80,7 @@ class ToastrService {
     // Rate limiting check
     if (_shouldThrottleNotifications()) {
       ToastrValidator.logSecurityEvent('RATE_LIMIT', 'Too many notifications');
-      return;
+      return '';
     }
 
     // Limit active notifications for security
@@ -99,7 +99,7 @@ class ToastrService {
     // Check for duplicates
     if (secureConfig.preventDuplicates &&
         _duplicateKeys.contains(secureConfig.key)) {
-      return;
+      return '';
     }
 
     final toastId = DateTime.now().millisecondsSinceEpoch.toString();
@@ -121,9 +121,57 @@ class ToastrService {
     _notificationCount++;
 
     // Auto-remove after duration (cancellable to prevent memory leaks)
-    _autoDismissTimers[toastId] = Timer(secureConfig.duration, () {
-      _removeToastr(toastId);
-    });
+    // Loading toasts persist until manually dismissed or updated
+    if (secureConfig.type != ToastrType.loading) {
+      _autoDismissTimers[toastId] = Timer(secureConfig.duration, () {
+        _removeToastr(toastId);
+      });
+    }
+
+    return toastId;
+  }
+
+  /// Dismiss a specific toast by its [id].
+  ///
+  /// If [id] is empty, does nothing.
+  void dismiss(String id) {
+    if (id.isEmpty) return;
+    _removeToastr(id);
+  }
+
+  /// Update an existing toast identified by [id] with a new [config].
+  ///
+  /// Removes the old toast and shows a new one with the same [id].
+  /// Returns the toast ID (same as input).
+  String update(String id, ToastrConfig config) {
+    if (id.isEmpty) return '';
+    // Remove old toast without animation
+    _autoDismissTimers.remove(id)?.cancel();
+    final oldEntry = _activeToastrs.remove(id);
+    oldEntry?.remove();
+
+    // Sanitize the new configuration
+    final secureConfig = _sanitizeConfig(config);
+
+    late OverlayEntry overlayEntry;
+    overlayEntry = OverlayEntry(
+      builder: (_) => _buildPositionedToastr(
+        secureConfig,
+        () => _removeToastr(id),
+      ),
+    );
+
+    _activeToastrs[id] = overlayEntry;
+    _overlay.insert(overlayEntry);
+
+    // Auto-remove after duration unless loading
+    if (secureConfig.type != ToastrType.loading) {
+      _autoDismissTimers[id] = Timer(secureConfig.duration, () {
+        _removeToastr(id);
+      });
+    }
+
+    return id;
   }
 
   Widget _buildPositionedToastr(

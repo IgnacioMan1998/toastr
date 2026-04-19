@@ -83,10 +83,12 @@ void main() {
       expect(ToastrType.error.defaultIcon, Icons.error);
       expect(ToastrType.warning.defaultIcon, Icons.warning);
       expect(ToastrType.info.defaultIcon, Icons.info);
+      expect(ToastrType.loading.defaultIcon, Icons.hourglass_empty);
+      expect(ToastrType.blank.defaultIcon, Icons.chat_bubble_outline);
     });
 
     test('has all expected values', () {
-      expect(ToastrType.values, hasLength(4));
+      expect(ToastrType.values, hasLength(6));
     });
   });
 
@@ -447,14 +449,23 @@ void main() {
         await tester.pumpWidget(buildTestWidget(
           config: ToastrConfig(type: type, message: 'Test'),
         ));
-        final expectedIcon = switch (type) {
-          ToastrType.success => Icons.check_circle_rounded,
-          ToastrType.error => Icons.cancel_rounded,
-          ToastrType.warning => Icons.warning_rounded,
-          ToastrType.info => Icons.info_rounded,
-        };
-        expect(find.byIcon(expectedIcon), findsOneWidget);
-        await tester.pumpAndSettle();
+        await tester.pump();
+        if (type == ToastrType.blank) {
+          // Blank type has no icon
+          expect(find.byIcon(Icons.chat_bubble_outline_rounded), findsNothing);
+        } else if (type == ToastrType.loading) {
+          // Loading type has CircularProgressIndicator, not an Icon
+          expect(find.byType(CircularProgressIndicator), findsOneWidget);
+        } else {
+          final expectedIcon = switch (type) {
+            ToastrType.success => Icons.check_circle_rounded,
+            ToastrType.error => Icons.cancel_rounded,
+            ToastrType.warning => Icons.warning_rounded,
+            ToastrType.info => Icons.info_rounded,
+            _ => Icons.help,
+          };
+          expect(find.byIcon(expectedIcon), findsOneWidget);
+        }
       }
     });
 
@@ -497,6 +508,61 @@ void main() {
       expect(find.byKey(const Key('custom-icon')), findsOneWidget);
       // Default icon should not be present
       expect(find.byIcon(Icons.check_circle_rounded), findsNothing);
+    });
+    testWidgets('loading type shows spinner', (tester) async {
+      await tester.pumpWidget(buildTestWidget(
+        config: const ToastrConfig(
+          type: ToastrType.loading,
+          message: 'Loading...',
+        ),
+      ));
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.text('Loading...'), findsOneWidget);
+    });
+
+    testWidgets('blank type shows no icon', (tester) async {
+      await tester.pumpWidget(buildTestWidget(
+        config: const ToastrConfig(
+          type: ToastrType.blank,
+          message: 'Plain text',
+        ),
+      ));
+      expect(find.text('Plain text'), findsOneWidget);
+      // No icon should be rendered
+      expect(find.byType(Icon), findsNothing);
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+    });
+
+    testWidgets('blank type with custom icon shows icon', (tester) async {
+      await tester.pumpWidget(buildTestWidget(
+        config: const ToastrConfig(
+          type: ToastrType.blank,
+          message: 'With emoji',
+          customIcon: Icon(Icons.emoji_emotions, key: Key('emoji-icon')),
+        ),
+      ));
+      expect(find.byKey(const Key('emoji-icon')), findsOneWidget);
+    });
+  });
+
+  // ===== Validator Loading Duration Tests =====
+  group('ToastrValidator loading type', () {
+    test('accepts loading config with very long duration', () {
+      const config = ToastrConfig(
+        type: ToastrType.loading,
+        message: 'Loading...',
+        duration: Duration(days: 365),
+      );
+      expect(ToastrValidator.isValidConfig(config), isTrue);
+    });
+
+    test('still rejects non-loading config with long duration', () {
+      const config = ToastrConfig(
+        type: ToastrType.success,
+        message: 'Success',
+        duration: Duration(minutes: 10),
+      );
+      expect(ToastrValidator.isValidConfig(config), isFalse);
     });
   });
 
