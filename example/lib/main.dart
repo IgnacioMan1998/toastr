@@ -51,6 +51,8 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
   bool _showProgressBar = false;
   bool _showCloseButton = false;
   bool _preventDuplicates = false;
+  bool _enableHapticFeedback = false;
+  SwipeDismissDirection _swipeDismissDirection = SwipeDismissDirection.horizontal;
 
   void _showToast() {
     final config = ToastrConfig(
@@ -70,6 +72,8 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
       showProgressBar: _showProgressBar,
       showCloseButton: _showCloseButton,
       preventDuplicates: _preventDuplicates,
+      enableHapticFeedback: _enableHapticFeedback,
+      swipeDismissDirection: _swipeDismissDirection,
     );
 
     ToastrHelper.custom(config);
@@ -203,6 +207,117 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                           'This is a longer notification that spans multiple lines to demonstrate text wrapping behavior.',
                           title: 'Multi-line Toast',
                         ),
+                      ),
+                      _QuickActionChip(
+                        label: 'Action Button',
+                        icon: Icons.touch_app_rounded,
+                        color: const Color(0xFFEC4899),
+                        onTap: () => Toastr.success(
+                          'File deleted',
+                          action: ToastrAction(
+                            label: 'Undo',
+                            onPressed: () => Toastr.info('Restored!'),
+                          ),
+                        ),
+                      ),
+                      _QuickActionChip(
+                        label: 'Haptic',
+                        icon: Icons.vibration_rounded,
+                        color: const Color(0xFF7C3AED),
+                        onTap: () => Toastr.success(
+                          'Saved with haptic feedback!',
+                          enableHapticFeedback: true,
+                          hapticFeedbackType: HapticFeedbackType.heavy,
+                        ),
+                      ),
+                      _QuickActionChip(
+                        label: 'Swipe Vertical',
+                        icon: Icons.swap_vert_rounded,
+                        color: const Color(0xFF059669),
+                        onTap: () => Toastr.info(
+                          'Swipe up or down to dismiss!',
+                          swipeDismissDirection: SwipeDismissDirection.vertical,
+                        ),
+                      ),
+                      _QuickActionChip(
+                        label: 'No Swipe',
+                        icon: Icons.block_rounded,
+                        color: const Color(0xFFB91C1C),
+                        onTap: () => Toastr.warning(
+                          'This toast cannot be swiped away',
+                          swipeDismissDirection: SwipeDismissDirection.none,
+                          showCloseButton: true,
+                        ),
+                      ),
+                      _QuickActionChip(
+                        label: 'Custom Anim',
+                        icon: Icons.animation_rounded,
+                        color: const Color(0xFFD946EF),
+                        onTap: () => Toastr.info(
+                          'Custom scale + fade animation!',
+                          enterAnimationBuilder: (child, animation) =>
+                              ScaleTransition(
+                            scale: animation,
+                            child: FadeTransition(
+                              opacity: animation,
+                              child: child,
+                            ),
+                          ),
+                        ),
+                      ),
+                      _QuickActionChip(
+                        label: 'Stack 5',
+                        icon: Icons.layers_rounded,
+                        color: const Color(0xFF0891B2),
+                        onTap: () {
+                          for (var i = 1; i <= 5; i++) {
+                            Future.delayed(
+                              Duration(milliseconds: i * 200),
+                              () => Toastr.info('Toast #$i'),
+                            );
+                          }
+                        },
+                      ),
+                      _QuickActionChip(
+                        label: 'Queue (max 3)',
+                        icon: Icons.queue_rounded,
+                        color: const Color(0xFFCA8A04),
+                        onTap: () {
+                          Toastr.configure(maxVisible: 3);
+                          for (var i = 1; i <= 6; i++) {
+                            Future.delayed(
+                              Duration(milliseconds: i * 150),
+                              () => Toastr.success('Queued toast #$i'),
+                            );
+                          }
+                          // Reset after demo
+                          Future.delayed(
+                            const Duration(seconds: 8),
+                            () => Toastr.configure(maxVisible: 5),
+                          );
+                        },
+                      ),
+                      _QuickActionChip(
+                        label: 'Full Featured',
+                        icon: Icons.star_rounded,
+                        color: const Color(0xFFE11D48),
+                        onTap: () => Toastr.custom(ToastrConfig(
+                          type: ToastrType.success,
+                          message: 'Item moved to trash',
+                          title: 'Deleted',
+                          showProgressBar: true,
+                          showCloseButton: true,
+                          enableHapticFeedback: true,
+                          hapticFeedbackType: HapticFeedbackType.medium,
+                          swipeDismissDirection:
+                              SwipeDismissDirection.horizontal,
+                          action: ToastrAction(
+                            label: 'Undo',
+                            onPressed: () => Toastr.info('Restored!'),
+                            textColor: Colors.white,
+                            backgroundColor: const Color(0xFF16A34A),
+                          ),
+                        )),
                       ),
                     ],
                   ),
@@ -357,6 +472,22 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                             setState(() => _preventDuplicates = v),
                         dense: true,
                         contentPadding: EdgeInsets.zero,
+                      ),
+                      SwitchListTile(
+                        title: const Text('Haptic feedback'),
+                        value: _enableHapticFeedback,
+                        onChanged: (v) =>
+                            setState(() => _enableHapticFeedback = v),
+                        dense: true,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      const SizedBox(height: 8),
+                      _DropdownField<SwipeDismissDirection>(
+                        label: 'Swipe direction',
+                        value: _swipeDismissDirection,
+                        items: SwipeDismissDirection.values,
+                        onChanged: (v) =>
+                            setState(() => _swipeDismissDirection = v!),
                       ),
                     ],
                   ),

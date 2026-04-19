@@ -1,4 +1,4 @@
-# Toastr Flutter 🍞
+# Toastr Flutter
 
 A highly customizable Flutter package for displaying beautiful toast notifications with smooth animations, multiple types, and flexible positioning. **Zero setup — just install and use!**
 
@@ -7,22 +7,22 @@ A highly customizable Flutter package for displaying beautiful toast notificatio
 
 ## Features ✨
 
-- � **react-hot-toast animations**: Faithful recreation of enter/exit animations with spring curves
-- 🎨 **Multiple notification types**: Success, Error, Warning, Info, Loading, Blank
-- 📍 **Flexible positioning**: Top/Bottom with Left/Center/Right alignment + Center
-- 🎭 **Animated icons**: Checkmark draws in, X lines appear sequentially, spinner rotates — all with staggered delays
-- 🔮 **Promise API**: Auto-transition loading → success/error based on `Future` result
-- 🎯 **Highly customizable**: Colors, icons, duration, progress bars, and more
-- 👆 **Interactive**: Tap to dismiss, swipe-to-dismiss, and close button
-- 🌗 **Dark theme**: Built-in dark theme support (`ToastrTheme.dark`)
-- 🧩 **Custom content**: Pass any `Widget` as toast content
-- 👆 **Callbacks**: `onTap` and `onDismiss` callbacks for interactive toasts
-- 🧪 **Well tested**: 76 unit tests with comprehensive coverage
-- 📱 **Responsive**: Adaptive design for mobile, tablet, and desktop
-- 🚀 **Zero setup**: No `BuildContext`, no `init()`, no `navigatorKey` — just call and go!
-- 🔒 **Secure**: Built-in XSS sanitization, rate limiting, and input validation
+- **react-hot-toast animations**: Faithful recreation of enter/exit animations with spring curves
+- **Multiple notification types**: Success, Error, Warning, Info, Loading, Blank
+- **Flexible positioning**: Top/Bottom with Left/Center/Right alignment + Center
+- **Animated icons**: Checkmark draws in, X lines appear sequentially, spinner rotates — all with staggered delays
+- **Promise API**: Auto-transition loading → success/error based on `Future` result
+- **Highly customizable**: Colors, icons, duration, progress bars, and more
+- **Interactive**: Tap to dismiss, swipe-to-dismiss, and close button
+- **Dark theme**: Built-in dark theme support (`ToastrTheme.dark`)
+- **Custom content**: Pass any `Widget` as toast content
+- **Callbacks**: `onTap` and `onDismiss` callbacks for interactive toasts
+- **Well tested**: 76 unit tests with comprehensive coverage
+- **Responsive**: Adaptive design for mobile, tablet, and desktop
+- **Zero setup**: No `BuildContext`, no `init()`, no `navigatorKey` — just call and go!
+- **Secure**: Built-in XSS sanitization, rate limiting, and input validation
 
-## Installation 📦
+## Installation
 
 Add this to your package's `pubspec.yaml` file:
 
