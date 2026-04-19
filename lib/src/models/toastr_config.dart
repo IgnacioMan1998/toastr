@@ -42,6 +42,15 @@ class ToastrConfig {
     this.showProgressBar = false,
     this.preventDuplicates = false,
     this.duplicateKey,
+    this.onTap,
+    this.onDismiss,
+    this.content,
+    this.maxWidth = 350,
+    this.margin,
+    this.accentColor,
+    this.containerDecoration,
+    this.theme = ToastrTheme.light,
+    this.reverseOrder = false,
   });
 
   /// The type of toastr notification
@@ -104,6 +113,33 @@ class ToastrConfig {
   /// Unique identifier for preventing duplicates
   final String? duplicateKey;
 
+  /// Callback invoked when the toast is tapped (before dismiss)
+  final VoidCallback? onTap;
+
+  /// Callback invoked when the toast is dismissed (by any means)
+  final VoidCallback? onDismiss;
+
+  /// Custom widget content to display instead of the text message
+  final Widget? content;
+
+  /// Maximum width of the toast (default: 350)
+  final double maxWidth;
+
+  /// Custom margin/offset from screen edges
+  final EdgeInsets? margin;
+
+  /// Custom accent color for progress bar and icon background
+  final Color? accentColor;
+
+  /// Custom container decoration to override the default style
+  final BoxDecoration? containerDecoration;
+
+  /// Color theme for the toast (light or dark)
+  final ToastrTheme theme;
+
+  /// Whether new toasts should appear at the bottom of the stack
+  final bool reverseOrder;
+
   /// Creates a copy of this config with updated values
   ToastrConfig copyWith({
     ToastrType? type,
@@ -126,6 +162,15 @@ class ToastrConfig {
     bool? showProgressBar,
     bool? preventDuplicates,
     String? duplicateKey,
+    VoidCallback? onTap,
+    VoidCallback? onDismiss,
+    Widget? content,
+    double? maxWidth,
+    EdgeInsets? margin,
+    Color? accentColor,
+    BoxDecoration? containerDecoration,
+    ToastrTheme? theme,
+    bool? reverseOrder,
   }) => ToastrConfig(
     type: type ?? this.type,
     message: message ?? this.message,
@@ -147,6 +192,15 @@ class ToastrConfig {
     showProgressBar: showProgressBar ?? this.showProgressBar,
     preventDuplicates: preventDuplicates ?? this.preventDuplicates,
     duplicateKey: duplicateKey ?? this.duplicateKey,
+    onTap: onTap ?? this.onTap,
+    onDismiss: onDismiss ?? this.onDismiss,
+    content: content ?? this.content,
+    maxWidth: maxWidth ?? this.maxWidth,
+    margin: margin ?? this.margin,
+    accentColor: accentColor ?? this.accentColor,
+    containerDecoration: containerDecoration ?? this.containerDecoration,
+    theme: theme ?? this.theme,
+    reverseOrder: reverseOrder ?? this.reverseOrder,
   );
 
   /// Generates a key for duplicate detection
@@ -217,4 +271,13 @@ enum ToastrHideMethod {
 
   /// Simple hide animation
   hide,
+}
+
+/// Color theme for toast notifications
+enum ToastrTheme {
+  /// Light theme: white background, dark text
+  light,
+
+  /// Dark theme: dark background, light text
+  dark,
 }

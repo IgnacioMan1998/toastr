@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import '../models/toastr_config.dart';
 import '../models/toastr_type.dart';
 import '../services/toastr_service.dart';
@@ -112,6 +114,14 @@ class ToastrHelper {
     bool? showProgressBar,
     bool? showCloseButton,
     bool? preventDuplicates,
+    VoidCallback? onTap,
+    VoidCallback? onDismiss,
+    Widget? content,
+    double? maxWidth,
+    EdgeInsets? margin,
+    Color? accentColor,
+    BoxDecoration? containerDecoration,
+    ToastrTheme? theme,
   }) =>
       _service.show(
         _defaultConfig.copyWith(
@@ -127,6 +137,14 @@ class ToastrHelper {
           showProgressBar: showProgressBar,
           showCloseButton: showCloseButton,
           preventDuplicates: preventDuplicates,
+          onTap: onTap,
+          onDismiss: onDismiss,
+          content: content,
+          maxWidth: maxWidth,
+          margin: margin,
+          accentColor: accentColor,
+          containerDecoration: containerDecoration,
+          theme: theme,
         ),
       );
 
@@ -145,6 +163,14 @@ class ToastrHelper {
     bool? showProgressBar,
     bool? showCloseButton,
     bool? preventDuplicates,
+    VoidCallback? onTap,
+    VoidCallback? onDismiss,
+    Widget? content,
+    double? maxWidth,
+    EdgeInsets? margin,
+    Color? accentColor,
+    BoxDecoration? containerDecoration,
+    ToastrTheme? theme,
   }) =>
       _service.show(
         _defaultConfig.copyWith(
@@ -161,6 +187,14 @@ class ToastrHelper {
           showCloseButton:
               showCloseButton ?? true, // Show close button for errors
           preventDuplicates: preventDuplicates,
+          onTap: onTap,
+          onDismiss: onDismiss,
+          content: content,
+          maxWidth: maxWidth,
+          margin: margin,
+          accentColor: accentColor,
+          containerDecoration: containerDecoration,
+          theme: theme,
         ),
       );
 
@@ -179,6 +213,14 @@ class ToastrHelper {
     bool? showProgressBar,
     bool? showCloseButton,
     bool? preventDuplicates,
+    VoidCallback? onTap,
+    VoidCallback? onDismiss,
+    Widget? content,
+    double? maxWidth,
+    EdgeInsets? margin,
+    Color? accentColor,
+    BoxDecoration? containerDecoration,
+    ToastrTheme? theme,
   }) =>
       _service.show(
         _defaultConfig.copyWith(
@@ -194,6 +236,14 @@ class ToastrHelper {
           showProgressBar: showProgressBar,
           showCloseButton: showCloseButton,
           preventDuplicates: preventDuplicates,
+          onTap: onTap,
+          onDismiss: onDismiss,
+          content: content,
+          maxWidth: maxWidth,
+          margin: margin,
+          accentColor: accentColor,
+          containerDecoration: containerDecoration,
+          theme: theme,
         ),
       );
 
@@ -212,6 +262,14 @@ class ToastrHelper {
     bool? showProgressBar,
     bool? showCloseButton,
     bool? preventDuplicates,
+    VoidCallback? onTap,
+    VoidCallback? onDismiss,
+    Widget? content,
+    double? maxWidth,
+    EdgeInsets? margin,
+    Color? accentColor,
+    BoxDecoration? containerDecoration,
+    ToastrTheme? theme,
   }) =>
       _service.show(
         _defaultConfig.copyWith(
@@ -227,6 +285,14 @@ class ToastrHelper {
           showProgressBar: showProgressBar,
           showCloseButton: showCloseButton,
           preventDuplicates: preventDuplicates,
+          onTap: onTap,
+          onDismiss: onDismiss,
+          content: content,
+          maxWidth: maxWidth,
+          margin: margin,
+          accentColor: accentColor,
+          containerDecoration: containerDecoration,
+          theme: theme,
         ),
       );
 
@@ -249,6 +315,14 @@ class ToastrHelper {
     Duration? showDuration,
     Duration? hideDuration,
     bool? showCloseButton,
+    VoidCallback? onTap,
+    VoidCallback? onDismiss,
+    Widget? content,
+    double? maxWidth,
+    EdgeInsets? margin,
+    Color? accentColor,
+    BoxDecoration? containerDecoration,
+    ToastrTheme? theme,
   }) =>
       _service.show(
         _defaultConfig.copyWith(
@@ -264,6 +338,14 @@ class ToastrHelper {
         showProgressBar: false,
         showCloseButton: showCloseButton ?? false,
         preventDuplicates: false,
+        onTap: onTap,
+        onDismiss: onDismiss,
+        content: content,
+        maxWidth: maxWidth,
+        margin: margin,
+        accentColor: accentColor,
+        containerDecoration: containerDecoration,
+        theme: theme,
       ),
     );
 
@@ -282,6 +364,14 @@ class ToastrHelper {
     bool? showProgressBar,
     bool? showCloseButton,
     bool? preventDuplicates,
+    VoidCallback? onTap,
+    VoidCallback? onDismiss,
+    Widget? content,
+    double? maxWidth,
+    EdgeInsets? margin,
+    Color? accentColor,
+    BoxDecoration? containerDecoration,
+    ToastrTheme? theme,
   }) =>
       _service.show(
         _defaultConfig.copyWith(
@@ -297,6 +387,14 @@ class ToastrHelper {
           showProgressBar: showProgressBar,
           showCloseButton: showCloseButton,
           preventDuplicates: preventDuplicates,
+          onTap: onTap,
+          onDismiss: onDismiss,
+          content: content,
+          maxWidth: maxWidth,
+          margin: margin,
+          accentColor: accentColor,
+          containerDecoration: containerDecoration,
+          theme: theme,
         ),
       );
 
@@ -405,6 +503,10 @@ class ToastrHelper {
     bool? showProgressBar,
     bool? showCloseButton,
     bool? preventDuplicates,
+    double? maxWidth,
+    EdgeInsets? margin,
+    ToastrTheme? theme,
+    bool? reverseOrder,
   }) {
     _defaultConfig = _defaultConfig.copyWith(
       position: position,
@@ -416,6 +518,10 @@ class ToastrHelper {
       showProgressBar: showProgressBar,
       showCloseButton: showCloseButton,
       preventDuplicates: preventDuplicates,
+      maxWidth: maxWidth,
+      margin: margin,
+      theme: theme,
+      reverseOrder: reverseOrder,
     );
   }
 }

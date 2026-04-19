@@ -303,8 +303,16 @@ class _ToastrWidgetState extends State<ToastrWidget>
     _autoDismissTimer?.cancel();
 
     _exitController.forward().then((_) {
-      if (mounted) widget.onDismiss?.call();
+      if (mounted) {
+        widget.config.onDismiss?.call();
+        widget.onDismiss?.call();
+      }
     });
+  }
+
+  void _handleTap() {
+    widget.config.onTap?.call();
+    if (widget.config.dismissible) _dismiss();
   }
 
   // --- Icon builders (faithful to react-hot-toast source) ---
@@ -535,17 +543,17 @@ class _ToastrWidgetState extends State<ToastrWidget>
     }
   }
 
-  Widget _buildCloseButton() {
+  Widget _buildCloseButton(Color closeColor) {
     if (!widget.config.showCloseButton) return const SizedBox.shrink();
 
     return GestureDetector(
       onTap: _dismiss,
-      child: const Padding(
-        padding: EdgeInsets.only(left: 6),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 6),
         child: Icon(
           Icons.close_rounded,
           size: 16,
-          color: Color(0xFFD1D5DB),
+          color: closeColor,
         ),
       ),
     );
@@ -580,6 +588,7 @@ class _ToastrWidgetState extends State<ToastrWidget>
   }
 
   Color _getAccentColor() {
+    if (widget.config.accentColor != null) return widget.config.accentColor!;
     switch (widget.config.type) {
       case ToastrType.success:
         return const Color(0xFF61D345);
@@ -598,8 +607,12 @@ class _ToastrWidgetState extends State<ToastrWidget>
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = widget.config.backgroundColor ?? const Color(0xFFFFFFFF);
-    final textColor = widget.config.textColor ?? const Color(0xFF363636);
+    final isDark = widget.config.theme == ToastrTheme.dark;
+    final bgColor = widget.config.backgroundColor ??
+        (isDark ? const Color(0xFF1C1917) : const Color(0xFFFFFFFF));
+    final textColor = widget.config.textColor ??
+        (isDark ? const Color(0xFFF5F5F4) : const Color(0xFF363636));
+    final closeColor = isDark ? const Color(0xFF78716C) : const Color(0xFFD1D5DB);
 
     Widget toast = GestureDetector(
       onHorizontalDragUpdate: widget.config.dismissible
@@ -616,28 +629,28 @@ class _ToastrWidgetState extends State<ToastrWidget>
               }
             }
           : null,
-      onTap: widget.config.dismissible ? _dismiss : null,
+      onTap: _handleTap,
       child: MouseRegion(
         onEnter: (_) => _onHover(true),
         onExit: (_) => _onHover(false),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           transform: Matrix4.translationValues(_dragOffset, 0, 0),
-          constraints: const BoxConstraints(maxWidth: 350),
-          margin: const EdgeInsets.symmetric(vertical: 4),
-          decoration: BoxDecoration(
+          constraints: BoxConstraints(maxWidth: widget.config.maxWidth),
+          margin: widget.config.margin ?? const EdgeInsets.symmetric(vertical: 4),
+          decoration: widget.config.containerDecoration ?? BoxDecoration(
             color: bgColor,
             borderRadius: BorderRadius.circular(8),
-            boxShadow: const [
+            boxShadow: [
               BoxShadow(
-                color: Color.fromRGBO(0, 0, 0, 0.1),
+                color: Color.fromRGBO(0, 0, 0, isDark ? 0.3 : 0.1),
                 blurRadius: 10,
-                offset: Offset(0, 3),
+                offset: const Offset(0, 3),
               ),
               BoxShadow(
-                color: Color.fromRGBO(0, 0, 0, 0.05),
+                color: Color.fromRGBO(0, 0, 0, isDark ? 0.2 : 0.05),
                 blurRadius: 3,
-                offset: Offset(0, 3),
+                offset: const Offset(0, 3),
               ),
             ],
           ),
@@ -661,7 +674,7 @@ class _ToastrWidgetState extends State<ToastrWidget>
                             horizontal: 10,
                             vertical: 4,
                           ),
-                          child: Column(
+                          child: widget.config.content ?? Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -694,7 +707,7 @@ class _ToastrWidgetState extends State<ToastrWidget>
                           ),
                         ),
                       ),
-                      _buildCloseButton(),
+                      _buildCloseButton(closeColor),
                     ],
                   ),
                 ),

@@ -596,4 +596,241 @@ void main() {
       expect(ToastrHideMethod.values, hasLength(6));
     });
   });
+
+  // ===== New Features Tests (v2.2.0) =====
+  group('ToastrConfig new properties', () {
+    test('defaults for new properties', () {
+      const config = ToastrConfig(
+        type: ToastrType.success,
+        message: 'Test',
+      );
+      expect(config.onTap, isNull);
+      expect(config.onDismiss, isNull);
+      expect(config.content, isNull);
+      expect(config.maxWidth, 350);
+      expect(config.margin, isNull);
+      expect(config.accentColor, isNull);
+      expect(config.containerDecoration, isNull);
+      expect(config.theme, ToastrTheme.light);
+      expect(config.reverseOrder, isFalse);
+    });
+
+    test('copyWith preserves new properties', () {
+      onTapCalled() {}
+      onDismissCalled() {}
+      final config = ToastrConfig(
+        type: ToastrType.success,
+        message: 'Test',
+        onTap: onTapCalled,
+        onDismiss: onDismissCalled,
+        maxWidth: 500,
+        margin: const EdgeInsets.all(20),
+        accentColor: Colors.purple,
+        theme: ToastrTheme.dark,
+        reverseOrder: true,
+      );
+      final copy = config.copyWith(message: 'Updated');
+      expect(copy.onTap, onTapCalled);
+      expect(copy.onDismiss, onDismissCalled);
+      expect(copy.maxWidth, 500);
+      expect(copy.margin, const EdgeInsets.all(20));
+      expect(copy.accentColor, Colors.purple);
+      expect(copy.theme, ToastrTheme.dark);
+      expect(copy.reverseOrder, isTrue);
+    });
+
+    test('copyWith overrides new properties', () {
+      const config = ToastrConfig(
+        type: ToastrType.info,
+        message: 'Test',
+      );
+      final copy = config.copyWith(
+        maxWidth: 600,
+        theme: ToastrTheme.dark,
+        reverseOrder: true,
+        accentColor: Colors.red,
+        margin: const EdgeInsets.only(top: 40),
+      );
+      expect(copy.maxWidth, 600);
+      expect(copy.theme, ToastrTheme.dark);
+      expect(copy.reverseOrder, isTrue);
+      expect(copy.accentColor, Colors.red);
+      expect(copy.margin, const EdgeInsets.only(top: 40));
+    });
+  });
+
+  group('ToastrTheme', () {
+    test('has light and dark values', () {
+      expect(ToastrTheme.values, hasLength(2));
+      expect(ToastrTheme.values, contains(ToastrTheme.light));
+      expect(ToastrTheme.values, contains(ToastrTheme.dark));
+    });
+  });
+
+  group('ToastrWidget new features', () {
+    Widget buildApp({required ToastrConfig config}) {
+      return MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: ToastrWidget(config: config),
+          ),
+        ),
+      );
+    }
+
+    testWidgets('dark theme applies dark background', (tester) async {
+      await tester.pumpWidget(buildApp(
+        config: const ToastrConfig(
+          type: ToastrType.success,
+          message: 'Dark toast',
+          theme: ToastrTheme.dark,
+        ),
+      ));
+      await tester.pump(const Duration(milliseconds: 350));
+
+      // Should have the dark background color
+      final container = tester.widgetList<AnimatedContainer>(
+        find.byType(AnimatedContainer),
+      ).first;
+      final decoration = container.decoration as BoxDecoration?;
+      expect(decoration?.color, const Color(0xFF1C1917));
+    });
+
+    testWidgets('custom maxWidth is applied', (tester) async {
+      await tester.pumpWidget(buildApp(
+        config: const ToastrConfig(
+          type: ToastrType.info,
+          message: 'Wide toast',
+          maxWidth: 500,
+        ),
+      ));
+      await tester.pump(const Duration(milliseconds: 350));
+
+      final container = tester.widgetList<AnimatedContainer>(
+        find.byType(AnimatedContainer),
+      ).first;
+      expect(container.constraints?.maxWidth, 500);
+    });
+
+    testWidgets('custom content widget replaces message text', (tester) async {
+      await tester.pumpWidget(buildApp(
+        config: ToastrConfig(
+          type: ToastrType.blank,
+          message: 'Ignored',
+          content: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              Icon(Icons.star, size: 16),
+              SizedBox(width: 4),
+              Text('Custom content'),
+            ],
+          ),
+        ),
+      ));
+      await tester.pump(const Duration(milliseconds: 350));
+
+      expect(find.text('Custom content'), findsOneWidget);
+      // The message text 'Ignored' should not appear as a standalone Text widget
+      // since content overrides the message column
+    });
+
+    testWidgets('onTap callback is called', (tester) async {
+      bool tapped = false;
+      await tester.pumpWidget(buildApp(
+        config: ToastrConfig(
+          type: ToastrType.info,
+          message: 'Tap me',
+          onTap: () => tapped = true,
+        ),
+      ));
+      await tester.pump(const Duration(milliseconds: 350));
+
+      await tester.tap(find.text('Tap me'));
+      await tester.pump();
+      expect(tapped, isTrue);
+    });
+
+    testWidgets('onDismiss callback is called when toast exits', (tester) async {
+      bool dismissed = false;
+      await tester.pumpWidget(buildApp(
+        config: ToastrConfig(
+          type: ToastrType.info,
+          message: 'Dismiss me',
+          onDismiss: () => dismissed = true,
+          dismissible: true,
+        ),
+      ));
+      await tester.pump(const Duration(milliseconds: 350));
+
+      await tester.tap(find.text('Dismiss me'));
+      // Wait for exit animation to complete (400ms)
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(dismissed, isTrue);
+    });
+
+    testWidgets('containerDecoration overrides default style', (tester) async {
+      await tester.pumpWidget(buildApp(
+        config: ToastrConfig(
+          type: ToastrType.success,
+          message: 'Styled toast',
+          containerDecoration: BoxDecoration(
+            color: Colors.blue,
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+      ));
+      await tester.pump(const Duration(milliseconds: 350));
+
+      final container = tester.widgetList<AnimatedContainer>(
+        find.byType(AnimatedContainer),
+      ).first;
+      final decoration = container.decoration as BoxDecoration;
+      expect(decoration.color, Colors.blue);
+    });
+
+    testWidgets('custom margin is applied', (tester) async {
+      await tester.pumpWidget(buildApp(
+        config: const ToastrConfig(
+          type: ToastrType.info,
+          message: 'Margined toast',
+          margin: EdgeInsets.all(20),
+        ),
+      ));
+      await tester.pump(const Duration(milliseconds: 350));
+
+      final container = tester.widgetList<AnimatedContainer>(
+        find.byType(AnimatedContainer),
+      ).first;
+      expect(container.margin, const EdgeInsets.all(20));
+    });
+  });
+
+  group('ToastrHelper configure new options', () {
+    test('configure sets maxWidth', () {
+      ToastrHelper.configure(maxWidth: 500);
+      expect(ToastrHelper.defaultConfig.maxWidth, 500);
+      // Reset
+      ToastrHelper.configure(maxWidth: 350);
+    });
+
+    test('configure sets theme', () {
+      ToastrHelper.configure(theme: ToastrTheme.dark);
+      expect(ToastrHelper.defaultConfig.theme, ToastrTheme.dark);
+      // Reset
+      ToastrHelper.configure(theme: ToastrTheme.light);
+    });
+
+    test('configure sets reverseOrder', () {
+      ToastrHelper.configure(reverseOrder: true);
+      expect(ToastrHelper.defaultConfig.reverseOrder, isTrue);
+      // Reset
+      ToastrHelper.configure(reverseOrder: false);
+    });
+
+    test('configure sets margin', () {
+      ToastrHelper.configure(margin: const EdgeInsets.all(32));
+      expect(ToastrHelper.defaultConfig.margin, const EdgeInsets.all(32));
+      // Reset — use copyWith to clear margin
+    });
+  });
 }

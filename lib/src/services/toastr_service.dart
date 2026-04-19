@@ -191,44 +191,49 @@ class ToastrService {
     // Use a Builder to get MediaQuery from the overlay context
     return Builder(builder: (overlayContext) {
       final padding = MediaQuery.of(overlayContext).padding;
+      final m = config.margin;
+      final top = (m?.top ?? 0) + padding.top + 16;
+      final bottom = (m?.bottom ?? 0) + padding.bottom + 16;
+      final left = (m?.left ?? 0) + 16;
+      final right = (m?.right ?? 0) + 16;
 
       switch (config.position) {
         case ToastrPosition.topLeft:
           return Positioned(
-            top: padding.top + 16,
-            left: 16,
+            top: top,
+            left: left,
             child: toastr,
           );
         case ToastrPosition.topCenter:
           return Positioned(
-            top: padding.top + 16,
-            left: 0,
-            right: 0,
+            top: top,
+            left: left,
+            right: right,
             child: Center(child: toastr),
           );
         case ToastrPosition.topRight:
           return Positioned(
-            top: padding.top + 16,
-            right: 16,
+            top: top,
+            right: right,
             child: toastr,
           );
         case ToastrPosition.bottomLeft:
           return Positioned(
-            bottom: padding.bottom + 16,
-            left: 16,
+            bottom: bottom,
+            left: left,
             child: toastr,
           );
         case ToastrPosition.bottomCenter:
           return Positioned(
-            bottom: padding.bottom + 16,
-            left: 0,
-            right: 0,
+            bottom: bottom,
+            left: left,
+            right: right,
             child: Center(child: toastr),
           );
         case ToastrPosition.bottomRight:
           return Positioned(
-            bottom: padding.bottom + 16,
-            right: 16,
+            bottom: bottom,
+            right: right,
             child: toastr,
           );
         case ToastrPosition.center:
