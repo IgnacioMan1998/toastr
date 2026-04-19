@@ -11,13 +11,15 @@ flutter run
 
 ## Características demostradas
 
-### 1. Métodos rápidos
-- `ToastrHelper.success(context, 'mensaje')`
-- `ToastrHelper.error(context, 'mensaje')`
-- `ToastrHelper.warning(context, 'mensaje')`
-- `ToastrHelper.info(context, 'mensaje')`
+### 1. Métodos rápidos (sin BuildContext)
+
+- `ToastrHelper.success('mensaje')`
+- `ToastrHelper.error('mensaje')`
+- `ToastrHelper.warning('mensaje')`
+- `ToastrHelper.info('mensaje')`
 
 ### 2. Configuración personalizada
+
 - Posicionamiento (top/bottom + left/center/right)
 - Animaciones de entrada y salida
 - Duración personalizable
@@ -26,6 +28,7 @@ flutter run
 - Prevención de duplicados
 
 ### 3. Gestión de notificaciones
+
 - Limpiar todas las notificaciones
 - Limpiar solo la última notificación
 

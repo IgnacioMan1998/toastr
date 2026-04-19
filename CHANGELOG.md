@@ -5,21 +5,76 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-04-18
+
+### BREAKING CHANGES
+
+- 🚀 **Zero-setup API**: Removed `BuildContext` from all methods — no context, no `init()`, no `navigatorKey` needed
+  - `ToastrHelper.success('Message')` instead of `ToastrHelper.success(context, 'Message')`
+  - `ToastrHelper.custom(config)` instead of `ToastrHelper.custom(context, config)`
+  - `ToastrService.show(config)` instead of `ToastrService.show(config, context)`
+
+### Added
+
+- 🔍 **Auto overlay discovery**: Service automatically finds the app's `Overlay` from the widget tree via `WidgetsBinding.instance.rootElement` — no manual wiring required
+- 🎨 **Modern UI redesign**: Completely rewritten toast widget with:
+  - Light Tailwind-style backgrounds with colored accent stripe
+  - Circular icon containers with multi-layer shadows
+  - Gradient progress bar
+  - Swipe-to-dismiss gesture (80px threshold)
+  - Hover scale animation (1.02x)
+- 🔧 **`ToastrHelper.configure()`**: New method to set global defaults (position, duration, progress bar, etc.)
+- ✅ **56 unit tests**: Comprehensive coverage for config, validator, helper, widget, and enums
+
+### Fixed
+
+- 🔒 **XSS sanitization regex**: Fixed double-escaped regex for inline event handlers with single quotes
+- 🧹 **Memory leak**: Replaced non-cancellable `Future.delayed` with tracked `Timer` instances; timers cancelled on dismiss and `dispose()`
+- 🎯 **Auto-detection false positives**: Word-boundary regex prevents "Error successfully handled" from being detected as error
+- 🛡️ **Mutable `defaultConfig`**: Now private with read-only getter; only modifiable via `configure()`
+
+### Removed
+
+- `BuildContext` parameter from all public methods
+- `improved_toastr_widget.dart` (dead code, was never exported)
+- `ToastrService.init()` and `ToastrHelper.init()` (no longer needed)
+
+### Changed
+
+- SDK constraint relaxed from `^3.9.0` to `>=3.4.0 <4.0.0`
+- Flutter constraint set to `>=3.22.0`
+- Updated deprecated `Color` API calls with `withValues(alpha:)` helper
+
+### Migration
+
+```dart
+// Before (v1.x)
+ToastrHelper.success(context, 'Done!');
+ToastrHelper.custom(context, config);
+
+// After (v2.0.0)
+ToastrHelper.success('Done!');
+ToastrHelper.custom(config);
+```
+
 ## [1.0.0+7] - 2025-09-04
 
 ### Fixed
+
 - 🖼️ **Screenshots Visibility on pub.dev**: Fixed images not displaying on pub.dev
   - Updated all screenshot paths from local `screenshots/` to GitHub Raw URLs
   - Changed image sources to use `https://raw.githubusercontent.com/IgnacioMan1998/toastr/main/screenshots/`
   - Ensures screenshots are publicly accessible and display correctly on pub.dev package page
 
 ### Enhanced
+
 - 📦 **Package Distribution**: Improved package presentation on pub.dev
   - Screenshots now properly visible to potential users browsing pub.dev
   - Enhanced package discoverability with visual documentation
   - Professional appearance with working image gallery
 
 ### Technical
+
 - 🔗 **URL Management**: Migrated from relative to absolute image URLs
   - All screenshot references now use GitHub Raw CDN
   - Improved reliability for documentation across different platforms
@@ -28,12 +83,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0+6] - 2025-09-04
 
 ### Changed
+
 - 📄 **License Update**: Migrated from MIT License to Apache License 2.0
   - Updated LICENSE file to Apache License 2.0, January 2004
   - Updated README.md badges and license section to reflect Apache 2.0
   - Ensures better compatibility with enterprise and commercial usage
 
 ### Enhanced
+
 - 🎨 **Documentation Visual Improvements**:
   - Added professional screenshot section with styled borders and shadows
   - Implemented responsive HTML tables for better screenshot presentation
@@ -41,12 +98,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added comprehensive visual documentation for desktop and mobile experiences
 
 ### Fixed
+
 - 🔧 **Badge and Link Corrections**:
   - Fixed malformed license badge syntax in README.md
   - Corrected all external links to point to proper Apache License resources
   - Ensured consistency between documentation and actual license file
 
 ### Technical
+
 - 📦 **Package Metadata**:
   - Updated package version to 1.0.0+6
   - Maintained compatibility with existing API
@@ -55,12 +114,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0+5]
 
 ### Fixed
+
 - 🐛 **Static Analysis Issues**: Resolved all formatting and linting issues
   - Fixed Dart formatter compliance across all source files
   - Removed empty test files that were causing compilation errors
   - Improved code documentation and comments for better maintainability
 
 ### Enhanced
+
 - 📝 **Documentation Improvements**:
   - Enhanced class-level documentation with comprehensive examples
   - Added detailed parameter descriptions and usage guidelines
@@ -68,6 +129,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated README with more comprehensive API documentation
 
 ### Technical Improvements
+
 - ✨ **Code Quality**:
   - Formatted all Dart files according to official style guide
   - Enhanced type safety and null safety compliance
@@ -75,6 +137,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Optimized import statements and dependency organization
 
 ### Package Metadata
+
 - 📦 **pub.dev Optimization**:
   - Enhanced package description for better discoverability
   - Added relevant topics and keywords
@@ -84,6 +147,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0+3]
 
 ### BREAKING CHANGES
+
 - 🔄 **Context-Based Architecture**: Reverted auto-initialization approach for better performance and security
   - All methods now require `BuildContext` parameter (similar to SnackBar)
   - `ToastrHelper.success(context, 'message')` instead of `ToastrHelper.success('message')`
@@ -91,8 +155,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - No more manual initialization required - context passed directly to each method
 
 ### Changed
+
 - **API Updates**: All ToastrHelper methods now require BuildContext as first parameter:
-  - `ToastrHelper.show(context, message)` 
+  - `ToastrHelper.show(context, message)`
   - `ToastrHelper.success(context, message)`
   - `ToastrHelper.error(context, message)`
   - `ToastrHelper.warning(context, message)`
@@ -100,6 +165,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `ToastrHelper.custom(context, config)`
 
 ### Removed
+
 - Auto-initialization system and related methods
 - Resource-intensive overlay detection
 - Health check system (no longer needed)
@@ -109,6 +175,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `isHealthy` getter (no longer needed)
 
 ### Benefits of New Approach
+
 - **Better Performance**: No background scanning or auto-detection overhead
 - **Enhanced Security**: No automatic context detection reduces potential vulnerabilities
 - **Simpler Architecture**: Direct context passing eliminates complex initialization logic
@@ -116,6 +183,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Flutter-like API**: Consistent with SnackBar and other Flutter APIs
 
 ### Migration
+
 Update your code to pass `BuildContext` as the first parameter:
 
 ```dart
@@ -130,6 +198,7 @@ ToastrHelper.success(context, 'Message'); // No initialization needed
 ## [1.0.0+2]
 
 ### Fixed
+
 - 🐛 **Error notification issue**: Fixed `ArgumentError` exception when showing error notifications
   - Removed invalid default duration of 0 seconds that violated minimum duration security constraint
   - Error notifications now properly inherit the default duration (5 seconds) when not specified
@@ -138,8 +207,9 @@ ToastrHelper.success(context, 'Message'); // No initialization needed
 - 🛠️ **Parameter ordering**: Fixed constructor parameter ordering to follow Flutter conventions (required parameters first)
 
 ### Enhanced
+
 - 📚 **Complete API documentation**: All public classes, methods, and properties now have detailed documentation
-- 🧹 **Code quality improvements**: 
+- 🧹 **Code quality improvements**:
   - Replaced `print` statements with `debugPrint` for better production behavior
   - Enhanced exception handling with specific exception types
   - Improved code organization and formatting
@@ -147,6 +217,7 @@ ToastrHelper.success(context, 'Message'); // No initialization needed
 - 🎯 **Better developer experience**: Improved IntelliSense and documentation tooltips in IDEs
 
 ### Technical Improvements
+
 - Enhanced `ToastrHelper.error()` method to use proper default duration
 - Improved security validation in `ToastrValidator` with better error messaging
 - Added proper imports for Flutter foundation framework
@@ -155,8 +226,9 @@ ToastrHelper.success(context, 'Message'); // No initialization needed
 ## [1.0.0+1]
 
 ### Added
+
 - 📱 **Responsive design support**: Optimized layouts for mobile, tablet, and desktop devices
-- 🎯 **Device-specific sizing**: 
+- 🎯 **Device-specific sizing**:
   - **Mobile**: Compact layout with appropriate touch targets
   - **Tablet**: Medium-sized notifications with enhanced readability
   - **Desktop**: Larger notifications with increased text and icon sizes
@@ -168,12 +240,14 @@ ToastrHelper.success(context, 'Message'); // No initialization needed
   - Responsive close button sizing
 
 ### Enhanced
+
 - 🎨 **Improved visual hierarchy**: Better text scaling across different devices
 - 📐 **Adaptive spacing**: Container padding and margins adjust based on screen size
 - 🎯 **Better touch targets**: Larger interactive elements on mobile devices
 - 🖥️ **Desktop optimization**: Enhanced hover effects and larger content for desktop users
 
 ### Technical Improvements
+
 - Added `ResponsiveDimensions` class for better dimension management
 - Improved breakpoint logic (Mobile: <768px, Tablet: 768-1024px, Desktop: >1024px)
 - Enhanced positioning service with responsive margins
@@ -182,6 +256,7 @@ ToastrHelper.success(context, 'Message'); // No initialization needed
 ## [1.0.0]
 
 ### Added
+
 - 🎉 **Initial release** of the Toastr Flutter package (published as `toastr_flutter`)
 - ✨ **Four notification types**: success, error, warning, and info with predefined colors and icons
 - 🎨 **Multiple positioning options**: topLeft, topCenter, topRight, bottomLeft, bottomCenter, bottomRight, and center
@@ -231,12 +306,14 @@ ToastrHelper.success(context, 'Message'); // No initialization needed
   - Professional project structure
 
 ### Technical Details
+
 - **Minimum Flutter version**: 3.0.0
 - **Minimum Dart SDK**: 3.9.0
 - **Dependencies**: Only Flutter SDK (no external dependencies)
 - **Platform support**: All Flutter-supported platforms
 
 ### Example Usage
+
 ```dart
 // Basic usage
 ToastrHelper.success('Operation completed successfully!');
@@ -261,6 +338,7 @@ ToastrHelper.custom(
 ```
 
 ### Documentation
+
 - Comprehensive README with installation guide, usage examples, and API reference
 - Working example application demonstrating all features
 - Complete API documentation for all public classes and methods
@@ -270,6 +348,7 @@ ToastrHelper.custom(
 ## [Unreleased]
 
 ### Planned Features
+
 - Custom animation curves support
 - Sound effects for notifications
 - Notification queuing system

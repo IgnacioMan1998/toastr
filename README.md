@@ -1,6 +1,6 @@
 # Toastr Flutter 🍞
 
-A highly customizable Flutter package for displaying beautiful toast notifications with smooth animations, multiple types, and flexible positioning. Works like Flutter's SnackBar - no initialization required!
+A highly customizable Flutter package for displaying beautiful toast notifications with smooth animations, multiple types, and flexible positioning. **Zero setup — just install and use!**
 
 [![pub package](https://img.shields.io/pub/v/toastr_flutter.svg)](https://pub.dev/packages/toastr_flutter)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -8,15 +8,14 @@ A highly customizable Flutter package for displaying beautiful toast notificatio
 ## Features ✨
 
 - 🎨 **Multiple notification types**: Success, Error, Warning, Info
-- 📍 **Flexible positioning**: Top/Bottom with Left/Center/Right alignment
+- 📍 **Flexible positioning**: Top/Bottom with Left/Center/Right alignment + Center
 - 🎭 **Smooth animations**: Fade and slide animations with custom easing
 - 🎯 **Highly customizable**: Colors, icons, duration, progress bars, and more
-- 👆 **Interactive**: Tap to dismiss and close button functionality
+- 👆 **Interactive**: Tap to dismiss, swipe-to-dismiss, and close button
 - 🧪 **Well tested**: Comprehensive test coverage
 - 📱 **Responsive**: Adaptive design for mobile, tablet, and desktop
-- 🚀 **Zero setup**: Just pass context like SnackBar - no initialization needed!
-- 🔒 **Secure**: No auto-detection, no performance overhead
-
+- 🚀 **Zero setup**: No `BuildContext`, no `init()`, no `navigatorKey` — just call and go!
+- 🔒 **Secure**: Built-in XSS sanitization, rate limiting, and input validation
 
 ## Installation 📦
 
@@ -37,27 +36,63 @@ flutter pub get
 
 ### Basic Usage
 
-Simply import the package and start using it anywhere in your app with BuildContext:
+Import the package and start showing toasts from **anywhere** — no `BuildContext` needed:
+
+```dart
+import 'package:toastr_flutter/toastr.dart';
+
+// That's it! No setup, no initialization, no context.
+ToastrHelper.success('Operation completed!');
+ToastrHelper.error('Something went wrong!');
+ToastrHelper.warning('Please check your input');
+ToastrHelper.info('Here is some information');
+```
+
+### Full Example
 
 ```dart
 import 'package:flutter/material.dart';
 import 'package:toastr_flutter/toastr.dart';
 
-class MyWidget extends StatelessWidget {
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: const HomeScreen(),
+    );
+  }
+}
+
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Toastr Example')),
+      appBar: AppBar(title: const Text('Toastr Example')),
       body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
-              onPressed: () => ToastrHelper.success(context, 'Success!'),
-              child: Text('Show Success'),
+              onPressed: () => ToastrHelper.success('Saved successfully!'),
+              child: const Text('Success'),
             ),
             ElevatedButton(
-              onPressed: () => ToastrHelper.error(context, 'Error occurred!'),
-              child: Text('Show Error'),
+              onPressed: () => ToastrHelper.error('Failed to save!'),
+              child: const Text('Error'),
+            ),
+            ElevatedButton(
+              onPressed: () => ToastrHelper.warning('Check your input'),
+              child: const Text('Warning'),
+            ),
+            ElevatedButton(
+              onPressed: () => ToastrHelper.info('New update available'),
+              child: const Text('Info'),
             ),
           ],
         ),
@@ -71,22 +106,22 @@ class MyWidget extends StatelessWidget {
 
 ```dart
 // Success notification (green)
-ToastrHelper.success(context, 'Operation completed successfully!');
+ToastrHelper.success('Operation completed successfully!');
 
 // Error notification (red)
-ToastrHelper.error(context, 'Something went wrong!');
+ToastrHelper.error('Something went wrong!');
 
 // Warning notification (orange)
-ToastrHelper.warning(context, 'Please check your input');
+ToastrHelper.warning('Please check your input');
 
 // Info notification (blue)
-ToastrHelper.info(context, 'Here is some useful information');
+ToastrHelper.info('Here is some useful information');
 
 // Auto-detect type from message content
-ToastrHelper.show(context, 'Success! Operation completed'); // Automatically shows green success
+ToastrHelper.show('Success! Operation completed'); // Auto-detects as success
 
 // Custom configuration
-ToastrHelper.custom(context, ToastrConfig(...));
+ToastrHelper.custom(ToastrConfig(...));
 ```
 
 ## Advanced Usage 🔧
@@ -96,7 +131,7 @@ ToastrHelper.custom(context, ToastrConfig(...));
 For complete control over appearance and behavior:
 
 ```dart
-ToastrHelper.custom(context, ToastrConfig(
+ToastrHelper.custom(ToastrConfig(
   type: ToastrType.success,
   message: 'Custom styled notification',
   title: 'Custom Title',
@@ -118,18 +153,30 @@ All helper methods support these optional parameters:
 
 ```dart
 ToastrHelper.success(
-  context,                    // Required: BuildContext
-  'Your message here',        // Required: String message
-  title: 'Optional Title',    // Optional: String title
-  duration: Duration(seconds: 3),       // Optional: How long to show
-  position: ToastrPosition.topRight,    // Optional: Where to show
-  showMethod: ToastrShowMethod.fadeIn,  // Optional: Show animation
-  hideMethod: ToastrHideMethod.fadeOut, // Optional: Hide animation
-  showDuration: Duration(milliseconds: 300),  // Optional: Animation duration
-  hideDuration: Duration(milliseconds: 1000), // Optional: Hide animation duration
-  showProgressBar: false,     // Optional: Show progress bar
-  showCloseButton: false,     // Optional: Show close button
-  preventDuplicates: false,   // Optional: Prevent duplicate messages
+  'Your message here',                  // Required: message
+  title: 'Optional Title',             // Optional: title text
+  duration: Duration(seconds: 3),       // Optional: how long to show
+  position: ToastrPosition.topRight,    // Optional: where to show
+  showMethod: ToastrShowMethod.fadeIn,  // Optional: show animation
+  hideMethod: ToastrHideMethod.fadeOut, // Optional: hide animation
+  showDuration: Duration(milliseconds: 300),  // Optional: show animation speed
+  hideDuration: Duration(milliseconds: 1000), // Optional: hide animation speed
+  showProgressBar: false,               // Optional: show progress bar
+  showCloseButton: false,               // Optional: show close button
+  preventDuplicates: false,             // Optional: prevent duplicates
+);
+```
+
+### Global Configuration
+
+Change default settings for all toasts:
+
+```dart
+ToastrHelper.configure(
+  position: ToastrPosition.bottomCenter,
+  duration: Duration(seconds: 3),
+  showProgressBar: true,
+  showCloseButton: true,
 );
 ```
 
@@ -138,15 +185,13 @@ ToastrHelper.success(
 Choose where your notifications appear:
 
 ```dart
-// Top positions
 ToastrPosition.topLeft      // Top-left corner
 ToastrPosition.topCenter    // Top-center
 ToastrPosition.topRight     // Top-right corner (default)
-
-// Bottom positions
 ToastrPosition.bottomLeft   // Bottom-left corner
 ToastrPosition.bottomCenter // Bottom-center
 ToastrPosition.bottomRight  // Bottom-right corner
+ToastrPosition.center       // Center of screen
 ```
 
 ### Animation Options
@@ -155,14 +200,20 @@ Customize how notifications appear and disappear:
 
 ```dart
 // Show methods
-ToastrShowMethod.fadeIn     // Fade in (default)
-ToastrShowMethod.slideDown  // Slide down from top
-ToastrShowMethod.slideUp    // Slide up from bottom
+ToastrShowMethod.fadeIn      // Fade in (default)
+ToastrShowMethod.slideDown   // Slide from top
+ToastrShowMethod.slideUp     // Slide from bottom
+ToastrShowMethod.slideLeft   // Slide from right
+ToastrShowMethod.slideRight  // Slide from left
+ToastrShowMethod.show        // Instant
 
 // Hide methods
-ToastrHideMethod.fadeOut    // Fade out (default)
-ToastrHideMethod.slideUp    // Slide up
-ToastrHideMethod.slideDown  // Slide down
+ToastrHideMethod.fadeOut     // Fade out (default)
+ToastrHideMethod.slideUp     // Slide to top
+ToastrHideMethod.slideDown   // Slide to bottom
+ToastrHideMethod.slideLeft   // Slide to left
+ToastrHideMethod.slideRight  // Slide to right
+ToastrHideMethod.hide        // Instant
 ```
 
 ### Managing Notifications
@@ -179,42 +230,42 @@ ToastrHelper.clearLast();
 
 ### ToastrHelper Methods
 
-| Method | Description | Parameters |
-|--------|-------------|------------|
-| `success(context, message, {...})` | Show green success notification | context, message, optional params |
-| `error(context, message, {...})` | Show red error notification | context, message, optional params |
-| `warning(context, message, {...})` | Show orange warning notification | context, message, optional params |
-| `info(context, message, {...})` | Show blue info notification | context, message, optional params |
-| `show(context, message, {type})` | Auto-detect type from content | context, message, optional type |
-| `custom(context, config)` | Show with full custom config | context, ToastrConfig object |
-| `clearAll()` | Clear all active notifications | None |
-| `clearLast()` | Clear only the last notification | None |
+| Method                    | Description                           |
+| ------------------------- | ------------------------------------- |
+| `success(message, {...})` | Show green success notification       |
+| `error(message, {...})`   | Show red error notification           |
+| `warning(message, {...})` | Show orange warning notification      |
+| `info(message, {...})`    | Show blue info notification           |
+| `show(message, {type})`   | Auto-detect type from message content |
+| `custom(config)`          | Show with full custom config          |
+| `configure({...})`        | Set global defaults                   |
+| `clearAll()`              | Clear all active notifications        |
+| `clearLast()`             | Clear only the last notification      |
 
 ### ToastrConfig Properties
 
-Configuration class for complete customization:
-
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `type` | `ToastrType` | required | success, error, warning, info |
-| `message` | `String` | required | Main message text |
-| `title` | `String?` | null | Optional title text |
-| `duration` | `Duration` | 5 seconds | How long to display |
-| `position` | `ToastrPosition` | topRight | Where to position |
-| `showMethod` | `ToastrShowMethod` | fadeIn | Show animation type |
-| `hideMethod` | `ToastrHideMethod` | fadeOut | Hide animation type |
-| `showDuration` | `Duration` | 300ms | Show animation duration |
-| `hideDuration` | `Duration` | 1000ms | Hide animation duration |
-| `showProgressBar` | `bool` | false | Show progress bar |
-| `showCloseButton` | `bool` | false | Show close button |
-| `preventDuplicates` | `bool` | false | Prevent duplicate messages |
+| Property            | Type               | Default   | Description                   |
+| ------------------- | ------------------ | --------- | ----------------------------- |
+| `type`              | `ToastrType`       | required  | success, error, warning, info |
+| `message`           | `String`           | required  | Main message text             |
+| `title`             | `String?`          | null      | Optional title text           |
+| `duration`          | `Duration`         | 5 seconds | How long to display           |
+| `position`          | `ToastrPosition`   | topRight  | Where to position             |
+| `showMethod`        | `ToastrShowMethod` | fadeIn    | Show animation type           |
+| `hideMethod`        | `ToastrHideMethod` | fadeOut   | Hide animation type           |
+| `showDuration`      | `Duration`         | 300ms     | Show animation duration       |
+| `hideDuration`      | `Duration`         | 1000ms    | Hide animation duration       |
+| `showProgressBar`   | `bool`             | false     | Show progress bar             |
+| `showCloseButton`   | `bool`             | false     | Show close button             |
+| `dismissible`       | `bool`             | true      | Allow tap to dismiss          |
+| `preventDuplicates` | `bool`             | false     | Prevent duplicate messages    |
 
 ## Responsive Design 📱
 
 The package automatically adapts to different screen sizes:
 
-- **Mobile (< 768px)**: Optimized spacing and sizing
-- **Tablet (768px - 1024px)**: Medium sizing with appropriate margins  
+- **Mobile (< 768px)**: Compact layout with touch-friendly targets
+- **Tablet (768px - 1024px)**: Medium sizing with appropriate margins
 - **Desktop (> 1024px)**: Full-featured with optimal positioning
 
 ## Examples 💡
@@ -222,31 +273,37 @@ The package automatically adapts to different screen sizes:
 ### Quick Notifications
 
 ```dart
-// In any widget with BuildContext
+// Simple toast from a button
 ElevatedButton(
-  onPressed: () => ToastrHelper.success(context, 'Saved successfully!'),
+  onPressed: () => ToastrHelper.success('Saved!'),
   child: Text('Save'),
 )
 
 // Error with custom duration
-ElevatedButton(
-  onPressed: () => ToastrHelper.error(
-    context, 
-    'Failed to save!',
-    duration: Duration(seconds: 10),
-  ),
-  child: Text('Save'),
+ToastrHelper.error(
+  'Failed to save!',
+  duration: Duration(seconds: 10),
+  showCloseButton: true,
 )
+
+// From a callback, async handler, service — anywhere!
+Future<void> fetchData() async {
+  try {
+    await api.getData();
+    ToastrHelper.success('Data loaded');
+  } catch (e) {
+    ToastrHelper.error('Failed to load data');
+  }
+}
 ```
 
 ### Advanced Notifications
 
 ```dart
-// Custom notification with all features
-ToastrHelper.custom(context, ToastrConfig(
+ToastrHelper.custom(ToastrConfig(
   type: ToastrType.info,
   title: 'Update Available',
-  message: 'A new version of the app is available. Update now?',
+  message: 'A new version is available. Update now?',
   duration: Duration(seconds: 10),
   position: ToastrPosition.bottomCenter,
   showProgressBar: true,
@@ -262,6 +319,7 @@ ToastrHelper.custom(context, ToastrConfig(
 <div align="center">
 
 ### 🖥️ Desktop Experience
+
 <table>
   <tr>
     <td align="center" width="50%">
@@ -279,7 +337,8 @@ ToastrHelper.custom(context, ToastrConfig(
   </tr>
 </table>
 
-### 📱 Mobile Experience  
+### 📱 Mobile Experience
+
 <table>
   <tr>
     <td align="center" width="50%">
@@ -299,32 +358,31 @@ ToastrHelper.custom(context, ToastrConfig(
 
 </div>
 
-> 🎨 **Responsive Design**: Automatically adapts to different screen sizes - from mobile phones to desktop computers with consistent behavior and beautiful animations.
-
+> 🎨 **Responsive Design**: Automatically adapts to different screen sizes — from mobile phones to desktop computers with consistent behavior and beautiful animations.
 
 ## Migration Guide 🔄
 
-### From v1.0.0+2 to v1.0.0+3
+### From v1.0.0+7 to v2.0.0
 
-**Breaking Change**: All methods now require `BuildContext` as first parameter.
+**Breaking Change**: `BuildContext` is no longer needed. Remove `context` from all calls.
 
 **Before:**
-```dart
-ToastrHelper.success('Message');
-ToastrHelper.error('Error');
-```
 
-**After:**
 ```dart
 ToastrHelper.success(context, 'Message');
 ToastrHelper.error(context, 'Error');
+ToastrHelper.custom(context, config);
 ```
 
-**Benefits:**
-- ✅ No more manual initialization required
-- ✅ Better performance (no auto-detection overhead)
-- ✅ More secure (no background scanning)
-- ✅ Works exactly like Flutter's SnackBar
+**After:**
+
+```dart
+ToastrHelper.success('Message');
+ToastrHelper.error('Error');
+ToastrHelper.custom(config);
+```
+
+No `init()`, no `navigatorKey`, no `builder` — just call the methods directly.
 
 ## License 📄
 
