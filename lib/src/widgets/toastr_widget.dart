@@ -32,24 +32,54 @@ class ToastrWidget extends StatefulWidget {
 
 class _ToastrWidgetState extends State<ToastrWidget>
     with TickerProviderStateMixin {
-  late AnimationController _showController;
-  late AnimationController _hideController;
+  // --- Toast enter/exit animation controllers ---
+  late AnimationController _enterController;
+  late Animation<double> _enterScale;
+  late Animation<double> _enterOpacity;
+  late Animation<double> _enterTranslateY;
+
+  late AnimationController _exitController;
+  late Animation<double> _exitScale;
+  late Animation<double> _exitOpacity;
+  late Animation<double> _exitTranslateY;
+
   late AnimationController _progressController;
-
-  late Animation<double> _showAnimation;
-  late Animation<double> _hideAnimation;
   late Animation<double> _progressAnimation;
-  late Animation<Offset> _slideAnimation;
 
-  // Icon entrance animation (like react-hot-toast scale-in)
-  late AnimationController _iconController;
-  late Animation<double> _iconScaleAnimation;
-  late Animation<double> _iconOpacityAnimation;
+  // --- Icon animation controllers ---
+  // Circle scale-in for success/error icons (0.3s, delay 100ms)
+  late AnimationController _iconCircleController;
+  late Animation<double> _iconCircleScale;
+  late Animation<double> _iconCircleOpacity;
+
+  // Checkmark line draw (0.2s, delay 200ms)
+  late AnimationController _checkmarkController;
+  late Animation<double> _checkmarkWidth;
+  late Animation<double> _checkmarkHeight;
+  late Animation<double> _checkmarkOpacity;
+
+  // Error lines (0.15s each, delays 150ms / 180ms)
+  late AnimationController _errorLine1Controller;
+  late Animation<double> _errorLine1Scale;
+  late Animation<double> _errorLine1Opacity;
+  late AnimationController _errorLine2Controller;
+  late Animation<double> _errorLine2Scale;
+  late Animation<double> _errorLine2Opacity;
+
+  // AnimatedIconWrapper: scale(0.6) opacity(0.4) → scale(1) opacity(1)
+  // 0.3s delay 0.12s — for custom icons and warning/info
+  late AnimationController _iconWrapperController;
+  late Animation<double> _iconWrapperScale;
+  late Animation<double> _iconWrapperOpacity;
 
   bool _isHovering = false;
   bool _isDismissing = false;
   Timer? _autoDismissTimer;
-  Timer? _iconDelayTimer;
+  Timer? _iconCircleDelayTimer;
+  Timer? _checkmarkDelayTimer;
+  Timer? _errorLine1DelayTimer;
+  Timer? _errorLine2DelayTimer;
+  Timer? _iconWrapperDelayTimer;
   double _dragOffset = 0;
 
   @override
@@ -61,112 +91,186 @@ class _ToastrWidgetState extends State<ToastrWidget>
   }
 
   void _setupAnimations() {
-    _showController = AnimationController(
-      duration: widget.config.showDuration,
+    final isTop = widget.config.position.name.startsWith('top');
+    final factor = isTop ? 1.0 : -1.0;
+
+    // --- Toast ENTER animation ---
+    // 0.35s cubic-bezier(.21,1.02,.73,1)
+    // from: translate3d(0, factor*-200%, 0) scale(.6) opacity:.5
+    // to:   translate3d(0, 0, 0) scale(1) opacity:1
+    _enterController = AnimationController(
+      duration: const Duration(milliseconds: 350),
       vsync: this,
     );
+    const enterCurve = Cubic(0.21, 1.02, 0.73, 1.0);
+    _enterScale = Tween<double>(begin: 0.6, end: 1.0).animate(
+      CurvedAnimation(parent: _enterController, curve: enterCurve),
+    );
+    _enterOpacity = Tween<double>(begin: 0.5, end: 1.0).animate(
+      CurvedAnimation(parent: _enterController, curve: enterCurve),
+    );
+    // factor * -200% means: top toasts slide down from above (-200%),
+    // bottom toasts slide up from below (200%)
+    _enterTranslateY = Tween<double>(
+      begin: factor * -200.0,
+      end: 0.0,
+    ).animate(CurvedAnimation(parent: _enterController, curve: enterCurve));
 
-    _hideController = AnimationController(
-      duration: widget.config.hideDuration,
+    // --- Toast EXIT animation ---
+    // 0.4s cubic-bezier(.06,.71,.55,1)
+    // from: scale(1) opacity:1
+    // to:   translate3d(0, factor*-150%, 0) scale(.6) opacity:0
+    _exitController = AnimationController(
+      duration: const Duration(milliseconds: 400),
       vsync: this,
     );
+    const exitCurve = Cubic(0.06, 0.71, 0.55, 1.0);
+    _exitScale = Tween<double>(begin: 1.0, end: 0.6).animate(
+      CurvedAnimation(parent: _exitController, curve: exitCurve),
+    );
+    _exitOpacity = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(parent: _exitController, curve: exitCurve),
+    );
+    _exitTranslateY = Tween<double>(
+      begin: 0.0,
+      end: factor * -150.0,
+    ).animate(CurvedAnimation(parent: _exitController, curve: exitCurve));
 
+    // --- Progress bar ---
     _progressController = AnimationController(
       duration: widget.config.duration,
       vsync: this,
     );
-
-    // Icon animation: scale(0.6) opacity(0.4) -> scale(1) opacity(1)
-    // 0.3s with 0.12s delay, cubic-bezier(0.175, 0.885, 0.32, 1.275)
-    _iconController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-    _iconScaleAnimation = Tween<double>(begin: 0.6, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _iconController,
-        curve: const Cubic(0.175, 0.885, 0.32, 1.275),
-      ),
-    );
-    _iconOpacityAnimation = Tween<double>(begin: 0.4, end: 1.0).animate(
-      CurvedAnimation(parent: _iconController, curve: Curves.easeOut),
-    );
-
-    _showAnimation = Tween<double>(begin: _getShowBeginValue(), end: 1.0)
-        .animate(CurvedAnimation(
-      parent: _showController,
-      curve: widget.config.showEasing,
-    ));
-
-    _hideAnimation = Tween<double>(begin: 1.0, end: _getHideEndValue())
-        .animate(CurvedAnimation(
-      parent: _hideController,
-      curve: widget.config.hideEasing,
-    ));
-
-    _slideAnimation =
-        Tween<Offset>(begin: _getSlideOffset(), end: Offset.zero).animate(
-      CurvedAnimation(
-        parent: _showController,
-        curve: widget.config.showEasing,
-      ),
-    );
-
     _progressAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(parent: _progressController, curve: Curves.linear),
     );
-  }
 
-  double _getShowBeginValue() {
-    switch (widget.config.showMethod) {
-      case ToastrShowMethod.fadeIn:
-        return 0.0;
-      case ToastrShowMethod.slideDown:
-      case ToastrShowMethod.slideUp:
-      case ToastrShowMethod.slideLeft:
-      case ToastrShowMethod.slideRight:
-      case ToastrShowMethod.show:
-        return 1.0;
-    }
-  }
+    // --- Icon circle animation (checkmark.tsx / error.tsx) ---
+    // scale(0) rotate(45deg) opacity:0 → scale(1) rotate(45deg) opacity:1
+    // 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), delay 100ms
+    _iconCircleController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    const iconCircleCurve = Cubic(0.175, 0.885, 0.32, 1.275);
+    _iconCircleScale = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _iconCircleController, curve: iconCircleCurve),
+    );
+    _iconCircleOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _iconCircleController, curve: Curves.easeOut),
+    );
 
-  double _getHideEndValue() {
-    switch (widget.config.hideMethod) {
-      case ToastrHideMethod.fadeOut:
-      case ToastrHideMethod.hide:
-        return 0.0;
-      case ToastrHideMethod.slideUp:
-      case ToastrHideMethod.slideDown:
-      case ToastrHideMethod.slideLeft:
-      case ToastrHideMethod.slideRight:
-        return 1.0;
-    }
-  }
+    // --- Checkmark line draw animation (checkmark.tsx) ---
+    // 0.2s ease-out, delay 200ms
+    // 0%: height:0 width:0 opacity:0
+    // 40%: height:0 width:6px opacity:1
+    // 100%: opacity:1 height:10px
+    _checkmarkController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _checkmarkOpacity = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.0), weight: 40),
+      TweenSequenceItem(tween: ConstantTween(1.0), weight: 60),
+    ]).animate(_checkmarkController);
+    _checkmarkWidth = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.0), weight: 40),
+      TweenSequenceItem(tween: ConstantTween(1.0), weight: 60),
+    ]).animate(_checkmarkController);
+    _checkmarkHeight = TweenSequence<double>([
+      TweenSequenceItem(tween: ConstantTween(0.0), weight: 40),
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.0), weight: 60),
+    ]).animate(_checkmarkController);
 
-  Offset _getSlideOffset() {
-    switch (widget.config.showMethod) {
-      case ToastrShowMethod.slideDown:
-        return const Offset(0, -1);
-      case ToastrShowMethod.slideUp:
-        return const Offset(0, 1);
-      case ToastrShowMethod.slideLeft:
-        return const Offset(1, 0);
-      case ToastrShowMethod.slideRight:
-        return const Offset(-1, 0);
-      default:
-        return Offset.zero;
-    }
+    // --- Error line 1 animation (error.tsx) ---
+    // scale(0) opacity:0 → scale(1) opacity:1, 0.15s ease-out, delay 150ms
+    _errorLine1Controller = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    _errorLine1Scale = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _errorLine1Controller, curve: Curves.easeOut),
+    );
+    _errorLine1Opacity = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _errorLine1Controller, curve: Curves.easeOut),
+    );
+
+    // --- Error line 2 animation (error.tsx) ---
+    // scale(0) rotate(90deg) opacity:0 → scale(1) rotate(90deg) opacity:1
+    // 0.15s ease-out, delay 180ms
+    _errorLine2Controller = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    _errorLine2Scale = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _errorLine2Controller, curve: Curves.easeOut),
+    );
+    _errorLine2Opacity = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _errorLine2Controller, curve: Curves.easeOut),
+    );
+
+    // --- Icon wrapper animation (toast-icon.tsx AnimatedIconWrapper) ---
+    // scale(0.6) opacity(0.4) → scale(1) opacity(1)
+    // 0.3s delay 0.12s cubic-bezier(0.175, 0.885, 0.32, 1.275)
+    _iconWrapperController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _iconWrapperScale = Tween<double>(begin: 0.6, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _iconWrapperController,
+        curve: const Cubic(0.175, 0.885, 0.32, 1.275),
+      ),
+    );
+    _iconWrapperOpacity = Tween<double>(begin: 0.4, end: 1.0).animate(
+      CurvedAnimation(parent: _iconWrapperController, curve: Curves.easeOut),
+    );
   }
 
   void _startShowAnimation() {
-    _showController.forward();
+    _enterController.forward();
     if (widget.config.showProgressBar) {
       _progressController.forward();
     }
-    // Delay icon animation by 120ms (like react-hot-toast animation-delay: 0.12s)
-    _iconDelayTimer = Timer(const Duration(milliseconds: 120), () {
-      if (mounted) _iconController.forward();
-    });
+    _startIconAnimations();
+  }
+
+  void _startIconAnimations() {
+    final type = widget.config.type;
+
+    if (type == ToastrType.success || type == ToastrType.error) {
+      // Circle scale-in: delay 100ms
+      _iconCircleDelayTimer = Timer(const Duration(milliseconds: 100), () {
+        if (mounted) _iconCircleController.forward();
+      });
+    }
+
+    if (type == ToastrType.success) {
+      // Checkmark draw: delay 200ms
+      _checkmarkDelayTimer = Timer(const Duration(milliseconds: 200), () {
+        if (mounted) _checkmarkController.forward();
+      });
+    }
+
+    if (type == ToastrType.error) {
+      // Error line 1: delay 150ms
+      _errorLine1DelayTimer = Timer(const Duration(milliseconds: 150), () {
+        if (mounted) _errorLine1Controller.forward();
+      });
+      // Error line 2: delay 180ms
+      _errorLine2DelayTimer = Timer(const Duration(milliseconds: 180), () {
+        if (mounted) _errorLine2Controller.forward();
+      });
+    }
+
+    // Icon wrapper for custom icons, warning, info: delay 120ms
+    if (widget.config.customIcon != null ||
+        type == ToastrType.warning ||
+        type == ToastrType.info) {
+      _iconWrapperDelayTimer = Timer(const Duration(milliseconds: 120), () {
+        if (mounted) _iconWrapperController.forward();
+      });
+    }
   }
 
   void _scheduleAutoDismiss() {
@@ -198,22 +302,29 @@ class _ToastrWidgetState extends State<ToastrWidget>
     setState(() => _isDismissing = true);
     _autoDismissTimer?.cancel();
 
-    _hideController.forward().then((_) {
+    _exitController.forward().then((_) {
       if (mounted) widget.onDismiss?.call();
     });
   }
 
   // --- Icon builders (faithful to react-hot-toast source) ---
 
+  /// Builds the toast icon matching react-hot-toast exactly.
+  ///
+  /// From toast-icon.tsx:
+  /// - blank → null
+  /// - custom icon string → AnimatedIconWrapper
+  /// - loading → only LoaderIcon (12px spinner)
+  /// - success/error → IndicatorWrapper with LoaderIcon + StatusWrapper overlay
   Widget _buildIcon() {
-    // Custom icon provided by user
+    // Custom icon provided by user → AnimatedIconWrapper
     if (widget.config.customIcon != null) {
       return AnimatedBuilder(
-        animation: _iconScaleAnimation,
+        animation: _iconWrapperScale,
         builder: (context, child) => Transform.scale(
-          scale: _iconScaleAnimation.value,
+          scale: _iconWrapperScale.value,
           child: Opacity(
-            opacity: _iconOpacityAnimation.value,
+            opacity: _iconWrapperOpacity.value,
             child: child,
           ),
         ),
@@ -225,12 +336,12 @@ class _ToastrWidgetState extends State<ToastrWidget>
       );
     }
 
-    // Blank -> no icon
+    // Blank → no icon (returns null in react-hot-toast)
     if (widget.config.type == ToastrType.blank) {
       return const SizedBox.shrink();
     }
 
-    // Loading -> just the spinner (12px border-based)
+    // Loading → only LoaderIcon (no overlay)
     if (widget.config.type == ToastrType.loading) {
       return const SizedBox(
         width: 20,
@@ -239,46 +350,158 @@ class _ToastrWidgetState extends State<ToastrWidget>
       );
     }
 
-    // Success/Error/Warning/Info -> animated icon with scale-in
+    // Success/Error → IndicatorWrapper: LoaderIcon underneath + StatusWrapper on top
+    if (widget.config.type == ToastrType.success ||
+        widget.config.type == ToastrType.error) {
+      return SizedBox(
+        width: 20,
+        height: 20,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // LoaderIcon always underneath (visible briefly before status appears)
+            const _LoaderIcon(),
+            // StatusWrapper (absolute positioned) with animated icon on top
+            Positioned.fill(
+              child: _buildAnimatedStatusIcon(),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Warning/Info → AnimatedIconWrapper with simple icon
     return AnimatedBuilder(
-      animation: _iconScaleAnimation,
+      animation: _iconWrapperScale,
       builder: (context, child) => Transform.scale(
-        scale: _iconScaleAnimation.value,
+        scale: _iconWrapperScale.value,
         child: Opacity(
-          opacity: _iconOpacityAnimation.value,
+          opacity: _iconWrapperOpacity.value,
           child: child,
         ),
       ),
       child: SizedBox(
         width: 20,
         height: 20,
-        child: _buildTypedIcon(),
+        child: _buildSimpleIcon(),
       ),
     );
   }
 
-  Widget _buildTypedIcon() {
+  /// Animated success/error icon with circle scale-in + line animations.
+  Widget _buildAnimatedStatusIcon() {
+    if (widget.config.type == ToastrType.success) {
+      return _buildAnimatedCheckmark();
+    }
+    return _buildAnimatedError();
+  }
+
+  /// Animated checkmark: circle scales in from 0 rotated 45deg,
+  /// then checkmark line draws inside.
+  Widget _buildAnimatedCheckmark() => AnimatedBuilder(
+        animation: _iconCircleScale,
+        builder: (context, _) => Opacity(
+          opacity: _iconCircleOpacity.value,
+          child: Transform.scale(
+            scale: _iconCircleScale.value,
+            child: Transform.rotate(
+              angle: math.pi / 4, // 45 degrees
+              child: Container(
+                width: 20,
+                height: 20,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF61D345),
+                  shape: BoxShape.circle,
+                ),
+                child: AnimatedBuilder(
+                  animation: _checkmarkWidth,
+                  builder: (context, _) => Opacity(
+                    opacity: _checkmarkOpacity.value,
+                    child: CustomPaint(
+                      size: const Size(20, 20),
+                      painter: _AnimatedCheckPaint(
+                        widthFactor: _checkmarkWidth.value,
+                        heightFactor: _checkmarkHeight.value,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+  /// Animated error: circle scales in from 0 rotated 45deg,
+  /// then two lines appear sequentially.
+  Widget _buildAnimatedError() => AnimatedBuilder(
+        animation: _iconCircleScale,
+        builder: (context, _) => Opacity(
+          opacity: _iconCircleOpacity.value,
+          child: Transform.scale(
+            scale: _iconCircleScale.value,
+            child: Transform.rotate(
+              angle: math.pi / 4, // 45 degrees
+              child: Container(
+                width: 20,
+                height: 20,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFF4B4B),
+                  shape: BoxShape.circle,
+                ),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // First line (horizontal)
+                    AnimatedBuilder(
+                      animation: _errorLine1Scale,
+                      builder: (context, _) => Opacity(
+                        opacity: _errorLine1Opacity.value,
+                        child: Transform.scale(
+                          scale: _errorLine1Scale.value,
+                          child: Container(
+                            width: 12,
+                            height: 2,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Second line (vertical — rotated 90deg relative)
+                    AnimatedBuilder(
+                      animation: _errorLine2Scale,
+                      builder: (context, _) => Opacity(
+                        opacity: _errorLine2Opacity.value,
+                        child: Transform.scale(
+                          scale: _errorLine2Scale.value,
+                          child: Transform.rotate(
+                            angle: math.pi / 2,
+                            child: Container(
+                              width: 12,
+                              height: 2,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+  /// Simple icon for warning/info types.
+  Widget _buildSimpleIcon() {
     switch (widget.config.type) {
-      case ToastrType.success:
-        return Container(
-          width: 20,
-          height: 20,
-          decoration: const BoxDecoration(
-            color: Color(0xFF61D345),
-            shape: BoxShape.circle,
-          ),
-          child: const Center(child: _CheckmarkPainter()),
-        );
-      case ToastrType.error:
-        return Container(
-          width: 20,
-          height: 20,
-          decoration: const BoxDecoration(
-            color: Color(0xFFFF4B4B),
-            shape: BoxShape.circle,
-          ),
-          child: const Center(child: _ErrorXPainter()),
-        );
       case ToastrType.warning:
         return Container(
           width: 20,
@@ -483,69 +706,60 @@ class _ToastrWidgetState extends State<ToastrWidget>
       ),
     );
 
-    toast = _applyShowAnimation(toast);
+    toast = AnimatedBuilder(
+      animation: _enterController,
+      builder: (context, child) {
+        if (_isDismissing) return child!;
+        return Opacity(
+          opacity: _enterOpacity.value,
+          child: Transform(
+            transform: Matrix4.identity()
+              ..translateByDouble(0.0, _enterTranslateY.value, 0.0, 1.0)
+              ..scaleByDouble(_enterScale.value, _enterScale.value, 1.0, 1.0),
+            alignment: Alignment.center,
+            child: child,
+          ),
+        );
+      },
+      child: toast,
+    );
 
     if (_isDismissing) {
-      toast = _applyHideAnimation(toast);
+      toast = AnimatedBuilder(
+        animation: _exitController,
+        builder: (context, child) => Opacity(
+          opacity: _exitOpacity.value,
+          child: Transform(
+            transform: Matrix4.identity()
+              ..translateByDouble(0.0, _exitTranslateY.value, 0.0, 1.0)
+              ..scaleByDouble(_exitScale.value, _exitScale.value, 1.0, 1.0),
+            alignment: Alignment.center,
+            child: child,
+          ),
+        ),
+        child: toast,
+      );
     }
 
     return Material(color: Colors.transparent, child: toast);
   }
 
-  Widget _applyShowAnimation(Widget child) {
-    if (widget.config.showMethod == ToastrShowMethod.fadeIn) {
-      return AnimatedBuilder(
-        animation: _showAnimation,
-        builder: (context, c) =>
-            Opacity(opacity: _showAnimation.value, child: c),
-        child: child,
-      );
-    }
-    if (_isSlideShow()) {
-      return AnimatedBuilder(
-        animation: _slideAnimation,
-        builder: (context, c) => Transform.translate(
-          offset: Offset(
-            _slideAnimation.value.dx * MediaQuery.of(context).size.width * 0.3,
-            _slideAnimation.value.dy *
-                MediaQuery.of(context).size.height *
-                0.15,
-          ),
-          child: c,
-        ),
-        child: child,
-      );
-    }
-    return child;
-  }
-
-  Widget _applyHideAnimation(Widget child) {
-    if (widget.config.hideMethod == ToastrHideMethod.fadeOut ||
-        widget.config.hideMethod == ToastrHideMethod.hide) {
-      return AnimatedBuilder(
-        animation: _hideAnimation,
-        builder: (context, c) =>
-            Opacity(opacity: _hideAnimation.value, child: c),
-        child: child,
-      );
-    }
-    return child;
-  }
-
-  bool _isSlideShow() =>
-      widget.config.showMethod == ToastrShowMethod.slideDown ||
-      widget.config.showMethod == ToastrShowMethod.slideUp ||
-      widget.config.showMethod == ToastrShowMethod.slideLeft ||
-      widget.config.showMethod == ToastrShowMethod.slideRight;
-
   @override
   void dispose() {
     _autoDismissTimer?.cancel();
-    _iconDelayTimer?.cancel();
-    _showController.dispose();
-    _hideController.dispose();
+    _iconCircleDelayTimer?.cancel();
+    _checkmarkDelayTimer?.cancel();
+    _errorLine1DelayTimer?.cancel();
+    _errorLine2DelayTimer?.cancel();
+    _iconWrapperDelayTimer?.cancel();
+    _enterController.dispose();
+    _exitController.dispose();
     _progressController.dispose();
-    _iconController.dispose();
+    _iconCircleController.dispose();
+    _checkmarkController.dispose();
+    _errorLine1Controller.dispose();
+    _errorLine2Controller.dispose();
+    _iconWrapperController.dispose();
     super.dispose();
   }
 }
@@ -554,18 +768,18 @@ class _ToastrWidgetState extends State<ToastrWidget>
 // Custom painters faithful to react-hot-toast icon components
 // =============================================================================
 
-/// White checkmark inside green circle (from checkmark.tsx)
-class _CheckmarkPainter extends StatelessWidget {
-  const _CheckmarkPainter();
+/// Animated checkmark paint matching checkmark.tsx:
+/// Inside 20px circle rotated 45deg, draws border-right + border-bottom
+/// positioned at bottom:6px, left:6px, width:6px, height:10px
+class _AnimatedCheckPaint extends CustomPainter {
+  _AnimatedCheckPaint({
+    required this.widthFactor,
+    required this.heightFactor,
+  });
 
-  @override
-  Widget build(BuildContext context) => CustomPaint(
-        size: const Size(10, 10),
-        painter: _CheckPaint(),
-      );
-}
+  final double widthFactor;
+  final double heightFactor;
 
-class _CheckPaint extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
@@ -575,53 +789,32 @@ class _CheckPaint extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
 
-    final path = Path()
-      ..moveTo(size.width * 0.15, size.height * 0.5)
-      ..lineTo(size.width * 0.4, size.height * 0.75)
-      ..lineTo(size.width * 0.85, size.height * 0.25);
+    // In checkmark.tsx the pseudo-element :after is positioned:
+    // bottom:6px left:6px → origin of the L-shape
+    // border-right + border-bottom form an L rotated 45deg (parent already rotated)
+    // width:6px height:10px
+    const originX = 6.0;
+    final originY = size.height - 6.0; // bottom: 6px
+
+    // The L-shape: bottom line goes right (width), right line goes up (height)
+    final currentWidth = 6.0 * widthFactor;
+    final currentHeight = 10.0 * heightFactor;
+
+    final path = Path()..moveTo(originX, originY - currentHeight);
+    if (currentHeight > 0) {
+      path.lineTo(originX, originY);
+    }
+    if (currentWidth > 0) {
+      path.lineTo(originX + currentWidth, originY);
+    }
 
     canvas.drawPath(path, paint);
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-/// White X inside red circle (from error.tsx)
-class _ErrorXPainter extends StatelessWidget {
-  const _ErrorXPainter();
-
-  @override
-  Widget build(BuildContext context) => CustomPaint(
-        size: const Size(10, 10),
-        painter: _XPaint(),
-      );
-}
-
-class _XPaint extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    canvas
-      ..drawLine(
-        Offset(size.width * 0.25, size.height * 0.25),
-        Offset(size.width * 0.75, size.height * 0.75),
-        paint,
-      )
-      ..drawLine(
-        Offset(size.width * 0.75, size.height * 0.25),
-        Offset(size.width * 0.25, size.height * 0.75),
-        paint,
-      );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _AnimatedCheckPaint oldDelegate) =>
+      oldDelegate.widthFactor != widthFactor ||
+      oldDelegate.heightFactor != heightFactor;
 }
 
 /// Border-based spinner matching loader.tsx:

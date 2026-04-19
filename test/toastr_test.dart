@@ -485,7 +485,8 @@ void main() {
         ),
         onDismiss: () => dismissed = true,
       ));
-      await tester.pump(const Duration(milliseconds: 150));
+      // Wait for enter animation (350ms) to complete so widget is on-screen
+      await tester.pump(const Duration(milliseconds: 350));
       await tester.tap(find.text('Tap me'));
       await tester.pumpAndSettle();
       expect(dismissed, isTrue);
