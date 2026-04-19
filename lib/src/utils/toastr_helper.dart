@@ -39,35 +39,47 @@ class ToastrHelper {
     }
   }
 
-  /// Auto-detect toast type from message content
+  /// Auto-detect toast type from message content.
+  ///
+  /// Uses word-boundary matching to avoid false positives like
+  /// "Error successfully handled" being detected as error.
+  /// Only matches when keywords appear as standalone words.
+  /// Defaults to [ToastrType.info] when no match is found.
   static ToastrType _detectTypeFromMessage(String message) {
     final lowerMessage = message.toLowerCase();
 
-    if (lowerMessage.contains('error') ||
-        lowerMessage.contains('failed') ||
-        lowerMessage.contains('wrong') ||
-        lowerMessage.contains('invalid')) {
-      return ToastrType.error;
-    }
+    // Use word-boundary regex to avoid false positives
+    bool hasWord(String word) =>
+        RegExp('\\b$word\\b').hasMatch(lowerMessage);
 
-    if (lowerMessage.contains('success') ||
-        lowerMessage.contains('completed') ||
-        lowerMessage.contains('done') ||
-        lowerMessage.contains('created')) {
+    // Check success first — "Error successfully handled" should be success
+    if (lowerMessage.startsWith('success') ||
+        hasWord('succeeded') ||
+        hasWord('completed') ||
+        hasWord('created')) {
       return ToastrType.success;
     }
 
-    if (lowerMessage.contains('warning') ||
-        lowerMessage.contains('caution') ||
-        lowerMessage.contains('attention')) {
+    if (hasWord('error') ||
+        hasWord('failed') ||
+        hasWord('failure') ||
+        hasWord('invalid')) {
+      return ToastrType.error;
+    }
+
+    if (hasWord('warning') ||
+        hasWord('caution') ||
+        hasWord('attention')) {
       return ToastrType.warning;
     }
 
     return ToastrType.info;
   }
 
-  /// Default configuration that can be customized globally
-  static ToastrConfig defaultConfig = const ToastrConfig(
+  /// Default configuration used as base for all toastrs.
+  ///
+  /// Use [configure] to change global defaults safely.
+  static ToastrConfig _defaultConfig = const ToastrConfig(
     type: ToastrType.info,
     message: '',
     position: ToastrPosition.topRight,
@@ -80,6 +92,9 @@ class ToastrHelper {
     showCloseButton: false,
     preventDuplicates: false,
   );
+
+  /// Returns the current default configuration (read-only).
+  static ToastrConfig get defaultConfig => _defaultConfig;
 
   /// Show a success toastr with the given message
   static void success(
@@ -97,7 +112,7 @@ class ToastrHelper {
     bool? preventDuplicates,
   }) {
     _service.show(
-      defaultConfig.copyWith(
+      _defaultConfig.copyWith(
         type: ToastrType.success,
         message: message,
         title: title,
@@ -131,7 +146,7 @@ class ToastrHelper {
     bool? preventDuplicates,
   }) {
     _service.show(
-      defaultConfig.copyWith(
+      _defaultConfig.copyWith(
         type: ToastrType.error,
         message: message,
         title: title,
@@ -166,7 +181,7 @@ class ToastrHelper {
     bool? preventDuplicates,
   }) {
     _service.show(
-      defaultConfig.copyWith(
+      _defaultConfig.copyWith(
         type: ToastrType.warning,
         message: message,
         title: title,
@@ -200,7 +215,7 @@ class ToastrHelper {
     bool? preventDuplicates,
   }) {
     _service.show(
-      defaultConfig.copyWith(
+      _defaultConfig.copyWith(
         type: ToastrType.info,
         message: message,
         title: title,
@@ -245,7 +260,7 @@ class ToastrHelper {
     bool? showCloseButton,
     bool? preventDuplicates,
   }) {
-    defaultConfig = defaultConfig.copyWith(
+    _defaultConfig = _defaultConfig.copyWith(
       position: position,
       duration: duration,
       showDuration: showDuration,

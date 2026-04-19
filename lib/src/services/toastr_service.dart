@@ -1,4 +1,5 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../models/toastr_config.dart';
@@ -27,6 +28,7 @@ class ToastrService {
   static ToastrService get instance => _instance;
 
   final Map<String, OverlayEntry> _activeToastrs = {};
+  final Map<String, Timer> _autoDismissTimers = {};
   final Set<String> _duplicateKeys = {};
 
   // Security tracking
@@ -91,8 +93,8 @@ class ToastrService {
     overlay.insert(overlayEntry);
     _notificationCount++;
 
-    // Auto-remove after duration
-    Future.delayed(secureConfig.duration, () {
+    // Auto-remove after duration (cancellable to prevent memory leaks)
+    _autoDismissTimers[toastId] = Timer(secureConfig.duration, () {
       _removeToastr(toastId);
     });
   }
@@ -163,6 +165,7 @@ class ToastrService {
   }
 
   void _removeToastr(String toastId) {
+    _autoDismissTimers.remove(toastId)?.cancel();
     final entry = _activeToastrs.remove(toastId);
     entry?.remove();
   }
@@ -223,6 +226,12 @@ class ToastrService {
 
   /// Clean up resources and clear all active notifications
   void dispose() {
+    // Cancel all pending timers
+    for (final timer in _autoDismissTimers.values) {
+      timer.cancel();
+    }
+    _autoDismissTimers.clear();
+
     // Remove all active notifications
     for (final entry in _activeToastrs.values) {
       entry.remove();

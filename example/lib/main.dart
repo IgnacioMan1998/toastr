@@ -12,7 +12,17 @@ class ToastrExampleApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Toastr Example',
-      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorSchemeSeed: const Color(0xFF6366F1),
+        useMaterial3: true,
+        brightness: Brightness.light,
+      ),
+      darkTheme: ThemeData(
+        colorSchemeSeed: const Color(0xFF6366F1),
+        useMaterial3: true,
+        brightness: Brightness.dark,
+      ),
       home: const ToastrDemoScreen(),
     );
   }
@@ -26,22 +36,17 @@ class ToastrDemoScreen extends StatefulWidget {
 }
 
 class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
-  // Form controllers
   final _titleController = TextEditingController();
-  final _messageController = TextEditingController(text: 'Sample message');
+  final _messageController = TextEditingController(text: 'This is a sample notification message');
 
-  // Configuration options
   ToastrType _selectedType = ToastrType.success;
   ToastrPosition _selectedPosition = ToastrPosition.topRight;
   ToastrShowMethod _selectedShowMethod = ToastrShowMethod.fadeIn;
   ToastrHideMethod _selectedHideMethod = ToastrHideMethod.fadeOut;
-  Curve _selectedShowEasing = Curves.easeOut;
-  Curve _selectedHideEasing = Curves.easeIn;
 
   int _showDuration = 300;
   int _hideDuration = 1000;
   int _timeout = 5000;
-  int _extendedTimeout = 1000;
 
   bool _showProgressBar = false;
   bool _showCloseButton = false;
@@ -57,12 +62,11 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
       position: _selectedPosition,
       showMethod: _selectedShowMethod,
       hideMethod: _selectedHideMethod,
-      showEasing: _selectedShowEasing,
-      hideEasing: _selectedHideEasing,
       showDuration: Duration(milliseconds: _showDuration),
       hideDuration: Duration(milliseconds: _hideDuration),
-      duration: _timeout > 0 ? Duration(milliseconds: _timeout) : const Duration(milliseconds: 100), // Minimum required duration
-      extendedTimeout: Duration(milliseconds: _extendedTimeout),
+      duration: _timeout > 0
+          ? Duration(milliseconds: _timeout)
+          : const Duration(milliseconds: 100),
       showProgressBar: _showProgressBar,
       showCloseButton: _showCloseButton,
       preventDuplicates: _preventDuplicates,
@@ -71,375 +75,480 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
     ToastrHelper.custom(context, config);
   }
 
-  Widget _buildFormField(String label, Widget child) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8.0),
-    child: Row(
-      children: [
-        SizedBox(
-          width: 120,
-          child: Text(
-            label,
-            style: const TextStyle(fontWeight: FontWeight.w500),
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(child: child),
-      ],
-    ),
-  );
-
-  Widget _buildTextField(String label, TextEditingController controller) =>
-      _buildFormField(
-        label,
-        TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            hintText: label,
-            border: const OutlineInputBorder(),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 8,
-            ),
-          ),
-        ),
-      );
-
-  Widget _buildDropdown<T>(
-    String label,
-    T value,
-    List<T> items,
-    void Function(T?) onChanged,
-  ) => _buildFormField(
-    label,
-    DropdownButton<T>(
-      value: value,
-      isExpanded: true,
-      items: items
-          .map(
-            (T item) => DropdownMenuItem<T>(
-              value: item,
-              child: Text(item.toString().split('.').last),
-            ),
-          )
-          .toList(),
-      onChanged: onChanged,
-    ),
-  );
-
-  Widget _buildSlider(
-    String label,
-    int value,
-    int min,
-    int max,
-    void Function(double) onChanged,
-  ) => _buildFormField(
-    label,
-    Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('$value ms'),
-        Slider(
-          value: value.toDouble(),
-          min: min.toDouble(),
-          max: max.toDouble(),
-          divisions: (max - min) ~/ 100,
-          onChanged: onChanged,
-        ),
-      ],
-    ),
-  );
-
-  Widget _buildSwitch(
-    String label,
-    bool value,
-    void Function(bool) onChanged,
-  ) => _buildFormField(label, Switch(value: value, onChanged: onChanged));
-
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      title: const Text('Toastr Demo'),
-      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-    ),
-    body: SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text(
-            'Toastr Configuration',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 20),
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
-          // Message configuration
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Message',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildTextField('Title', _titleController),
-                  _buildTextField('Message', _messageController),
-                  _buildDropdown<ToastrType>(
-                    'Toast Type',
-                    _selectedType,
-                    ToastrType.values,
-                    (value) => setState(() => _selectedType = value!),
-                  ),
-                ],
+    return Scaffold(
+      backgroundColor: colorScheme.surface,
+      body: CustomScrollView(
+        slivers: [
+          // App bar
+          SliverAppBar.large(
+            title: const Text('Toastr Demo'),
+            centerTitle: false,
+            actions: [
+              IconButton(
+                onPressed: ToastrHelper.clearAll,
+                icon: const Icon(Icons.clear_all_rounded),
+                tooltip: 'Clear all toasts',
               ),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Position and Animation configuration
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Position & Animation',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildDropdown<ToastrPosition>(
-                    'Position',
-                    _selectedPosition,
-                    ToastrPosition.values,
-                    (value) => setState(() => _selectedPosition = value!),
-                  ),
-                  _buildDropdown<ToastrShowMethod>(
-                    'Show Method',
-                    _selectedShowMethod,
-                    ToastrShowMethod.values,
-                    (value) => setState(() => _selectedShowMethod = value!),
-                  ),
-                  _buildDropdown<ToastrHideMethod>(
-                    'Hide Method',
-                    _selectedHideMethod,
-                    ToastrHideMethod.values,
-                    (value) => setState(() => _selectedHideMethod = value!),
-                  ),
-                  _buildDropdown<Curve>(
-                    'Show Easing',
-                    _selectedShowEasing,
-                    [
-                      Curves.easeOut,
-                      Curves.easeIn,
-                      Curves.linear,
-                      Curves.bounceOut,
-                      Curves.elasticOut,
-                    ],
-                    (value) => setState(() => _selectedShowEasing = value!),
-                  ),
-                  _buildDropdown<Curve>(
-                    'Hide Easing',
-                    _selectedHideEasing,
-                    [
-                      Curves.easeIn,
-                      Curves.easeOut,
-                      Curves.linear,
-                      Curves.bounceIn,
-                      Curves.elasticIn,
-                    ],
-                    (value) => setState(() => _selectedHideEasing = value!),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Timing configuration
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Timing',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildSlider(
-                    'Show Duration',
-                    _showDuration,
-                    100,
-                    2000,
-                    (value) => setState(() => _showDuration = value.round()),
-                  ),
-                  _buildSlider(
-                    'Hide Duration',
-                    _hideDuration,
-                    100,
-                    2000,
-                    (value) => setState(() => _hideDuration = value.round()),
-                  ),
-                  _buildSlider(
-                    'Timeout',
-                    _timeout,
-                    100, // Minimum valid duration (100ms)
-                    10000,
-                    (value) => setState(() => _timeout = value.round()),
-                  ),
-                  _buildSlider(
-                    'Extended Timeout',
-                    _extendedTimeout,
-                    0,
-                    5000,
-                    (value) => setState(() => _extendedTimeout = value.round()),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Options configuration
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Options',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildSwitch(
-                    'Progress Bar',
-                    _showProgressBar,
-                    (value) => setState(() => _showProgressBar = value),
-                  ),
-                  _buildSwitch(
-                    'Close Button',
-                    _showCloseButton,
-                    (value) => setState(() => _showCloseButton = value),
-                  ),
-                  _buildSwitch(
-                    'Prevent Duplicates',
-                    _preventDuplicates,
-                    (value) => setState(() => _preventDuplicates = value),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          // Action buttons
-          Row(
-            children: [
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: _showToast,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: const Text(
-                    'Show Toast',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: ToastrHelper.clearAll,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: const Text(
-                    'Clear Toasts',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: ToastrHelper.clearLast,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: const Text(
-                    'Clear Last',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-              ),
+              const SizedBox(width: 8),
             ],
           ),
 
-          const SizedBox(height: 24),
-
-          // Quick test buttons
-          const Text(
-            'Quick Tests',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          // Quick actions
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Quick Actions',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: [
+                      _QuickActionChip(
+                        label: 'Success',
+                        icon: Icons.check_circle_rounded,
+                        color: const Color(0xFF16A34A),
+                        onTap: () => ToastrHelper.success(
+                          context,
+                          'Operation completed successfully!',
+                          title: 'Success',
+                          showProgressBar: true,
+                        ),
+                      ),
+                      _QuickActionChip(
+                        label: 'Error',
+                        icon: Icons.cancel_rounded,
+                        color: const Color(0xFFDC2626),
+                        onTap: () => ToastrHelper.error(
+                          context,
+                          'Something went wrong. Please try again.',
+                          title: 'Error',
+                        ),
+                      ),
+                      _QuickActionChip(
+                        label: 'Warning',
+                        icon: Icons.warning_rounded,
+                        color: const Color(0xFFD97706),
+                        onTap: () => ToastrHelper.warning(
+                          context,
+                          'Please check your input before continuing.',
+                          title: 'Warning',
+                        ),
+                      ),
+                      _QuickActionChip(
+                        label: 'Info',
+                        icon: Icons.info_rounded,
+                        color: const Color(0xFF2563EB),
+                        onTap: () => ToastrHelper.info(
+                          context,
+                          'Here is some useful information for you.',
+                          title: 'Info',
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              ElevatedButton.icon(
-                onPressed: () => ToastrHelper.success(
-                  context,
-                  'Operation completed successfully!',
-                ),
-                icon: const Icon(Icons.check_circle, color: Colors.green),
-                label: const Text('Success'),
+
+          // Configuration section
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Configuration',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Message card
+                  _ConfigCard(
+                    title: 'Content',
+                    icon: Icons.text_fields_rounded,
+                    children: [
+                      TextField(
+                        controller: _titleController,
+                        decoration: const InputDecoration(
+                          labelText: 'Title (optional)',
+                          border: OutlineInputBorder(),
+                          isDense: true,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _messageController,
+                        decoration: const InputDecoration(
+                          labelText: 'Message',
+                          border: OutlineInputBorder(),
+                          isDense: true,
+                        ),
+                        maxLines: 2,
+                      ),
+                      const SizedBox(height: 12),
+                      _SegmentedSelector<ToastrType>(
+                        label: 'Type',
+                        value: _selectedType,
+                        items: ToastrType.values,
+                        labelBuilder: (t) => t.name,
+                        onChanged: (v) => setState(() => _selectedType = v),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Position & Animation card
+                  _ConfigCard(
+                    title: 'Position & Animation',
+                    icon: Icons.swap_vert_rounded,
+                    children: [
+                      _DropdownField<ToastrPosition>(
+                        label: 'Position',
+                        value: _selectedPosition,
+                        items: ToastrPosition.values,
+                        onChanged: (v) =>
+                            setState(() => _selectedPosition = v!),
+                      ),
+                      const SizedBox(height: 8),
+                      _DropdownField<ToastrShowMethod>(
+                        label: 'Show animation',
+                        value: _selectedShowMethod,
+                        items: ToastrShowMethod.values,
+                        onChanged: (v) =>
+                            setState(() => _selectedShowMethod = v!),
+                      ),
+                      const SizedBox(height: 8),
+                      _DropdownField<ToastrHideMethod>(
+                        label: 'Hide animation',
+                        value: _selectedHideMethod,
+                        items: ToastrHideMethod.values,
+                        onChanged: (v) =>
+                            setState(() => _selectedHideMethod = v!),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Timing card
+                  _ConfigCard(
+                    title: 'Timing',
+                    icon: Icons.timer_rounded,
+                    children: [
+                      _SliderField(
+                        label: 'Duration',
+                        value: _timeout,
+                        min: 100,
+                        max: 10000,
+                        suffix: 'ms',
+                        onChanged: (v) =>
+                            setState(() => _timeout = v.round()),
+                      ),
+                      _SliderField(
+                        label: 'Show speed',
+                        value: _showDuration,
+                        min: 100,
+                        max: 2000,
+                        suffix: 'ms',
+                        onChanged: (v) =>
+                            setState(() => _showDuration = v.round()),
+                      ),
+                      _SliderField(
+                        label: 'Hide speed',
+                        value: _hideDuration,
+                        min: 100,
+                        max: 2000,
+                        suffix: 'ms',
+                        onChanged: (v) =>
+                            setState(() => _hideDuration = v.round()),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Options card
+                  _ConfigCard(
+                    title: 'Options',
+                    icon: Icons.tune_rounded,
+                    children: [
+                      SwitchListTile(
+                        title: const Text('Progress bar'),
+                        value: _showProgressBar,
+                        onChanged: (v) =>
+                            setState(() => _showProgressBar = v),
+                        dense: true,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      SwitchListTile(
+                        title: const Text('Close button'),
+                        value: _showCloseButton,
+                        onChanged: (v) =>
+                            setState(() => _showCloseButton = v),
+                        dense: true,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      SwitchListTile(
+                        title: const Text('Prevent duplicates'),
+                        value: _preventDuplicates,
+                        onChanged: (v) =>
+                            setState(() => _preventDuplicates = v),
+                        dense: true,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                ],
               ),
-              ElevatedButton.icon(
-                onPressed: () =>
-                    ToastrHelper.error(context, 'Something went wrong!'),
-                icon: const Icon(Icons.error, color: Colors.red),
-                label: const Text('Error'),
-              ),
-              ElevatedButton.icon(
-                onPressed: () =>
-                    ToastrHelper.warning(context, 'Please check your input'),
-                icon: const Icon(Icons.warning, color: Colors.orange),
-                label: const Text('Warning'),
-              ),
-              ElevatedButton.icon(
-                onPressed: () =>
-                    ToastrHelper.info(context, 'Here is some information'),
-                icon: const Icon(Icons.info, color: Colors.blue),
-                label: const Text('Info'),
-              ),
-            ],
+            ),
           ),
         ],
       ),
-    ),
-  );
+
+      // Show toast FAB
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _showToast,
+        icon: const Icon(Icons.notifications_active_rounded),
+        label: const Text('Show Toast'),
+      ),
+    );
+  }
 
   @override
   void dispose() {
     _titleController.dispose();
     _messageController.dispose();
     super.dispose();
+  }
+}
+
+// --- Reusable UI components ---
+
+class _QuickActionChip extends StatelessWidget {
+  const _QuickActionChip({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: color.withValues(alpha: 0.1),
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 18, color: color),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  color: color,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ConfigCard extends StatelessWidget {
+  const _ConfigCard({
+    required this.title,
+    required this.icon,
+    required this.children,
+  });
+
+  final String title;
+  final IconData icon;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, size: 20, color: theme.colorScheme.primary),
+                const SizedBox(width: 8),
+                Text(
+                  title,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            ...children,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SegmentedSelector<T> extends StatelessWidget {
+  const _SegmentedSelector({
+    required this.label,
+    required this.value,
+    required this.items,
+    required this.labelBuilder,
+    required this.onChanged,
+  });
+
+  final String label;
+  final T value;
+  final List<T> items;
+  final String Function(T) labelBuilder;
+  final ValueChanged<T> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: Theme.of(context).textTheme.bodySmall),
+        const SizedBox(height: 6),
+        SegmentedButton<T>(
+          segments: items
+              .map((e) => ButtonSegment(value: e, label: Text(labelBuilder(e))))
+              .toList(),
+          selected: {value},
+          onSelectionChanged: (s) => onChanged(s.first),
+          showSelectedIcon: false,
+          style: ButtonStyle(
+            visualDensity: VisualDensity.compact,
+            textStyle: WidgetStatePropertyAll(
+              Theme.of(context).textTheme.labelSmall,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DropdownField<T extends Enum> extends StatelessWidget {
+  const _DropdownField({
+    required this.label,
+    required this.value,
+    required this.items,
+    required this.onChanged,
+  });
+
+  final String label;
+  final T value;
+  final List<T> items;
+  final ValueChanged<T?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonFormField<T>(
+      initialValue: value,
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+        isDense: true,
+      ),
+      items: items
+          .map((e) => DropdownMenuItem(
+                value: e,
+                child: Text(e.name, style: const TextStyle(fontSize: 14)),
+              ))
+          .toList(),
+      onChanged: onChanged,
+    );
+  }
+}
+
+class _SliderField extends StatelessWidget {
+  const _SliderField({
+    required this.label,
+    required this.value,
+    required this.min,
+    required this.max,
+    required this.suffix,
+    required this.onChanged,
+  });
+
+  final String label;
+  final int value;
+  final int min;
+  final int max;
+  final String suffix;
+  final ValueChanged<double> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 90,
+          child: Text(label, style: Theme.of(context).textTheme.bodyMedium),
+        ),
+        Expanded(
+          child: Slider(
+            value: value.toDouble(),
+            min: min.toDouble(),
+            max: max.toDouble(),
+            divisions: (max - min) ~/ 100,
+            onChanged: onChanged,
+          ),
+        ),
+        SizedBox(
+          width: 64,
+          child: Text(
+            '$value $suffix',
+            style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.end,
+          ),
+        ),
+      ],
+    );
   }
 }

@@ -55,7 +55,7 @@ class ToastrValidator {
       '',
     );
     cleaned = cleaned.replaceAll(
-      RegExp(r"on\\w+\\s*=\\s*'[^']*'", caseSensitive: false),
+      RegExp(r"on\w+\s*=\s*'[^']*'", caseSensitive: false),
       '',
     );
 
