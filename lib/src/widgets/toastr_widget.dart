@@ -49,6 +49,7 @@ class _ToastrWidgetState extends State<ToastrWidget>
   bool _isHovering = false;
   bool _isDismissing = false;
   Timer? _autoDismissTimer;
+  Timer? _iconDelayTimer;
   double _dragOffset = 0;
 
   @override
@@ -163,7 +164,7 @@ class _ToastrWidgetState extends State<ToastrWidget>
       _progressController.forward();
     }
     // Delay icon animation by 120ms (like react-hot-toast animation-delay: 0.12s)
-    Future.delayed(const Duration(milliseconds: 120), () {
+    _iconDelayTimer = Timer(const Duration(milliseconds: 120), () {
       if (mounted) _iconController.forward();
     });
   }
@@ -540,6 +541,7 @@ class _ToastrWidgetState extends State<ToastrWidget>
   @override
   void dispose() {
     _autoDismissTimer?.cancel();
+    _iconDelayTimer?.cancel();
     _showController.dispose();
     _hideController.dispose();
     _progressController.dispose();

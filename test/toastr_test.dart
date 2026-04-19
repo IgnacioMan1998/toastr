@@ -407,6 +407,7 @@ void main() {
 
     testWidgets('renders message text', (tester) async {
       await tester.pumpWidget(buildTestWidget());
+      await tester.pump(const Duration(milliseconds: 150));
       expect(find.text('Test message'), findsOneWidget);
     });
 
@@ -418,12 +419,14 @@ void main() {
           title: 'My Title',
         ),
       ));
+      await tester.pump(const Duration(milliseconds: 150));
       expect(find.text('My Title'), findsOneWidget);
       expect(find.text('Message'), findsOneWidget);
     });
 
     testWidgets('does not render title when null', (tester) async {
       await tester.pumpWidget(buildTestWidget());
+      await tester.pump(const Duration(milliseconds: 150));
       // Only message should be present, no title
       expect(find.text('Test message'), findsOneWidget);
     });
@@ -436,11 +439,13 @@ void main() {
           showCloseButton: true,
         ),
       ));
+      await tester.pump(const Duration(milliseconds: 150));
       expect(find.byIcon(Icons.close_rounded), findsOneWidget);
     });
 
     testWidgets('does not render close button by default', (tester) async {
       await tester.pumpWidget(buildTestWidget());
+      await tester.pump(const Duration(milliseconds: 150));
       expect(find.byIcon(Icons.close_rounded), findsNothing);
     });
 
@@ -449,7 +454,7 @@ void main() {
         await tester.pumpWidget(buildTestWidget(
           config: ToastrConfig(type: type, message: 'Test'),
         ));
-        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 150));
         if (type == ToastrType.blank) {
           // Blank type has no icon — only SizedBox.shrink
           expect(find.byType(Icon), findsNothing);
@@ -481,6 +486,7 @@ void main() {
         ),
         onDismiss: () => dismissed = true,
       ));
+      await tester.pump(const Duration(milliseconds: 150));
       await tester.tap(find.text('Tap me'));
       await tester.pumpAndSettle();
       expect(dismissed, isTrue);
@@ -494,7 +500,7 @@ void main() {
           showProgressBar: true,
         ),
       ));
-      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 150));
       // The progress bar container should exist
       expect(find.text('Progress'), findsOneWidget);
     });
@@ -507,8 +513,8 @@ void main() {
           customIcon: Icon(Icons.star, key: Key('custom-icon')),
         ),
       ));
+      await tester.pump(const Duration(milliseconds: 150));
       expect(find.byKey(const Key('custom-icon')), findsOneWidget);
-      // Default success icon (custom painted) should not be present
     });
     testWidgets('loading type shows spinner', (tester) async {
       await tester.pumpWidget(buildTestWidget(
@@ -517,6 +523,7 @@ void main() {
           message: 'Loading...',
         ),
       ));
+      await tester.pump(const Duration(milliseconds: 150));
       // Loading uses custom-painted border spinner, not CircularProgressIndicator
       expect(find.byType(CustomPaint), findsWidgets);
       expect(find.text('Loading...'), findsOneWidget);
@@ -529,6 +536,7 @@ void main() {
           message: 'Plain text',
         ),
       ));
+      await tester.pump(const Duration(milliseconds: 150));
       expect(find.text('Plain text'), findsOneWidget);
       // No icon should be rendered (only SizedBox.shrink)
       expect(find.byType(Icon), findsNothing);
@@ -542,6 +550,7 @@ void main() {
           customIcon: Icon(Icons.emoji_emotions, key: Key('emoji-icon')),
         ),
       ));
+      await tester.pump(const Duration(milliseconds: 150));
       expect(find.byKey(const Key('emoji-icon')), findsOneWidget);
     });
   });
