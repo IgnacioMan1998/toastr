@@ -7,12 +7,14 @@ A highly customizable Flutter package for displaying beautiful toast notificatio
 
 ## Features ✨
 
-- 🎨 **Multiple notification types**: Success, Error, Warning, Info
+- � **react-hot-toast animations**: Faithful recreation of enter/exit animations with spring curves
+- 🎨 **Multiple notification types**: Success, Error, Warning, Info, Loading, Blank
 - 📍 **Flexible positioning**: Top/Bottom with Left/Center/Right alignment + Center
-- 🎭 **Smooth animations**: Fade and slide animations with custom easing
+- 🎭 **Animated icons**: Checkmark draws in, X lines appear sequentially, spinner rotates — all with staggered delays
+- 🔮 **Promise API**: Auto-transition loading → success/error based on `Future` result
 - 🎯 **Highly customizable**: Colors, icons, duration, progress bars, and more
 - 👆 **Interactive**: Tap to dismiss, swipe-to-dismiss, and close button
-- 🧪 **Well tested**: Comprehensive test coverage
+- 🧪 **Well tested**: 61 unit tests with comprehensive coverage
 - 📱 **Responsive**: Adaptive design for mobile, tablet, and desktop
 - 🚀 **Zero setup**: No `BuildContext`, no `init()`, no `navigatorKey` — just call and go!
 - 🔒 **Secure**: Built-in XSS sanitization, rate limiting, and input validation
@@ -23,7 +25,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  toastr_flutter: ^1.0.0
+  toastr_flutter: ^2.1.0
 ```
 
 Then run:
@@ -46,6 +48,22 @@ ToastrHelper.success('Operation completed!');
 ToastrHelper.error('Something went wrong!');
 ToastrHelper.warning('Please check your input');
 ToastrHelper.info('Here is some information');
+
+// Loading toast (stays until dismissed)
+final id = ToastrHelper.loading('Saving...');
+// ... later
+ToastrHelper.dismiss(id);
+
+// Promise API — auto-transitions loading → success/error
+await ToastrHelper.promise(
+  myFuture,
+  loading: 'Saving...',
+  success: 'Saved!',
+  error: 'Failed to save',
+);
+
+// Short alias
+Toastr.success('Done!');
 ```
 
 ### Full Example
@@ -119,6 +137,31 @@ ToastrHelper.info('Here is some useful information');
 
 // Auto-detect type from message content
 ToastrHelper.show('Success! Operation completed'); // Auto-detects as success
+
+// Loading toast — stays on screen until dismissed
+final id = ToastrHelper.loading('Processing...');
+
+// Blank toast — no icon
+ToastrHelper.blank('Plain message');
+
+// Promise API — loading → success/error automatically
+await ToastrHelper.promise<Data>(
+  fetchData(),
+  loading: 'Fetching...',
+  success: 'Data loaded!',
+  error: 'Failed to fetch',
+);
+
+// Dismiss a specific toast by ID
+ToastrHelper.dismiss(id);
+
+// Dismiss all toasts
+ToastrHelper.dismiss();
+
+// Short alias — same API, shorter name
+Toastr.success('Saved!');
+Toastr.loading('Working...');
+await Toastr.promise(future, loading: '...', success: '...', error: '...');
 
 // Custom configuration
 ToastrHelper.custom(ToastrConfig(...));
@@ -230,17 +273,23 @@ ToastrHelper.clearLast();
 
 ### ToastrHelper Methods
 
-| Method                    | Description                           |
-| ------------------------- | ------------------------------------- |
-| `success(message, {...})` | Show green success notification       |
-| `error(message, {...})`   | Show red error notification           |
-| `warning(message, {...})` | Show orange warning notification      |
-| `info(message, {...})`    | Show blue info notification           |
-| `show(message, {type})`   | Auto-detect type from message content |
-| `custom(config)`          | Show with full custom config          |
-| `configure({...})`        | Set global defaults                   |
-| `clearAll()`              | Clear all active notifications        |
-| `clearLast()`             | Clear only the last notification      |
+| Method                    | Description                                  |
+| ------------------------- | -------------------------------------------- |
+| `success(message, {...})` | Show green success notification              |
+| `error(message, {...})`   | Show red error notification                  |
+| `warning(message, {...})` | Show orange warning notification             |
+| `info(message, {...})`    | Show blue info notification                  |
+| `loading(message, {...})` | Show loading spinner (stays until dismissed) |
+| `blank(message, {...})`   | Show plain text toast without icon           |
+| `promise(future, {...})`  | Auto-transition loading → success/error      |
+| `show(message, {type})`   | Auto-detect type from message content        |
+| `custom(config)`          | Show with full custom config                 |
+| `dismiss([id])`           | Dismiss specific toast or all toasts         |
+| `configure({...})`        | Set global defaults                          |
+| `clearAll()`              | Clear all active notifications               |
+| `clearLast()`             | Clear only the last notification             |
+
+> **Tip**: All methods also available via the `Toastr` alias: `Toastr.success(...)`, `Toastr.promise(...)`, etc.
 
 ### ToastrConfig Properties
 
@@ -295,6 +344,32 @@ Future<void> fetchData() async {
     ToastrHelper.error('Failed to load data');
   }
 }
+```
+
+### Loading & Promise
+
+```dart
+// Show a loading toast, update it when done
+final id = ToastrHelper.loading('Uploading file...');
+await uploadFile();
+ToastrHelper.dismiss(id);
+ToastrHelper.success('File uploaded!');
+
+// Or use promise() for automatic transitions
+final result = await ToastrHelper.promise<User>(
+  authService.login(email, password),
+  loading: 'Signing in...',
+  success: 'Welcome back!',
+  error: 'Invalid credentials',
+);
+
+// Blank toast — just text, no icon
+ToastrHelper.blank('Copied to clipboard');
+
+// Using the Toastr alias
+final loadId = Toastr.loading('Syncing...');
+await syncData();
+Toastr.dismiss(loadId);
 ```
 
 ### Advanced Notifications

@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-04-19
+
+### Added
+
+- 🎬 **react-hot-toast animations**: Faithful recreation of all react-hot-toast animation sequences
+  - **Enter**: `translateY(-200%) scale(0.6) opacity(0.5)` → `translateY(0) scale(1) opacity(1)`, 350ms `cubic-bezier(.21,1.02,.73,1)`
+  - **Exit**: `scale(1) opacity(1)` → `translateY(-150%) scale(0.6) opacity(0)`, 400ms `cubic-bezier(.06,.71,.55,1)`
+  - **Direction-aware**: Top toasts slide down from above, bottom toasts slide up from below
+- ✅ **Animated success icon**: Circle scales in from 0 with 45° rotation (300ms, delay 100ms) + checkmark line draws progressively (200ms, delay 200ms)
+- ❌ **Animated error icon**: Circle scales in (300ms, delay 100ms) + two X lines appear sequentially (150ms each, delays 150ms/180ms)
+- 🔄 **Layered icon system**: Loader spinner underneath with status icon overlay (matches toast-icon.tsx architecture)
+- 🎯 **AnimatedIconWrapper**: Warning, info, and custom icons scale in from 0.6 with opacity 0.4 (300ms, delay 120ms, `cubic-bezier(0.175, 0.885, 0.32, 1.275)`)
+- 🍞 **Loading toast**: `ToastrHelper.loading('Loading...')` — shows animated spinner, stays until dismissed
+- 📨 **Blank toast**: `ToastrHelper.blank('Message')` — plain text toast without icon
+- 🔮 **Promise API**: `ToastrHelper.promise(future, loading:, success:, error:)` — auto-transitions loading → success/error
+- 🔖 **Toast IDs**: All methods return a `String` ID for programmatic control
+- 🗑️ **Dismiss by ID**: `ToastrHelper.dismiss(id)` — dismiss a specific toast, or `dismiss()` for all
+- 🏷️ **`Toastr` alias**: Short alias class — `Toastr.success('Done!')`, `Toastr.promise(...)`, etc.
+
+### Changed
+
+- Replaced old `showMethod`/`hideMethod` animation system with fixed react-hot-toast-style enter/exit animations (config properties kept for API compatibility)
+- Replaced `_showController`/`_hideController` with `_enterController`/`_exitController`
+- Success/error icons now use animated `CustomPaint` + `Container` instead of static painters
+
+### Fixed
+
+- 🛡️ **Opacity assertion crash**: Clamped all opacity values to `[0.0, 1.0]` to prevent `Opacity` widget assertion failures from overshooting cubic-bezier curves
+
 ## [2.0.0] - 2026-04-18
 
 ### BREAKING CHANGES

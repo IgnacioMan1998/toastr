@@ -324,7 +324,7 @@ class _ToastrWidgetState extends State<ToastrWidget>
         builder: (context, child) => Transform.scale(
           scale: _iconWrapperScale.value,
           child: Opacity(
-            opacity: _iconWrapperOpacity.value,
+            opacity: _iconWrapperOpacity.value.clamp(0.0, 1.0),
             child: child,
           ),
         ),
@@ -401,7 +401,7 @@ class _ToastrWidgetState extends State<ToastrWidget>
   Widget _buildAnimatedCheckmark() => AnimatedBuilder(
         animation: _iconCircleScale,
         builder: (context, _) => Opacity(
-          opacity: _iconCircleOpacity.value,
+          opacity: _iconCircleOpacity.value.clamp(0.0, 1.0),
           child: Transform.scale(
             scale: _iconCircleScale.value,
             child: Transform.rotate(
@@ -416,7 +416,7 @@ class _ToastrWidgetState extends State<ToastrWidget>
                 child: AnimatedBuilder(
                   animation: _checkmarkWidth,
                   builder: (context, _) => Opacity(
-                    opacity: _checkmarkOpacity.value,
+                    opacity: _checkmarkOpacity.value.clamp(0.0, 1.0),
                     child: CustomPaint(
                       size: const Size(20, 20),
                       painter: _AnimatedCheckPaint(
@@ -437,7 +437,7 @@ class _ToastrWidgetState extends State<ToastrWidget>
   Widget _buildAnimatedError() => AnimatedBuilder(
         animation: _iconCircleScale,
         builder: (context, _) => Opacity(
-          opacity: _iconCircleOpacity.value,
+          opacity: _iconCircleOpacity.value.clamp(0.0, 1.0),
           child: Transform.scale(
             scale: _iconCircleScale.value,
             child: Transform.rotate(
@@ -456,7 +456,7 @@ class _ToastrWidgetState extends State<ToastrWidget>
                     AnimatedBuilder(
                       animation: _errorLine1Scale,
                       builder: (context, _) => Opacity(
-                        opacity: _errorLine1Opacity.value,
+                        opacity: _errorLine1Opacity.value.clamp(0.0, 1.0),
                         child: Transform.scale(
                           scale: _errorLine1Scale.value,
                           child: Container(
@@ -474,7 +474,7 @@ class _ToastrWidgetState extends State<ToastrWidget>
                     AnimatedBuilder(
                       animation: _errorLine2Scale,
                       builder: (context, _) => Opacity(
-                        opacity: _errorLine2Opacity.value,
+                        opacity: _errorLine2Opacity.value.clamp(0.0, 1.0),
                         child: Transform.scale(
                           scale: _errorLine2Scale.value,
                           child: Transform.rotate(
@@ -711,7 +711,7 @@ class _ToastrWidgetState extends State<ToastrWidget>
       builder: (context, child) {
         if (_isDismissing) return child!;
         return Opacity(
-          opacity: _enterOpacity.value,
+          opacity: _enterOpacity.value.clamp(0.0, 1.0),
           child: Transform(
             transform: Matrix4.identity()
               ..translateByDouble(0.0, _enterTranslateY.value, 0.0, 1.0)
@@ -728,7 +728,7 @@ class _ToastrWidgetState extends State<ToastrWidget>
       toast = AnimatedBuilder(
         animation: _exitController,
         builder: (context, child) => Opacity(
-          opacity: _exitOpacity.value,
+          opacity: _exitOpacity.value.clamp(0.0, 1.0),
           child: Transform(
             transform: Matrix4.identity()
               ..translateByDouble(0.0, _exitTranslateY.value, 0.0, 1.0)
