@@ -14,7 +14,10 @@ A highly customizable Flutter package for displaying beautiful toast notificatio
 - 🔮 **Promise API**: Auto-transition loading → success/error based on `Future` result
 - 🎯 **Highly customizable**: Colors, icons, duration, progress bars, and more
 - 👆 **Interactive**: Tap to dismiss, swipe-to-dismiss, and close button
-- 🧪 **Well tested**: 61 unit tests with comprehensive coverage
+- 🌗 **Dark theme**: Built-in dark theme support (`ToastrTheme.dark`)
+- 🧩 **Custom content**: Pass any `Widget` as toast content
+- 👆 **Callbacks**: `onTap` and `onDismiss` callbacks for interactive toasts
+- 🧪 **Well tested**: 76 unit tests with comprehensive coverage
 - 📱 **Responsive**: Adaptive design for mobile, tablet, and desktop
 - 🚀 **Zero setup**: No `BuildContext`, no `init()`, no `navigatorKey` — just call and go!
 - 🔒 **Secure**: Built-in XSS sanitization, rate limiting, and input validation
@@ -25,7 +28,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  toastr_flutter: ^2.1.0
+  toastr_flutter: ^2.2.0
 ```
 
 Then run:
@@ -293,21 +296,30 @@ ToastrHelper.clearLast();
 
 ### ToastrConfig Properties
 
-| Property            | Type               | Default   | Description                   |
-| ------------------- | ------------------ | --------- | ----------------------------- |
-| `type`              | `ToastrType`       | required  | success, error, warning, info |
-| `message`           | `String`           | required  | Main message text             |
-| `title`             | `String?`          | null      | Optional title text           |
-| `duration`          | `Duration`         | 5 seconds | How long to display           |
-| `position`          | `ToastrPosition`   | topRight  | Where to position             |
-| `showMethod`        | `ToastrShowMethod` | fadeIn    | Show animation type           |
-| `hideMethod`        | `ToastrHideMethod` | fadeOut   | Hide animation type           |
-| `showDuration`      | `Duration`         | 300ms     | Show animation duration       |
-| `hideDuration`      | `Duration`         | 1000ms    | Hide animation duration       |
-| `showProgressBar`   | `bool`             | false     | Show progress bar             |
-| `showCloseButton`   | `bool`             | false     | Show close button             |
-| `dismissible`       | `bool`             | true      | Allow tap to dismiss          |
-| `preventDuplicates` | `bool`             | false     | Prevent duplicate messages    |
+| Property              | Type               | Default   | Description                   |
+| --------------------- | ------------------ | --------- | ----------------------------- |
+| `type`                | `ToastrType`       | required  | success, error, warning, info |
+| `message`             | `String`           | required  | Main message text             |
+| `title`               | `String?`          | null      | Optional title text           |
+| `duration`            | `Duration`         | 5 seconds | How long to display           |
+| `position`            | `ToastrPosition`   | topRight  | Where to position             |
+| `showMethod`          | `ToastrShowMethod` | fadeIn    | Show animation type           |
+| `hideMethod`          | `ToastrHideMethod` | fadeOut   | Hide animation type           |
+| `showDuration`        | `Duration`         | 300ms     | Show animation duration       |
+| `hideDuration`        | `Duration`         | 1000ms    | Hide animation duration       |
+| `showProgressBar`     | `bool`             | false     | Show progress bar             |
+| `showCloseButton`     | `bool`             | false     | Show close button             |
+| `dismissible`         | `bool`             | true      | Allow tap to dismiss          |
+| `preventDuplicates`   | `bool`             | false     | Prevent duplicate messages    |
+| `onTap`               | `VoidCallback?`    | null      | Callback when toast is tapped |
+| `onDismiss`           | `VoidCallback?`    | null      | Callback when toast exits     |
+| `content`             | `Widget?`          | null      | Custom widget content         |
+| `maxWidth`            | `double`           | 350       | Maximum toast width           |
+| `margin`              | `EdgeInsets?`      | null      | Custom margin from edges      |
+| `accentColor`         | `Color?`           | null      | Custom accent color           |
+| `containerDecoration` | `BoxDecoration?`   | null      | Full style override           |
+| `theme`               | `ToastrTheme`      | light     | Color theme (light/dark)      |
+| `reverseOrder`        | `bool`             | false     | Stack order for new toasts    |
 
 ## Responsive Design 📱
 
@@ -370,6 +382,58 @@ ToastrHelper.blank('Copied to clipboard');
 final loadId = Toastr.loading('Syncing...');
 await syncData();
 Toastr.dismiss(loadId);
+```
+
+### Dark Theme
+
+```dart
+// Single toast
+Toastr.success('Saved!', theme: ToastrTheme.dark);
+
+// Global default
+Toastr.configure(theme: ToastrTheme.dark);
+```
+
+### Callbacks
+
+```dart
+Toastr.success(
+  'File uploaded',
+  onTap: () => openFile(),
+  onDismiss: () => cleanupTempFiles(),
+);
+```
+
+### Custom Content Widget
+
+```dart
+Toastr.blank(
+  '',
+  content: Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      CircleAvatar(backgroundImage: NetworkImage(avatarUrl)),
+      SizedBox(width: 8),
+      Text('John liked your post'),
+    ],
+  ),
+);
+```
+
+### Custom Styling
+
+```dart
+Toastr.info(
+  'Wide toast',
+  maxWidth: 500,
+  margin: EdgeInsets.only(top: 60),
+  accentColor: Colors.purple,
+  containerDecoration: BoxDecoration(
+    color: Colors.indigo.shade900,
+    borderRadius: BorderRadius.circular(16),
+    border: Border.all(color: Colors.indigo.shade400),
+  ),
+);
 ```
 
 ### Advanced Notifications

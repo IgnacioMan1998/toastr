@@ -616,8 +616,8 @@ void main() {
     });
 
     test('copyWith preserves new properties', () {
-      onTapCalled() {}
-      onDismissCalled() {}
+      void onTapCalled() {}
+      void onDismissCalled() {}
       final config = ToastrConfig(
         type: ToastrType.success,
         message: 'Test',
@@ -668,15 +668,13 @@ void main() {
   });
 
   group('ToastrWidget new features', () {
-    Widget buildApp({required ToastrConfig config}) {
-      return MaterialApp(
+    Widget buildApp({required ToastrConfig config}) => MaterialApp(
         home: Scaffold(
           body: Center(
             child: ToastrWidget(config: config),
           ),
         ),
       );
-    }
 
     testWidgets('dark theme applies dark background', (tester) async {
       await tester.pumpWidget(buildApp(
@@ -714,12 +712,12 @@ void main() {
 
     testWidgets('custom content widget replaces message text', (tester) async {
       await tester.pumpWidget(buildApp(
-        config: ToastrConfig(
+        config: const ToastrConfig(
           type: ToastrType.blank,
           message: 'Ignored',
           content: Row(
             mainAxisSize: MainAxisSize.min,
-            children: const [
+            children: [
               Icon(Icons.star, size: 16),
               SizedBox(width: 4),
               Text('Custom content'),
@@ -740,7 +738,7 @@ void main() {
         config: ToastrConfig(
           type: ToastrType.info,
           message: 'Tap me',
-          onTap: () => tapped = true,
+          onTap: () { tapped = true; },
         ),
       ));
       await tester.pump(const Duration(milliseconds: 350));
@@ -763,8 +761,9 @@ void main() {
       await tester.pump(const Duration(milliseconds: 350));
 
       await tester.tap(find.text('Dismiss me'));
-      // Wait for exit animation to complete (400ms)
-      await tester.pump(const Duration(milliseconds: 500));
+      await tester.pump(); // process tap → starts exit animation
+      await tester.pump(const Duration(milliseconds: 500)); // exit animation completes
+      await tester.pump(); // .then() callback fires
       expect(dismissed, isTrue);
     });
 

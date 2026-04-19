@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-04-19
+
+### Added
+
+- 👆 **`onTap` callback**: Execute custom actions when a toast is tapped — `Toastr.success('Saved!', onTap: () => navigate())`
+- 👋 **`onDismiss` callback**: Get notified when a toast is dismissed (by any means) — `Toastr.info('Done', onDismiss: () => cleanup())`
+- 🎨 **`accentColor`**: Override the default type-based accent color for progress bar and icons — `accentColor: Colors.purple`
+- 📐 **`maxWidth`**: Configurable max width (previously hardcoded at 350px) — `maxWidth: 500`
+- 🧩 **`content` widget**: Provide a custom `Widget` to replace the default text — `content: Row(children: [Icon(...), Text(...)])`
+- 📏 **`margin`**: Custom margin/offset from screen edges — `margin: EdgeInsets.only(top: 60)`
+- 🌗 **`ToastrTheme`**: Dark theme support — `theme: ToastrTheme.dark` (bg `#1C1917`, text `#F5F5F4`)
+- 🔄 **`reverseOrder`**: Stack new toasts above or below existing ones — `reverseOrder: true`
+- 🎭 **`containerDecoration`**: Full `BoxDecoration` override for complete style control — `containerDecoration: BoxDecoration(...)`
+- ⚙️ **Global config for new options**: `Toastr.configure(theme: ToastrTheme.dark, maxWidth: 500, margin: ..., reverseOrder: true)`
+- 🧪 **15 new tests** (76 total) covering all new features
+
+### Changed
+
+- Close button color adapts to dark/light theme automatically
+- Box shadow intensity adapts to dark/light theme
+- Margin config now affects positioning offsets from screen edges
+
 ## [2.1.0] - 2026-04-19
 
 ### Added
