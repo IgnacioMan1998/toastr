@@ -435,10 +435,8 @@ class ToastrHelper {
     bool? enableHapticFeedback,
     HapticFeedbackType? hapticFeedbackType,
     SwipeDismissDirection? swipeDismissDirection,
-    Widget Function(Widget child, Animation<double> animation)?
-        enterAnimationBuilder,
-    Widget Function(Widget child, Animation<double> animation)?
-        exitAnimationBuilder,
+    Widget Function(Widget child, Animation<double> animation)? enterAnimationBuilder,
+    Widget Function(Widget child, Animation<double> animation)? exitAnimationBuilder,
   }) =>
       _service.show(
         _defaultConfig.copyWith(
