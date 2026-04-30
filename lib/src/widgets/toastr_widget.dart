@@ -665,9 +665,7 @@ class _ToastrWidgetState extends State<ToastrWidget>
         onExit: (_) => _onHover(false),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          transform: canSwipeV
-              ? Matrix4.translationValues(0, _dragOffset, 0)
-              : Matrix4.translationValues(_dragOffset, 0, 0),
+          transform: canSwipeV ? Matrix4.translationValues(0, _dragOffset, 0) : Matrix4.translationValues(_dragOffset, 0, 0),
           constraints: BoxConstraints(maxWidth: widget.config.maxWidth),
           margin: widget.config.margin ?? const EdgeInsets.symmetric(vertical: 4),
           decoration: widget.config.containerDecoration ?? BoxDecoration(
