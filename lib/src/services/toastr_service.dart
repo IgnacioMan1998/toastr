@@ -415,8 +415,7 @@ class _ToastrContainer extends StatelessWidget {
       children: grouped.entries.map((mapEntry) {
         final position = mapEntry.key;
         final toasts = mapEntry.value;
-        final reversed =
-            toasts.isNotEmpty && toasts.first.config.reverseOrder;
+        final reversed = toasts.isNotEmpty && toasts.first.config.reverseOrder;
         final orderedToasts = reversed ? toasts.reversed.toList() : toasts;
 
         final m = toasts.first.config.margin;

@@ -849,13 +849,13 @@ void main() {
     });
 
     test('copyWith preserves v2.3.0 properties', () {
-      final config = ToastrConfig(
+      const config = ToastrConfig(
         type: ToastrType.success,
         message: 'Test',
         enableHapticFeedback: true,
         hapticFeedbackType: HapticFeedbackType.heavy,
         swipeDismissDirection: SwipeDismissDirection.vertical,
-        action: const ToastrAction(
+        action: ToastrAction(
           label: 'Undo',
           onPressed: _noOp,
         ),
@@ -939,10 +939,10 @@ void main() {
 
     testWidgets('renders action button when provided', (tester) async {
       await tester.pumpWidget(buildApp(
-        config: ToastrConfig(
+        config: const ToastrConfig(
           type: ToastrType.success,
           message: 'Deleted',
-          action: const ToastrAction(label: 'Undo', onPressed: _noOp),
+          action: ToastrAction(label: 'Undo', onPressed: _noOp),
         ),
       ));
       await tester.pump(const Duration(milliseconds: 350));

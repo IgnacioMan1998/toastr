@@ -622,19 +622,13 @@ class _ToastrWidgetState extends State<ToastrWidget>
   @override
   Widget build(BuildContext context) {
     final isDark = widget.config.theme == ToastrTheme.dark;
-    final bgColor = widget.config.backgroundColor ??
-        (isDark ? const Color(0xFF1C1917) : const Color(0xFFFFFFFF));
-    final textColor = widget.config.textColor ??
-        (isDark ? const Color(0xFFF5F5F4) : const Color(0xFF363636));
+    final bgColor = widget.config.backgroundColor ?? (isDark ? const Color(0xFF1C1917) : const Color(0xFFFFFFFF));
+    final textColor = widget.config.textColor ?? (isDark ? const Color(0xFFF5F5F4) : const Color(0xFF363636));
     final closeColor = isDark ? const Color(0xFF78716C) : const Color(0xFFD1D5DB);
 
     final swipeDir = widget.config.swipeDismissDirection;
-    final canSwipeH = widget.config.dismissible &&
-        (swipeDir == SwipeDismissDirection.horizontal ||
-            swipeDir == SwipeDismissDirection.both);
-    final canSwipeV = widget.config.dismissible &&
-        (swipeDir == SwipeDismissDirection.vertical ||
-            swipeDir == SwipeDismissDirection.both);
+    final canSwipeH = widget.config.dismissible && (swipeDir == SwipeDismissDirection.horizontal || swipeDir == SwipeDismissDirection.both);
+    final canSwipeV = widget.config.dismissible && (swipeDir == SwipeDismissDirection.vertical || swipeDir == SwipeDismissDirection.both);
 
     Widget toast = GestureDetector(
       onHorizontalDragUpdate: canSwipeH
@@ -794,8 +788,7 @@ class _ToastrWidgetState extends State<ToastrWidget>
       if (widget.config.exitAnimationBuilder != null) {
         toast = AnimatedBuilder(
           animation: _exitController,
-          builder: (context, child) =>
-              widget.config.exitAnimationBuilder!(child!, _exitController),
+          builder: (context, child) => widget.config.exitAnimationBuilder!(child!, _exitController),
           child: toast,
         );
       } else {
@@ -949,8 +942,7 @@ class _LoaderIcon extends StatefulWidget {
   State<_LoaderIcon> createState() => _LoaderIconState();
 }
 
-class _LoaderIconState extends State<_LoaderIcon>
-    with SingleTickerProviderStateMixin {
+class _LoaderIconState extends State<_LoaderIcon> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
