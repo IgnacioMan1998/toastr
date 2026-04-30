@@ -85,7 +85,7 @@ class ToastrHelper {
   static ToastrConfig _defaultConfig = const ToastrConfig(
     type: ToastrType.info,
     message: '',
-    position: ToastrPosition.topRight,
+    position: ToastrPosition.bottomCenter,
     duration: Duration(seconds: 5),
     showDuration: Duration(milliseconds: 300),
     hideDuration: Duration(milliseconds: 1000),
@@ -187,10 +187,8 @@ class ToastrHelper {
     bool? enableHapticFeedback,
     HapticFeedbackType? hapticFeedbackType,
     SwipeDismissDirection? swipeDismissDirection,
-    Widget Function(Widget child, Animation<double> animation)?
-        enterAnimationBuilder,
-    Widget Function(Widget child, Animation<double> animation)?
-        exitAnimationBuilder,
+    Widget Function(Widget child, Animation<double> animation)? enterAnimationBuilder,
+    Widget Function(Widget child, Animation<double> animation)? exitAnimationBuilder,
   }) =>
       _service.show(
         _defaultConfig.copyWith(
@@ -204,8 +202,7 @@ class ToastrHelper {
           showDuration: showDuration,
           hideDuration: hideDuration,
           showProgressBar: showProgressBar,
-          showCloseButton:
-              showCloseButton ?? true, // Show close button for errors
+          showCloseButton: showCloseButton,
           preventDuplicates: preventDuplicates,
           onTap: onTap,
           onDismiss: onDismiss,
@@ -251,10 +248,8 @@ class ToastrHelper {
     bool? enableHapticFeedback,
     HapticFeedbackType? hapticFeedbackType,
     SwipeDismissDirection? swipeDismissDirection,
-    Widget Function(Widget child, Animation<double> animation)?
-        enterAnimationBuilder,
-    Widget Function(Widget child, Animation<double> animation)?
-        exitAnimationBuilder,
+    Widget Function(Widget child, Animation<double> animation)? enterAnimationBuilder,
+    Widget Function(Widget child, Animation<double> animation)? exitAnimationBuilder,
   }) =>
       _service.show(
         _defaultConfig.copyWith(
@@ -314,10 +309,8 @@ class ToastrHelper {
     bool? enableHapticFeedback,
     HapticFeedbackType? hapticFeedbackType,
     SwipeDismissDirection? swipeDismissDirection,
-    Widget Function(Widget child, Animation<double> animation)?
-        enterAnimationBuilder,
-    Widget Function(Widget child, Animation<double> animation)?
-        exitAnimationBuilder,
+    Widget Function(Widget child, Animation<double> animation)? enterAnimationBuilder,
+    Widget Function(Widget child, Animation<double> animation)? exitAnimationBuilder,
   }) =>
       _service.show(
         _defaultConfig.copyWith(
@@ -381,17 +374,15 @@ class ToastrHelper {
     bool? enableHapticFeedback,
     HapticFeedbackType? hapticFeedbackType,
     SwipeDismissDirection? swipeDismissDirection,
-    Widget Function(Widget child, Animation<double> animation)?
-        enterAnimationBuilder,
-    Widget Function(Widget child, Animation<double> animation)?
-        exitAnimationBuilder,
+    Widget Function(Widget child, Animation<double> animation)? enterAnimationBuilder,
+    Widget Function(Widget child, Animation<double> animation)? exitAnimationBuilder,
   }) =>
       _service.show(
         _defaultConfig.copyWith(
-          type: ToastrType.loading,
+        type: ToastrType.loading,
         message: message,
         title: title,
-        duration: const Duration(days: 365), // Persist until dismissed
+        duration: const Duration(days: 365),
         position: position,
         showMethod: showMethod,
         hideMethod: hideMethod,
