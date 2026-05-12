@@ -445,6 +445,43 @@ Toastr.info(
 );
 ```
 
+### Compact Mode
+
+```dart
+// Smaller, denser layout — great for sidebars or data-heavy UIs
+Toastr.success('Row saved', compact: true);
+
+// Global compact default
+Toastr.configure(compact: true);
+```
+
+### Circular Progress Indicator
+
+```dart
+// Show a circular countdown ring instead of a linear bar
+Toastr.info('Auto-closing…', showCircularProgress: true, showProgressBar: false);
+```
+
+### Custom Icon Theme
+
+```dart
+// Override icon circle and checkmark colors independently
+Toastr.success(
+  'Custom icon colors',
+  iconTheme: ToastrIconTheme(primary: Colors.purple, secondary: Colors.white),
+);
+```
+
+### Custom Border Radius & Gutter
+
+```dart
+Toastr.info(
+  'Pill shape',
+  borderRadius: BorderRadius.circular(32),
+  gutter: 12, // spacing between stacked toasts
+);
+```
+
 ### Advanced Notifications
 
 ```dart
