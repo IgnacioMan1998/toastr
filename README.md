@@ -16,8 +16,10 @@ A highly customizable Flutter package for displaying beautiful toast notificatio
 - **Interactive**: Tap to dismiss, swipe-to-dismiss, and close button
 - **Dark theme**: Built-in dark theme support (`ToastrTheme.dark`)
 - **Custom content**: Pass any `Widget` as toast content
-- **Callbacks**: `onTap` and `onDismiss` callbacks for interactive toasts
-- **Well tested**: 76 unit tests with comprehensive coverage
+- **Callbacks**: `onTap` and `onDismiss` callbacks for interactive toasts- **Compact mode**: Reduced-padding layout for dense UIs
+- **Circular progress**: Circular countdown ring as an alternative to the linear bar
+- **Keyboard avoidance**: Toast auto-slides above the soft keyboard
+- **Icon theme**: Per-toast icon color overrides via `ToastrIconTheme`- **Well tested**: 91 unit tests with comprehensive coverage
 - **Responsive**: Adaptive design for mobile, tablet, and desktop
 - **Zero setup**: No `BuildContext`, no `init()`, no `navigatorKey` — just call and go!
 - **Secure**: Built-in XSS sanitization, rate limiting, and input validation
@@ -28,7 +30,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  toastr_flutter: ^2.2.0
+  toastr_flutter: ^2.4.0
 ```
 
 Then run:
@@ -296,30 +298,37 @@ ToastrHelper.clearLast();
 
 ### ToastrConfig Properties
 
-| Property              | Type               | Default   | Description                   |
-| --------------------- | ------------------ | --------- | ----------------------------- |
-| `type`                | `ToastrType`       | required  | success, error, warning, info |
-| `message`             | `String`           | required  | Main message text             |
-| `title`               | `String?`          | null      | Optional title text           |
-| `duration`            | `Duration`         | 5 seconds | How long to display           |
-| `position`            | `ToastrPosition`   | topRight  | Where to position             |
-| `showMethod`          | `ToastrShowMethod` | fadeIn    | Show animation type           |
-| `hideMethod`          | `ToastrHideMethod` | fadeOut   | Hide animation type           |
-| `showDuration`        | `Duration`         | 300ms     | Show animation duration       |
-| `hideDuration`        | `Duration`         | 1000ms    | Hide animation duration       |
-| `showProgressBar`     | `bool`             | false     | Show progress bar             |
-| `showCloseButton`     | `bool`             | false     | Show close button             |
-| `dismissible`         | `bool`             | true      | Allow tap to dismiss          |
-| `preventDuplicates`   | `bool`             | false     | Prevent duplicate messages    |
-| `onTap`               | `VoidCallback?`    | null      | Callback when toast is tapped |
-| `onDismiss`           | `VoidCallback?`    | null      | Callback when toast exits     |
-| `content`             | `Widget?`          | null      | Custom widget content         |
-| `maxWidth`            | `double`           | 350       | Maximum toast width           |
-| `margin`              | `EdgeInsets?`      | null      | Custom margin from edges      |
-| `accentColor`         | `Color?`           | null      | Custom accent color           |
-| `containerDecoration` | `BoxDecoration?`   | null      | Full style override           |
-| `theme`               | `ToastrTheme`      | light     | Color theme (light/dark)      |
-| `reverseOrder`        | `bool`             | false     | Stack order for new toasts    |
+| Property               | Type               | Default   | Description                          |
+| ---------------------- | ------------------ | --------- | ------------------------------------ |
+| `type`                 | `ToastrType`       | required  | success, error, warning, info        |
+| `message`              | `String`           | required  | Main message text                    |
+| `title`                | `String?`          | null      | Optional title text                  |
+| `duration`             | `Duration`         | 5 seconds | How long to display                  |
+| `position`             | `ToastrPosition`   | topRight  | Where to position                    |
+| `showMethod`           | `ToastrShowMethod` | fadeIn    | Show animation type                  |
+| `hideMethod`           | `ToastrHideMethod` | fadeOut   | Hide animation type                  |
+| `showDuration`         | `Duration`         | 300ms     | Show animation duration              |
+| `hideDuration`         | `Duration`         | 1000ms    | Hide animation duration              |
+| `showProgressBar`      | `bool`             | false     | Show progress bar                    |
+| `showCloseButton`      | `bool`             | false     | Show close button                    |
+| `dismissible`          | `bool`             | true      | Allow tap to dismiss                 |
+| `preventDuplicates`    | `bool`             | false     | Prevent duplicate messages           |
+| `onTap`                | `VoidCallback?`    | null      | Callback when toast is tapped        |
+| `onDismiss`            | `VoidCallback?`    | null      | Callback when toast exits            |
+| `content`              | `Widget?`          | null      | Custom widget content                |
+| `maxWidth`             | `double`           | 350       | Maximum toast width                  |
+| `margin`               | `EdgeInsets?`      | null      | Custom margin from edges             |
+| `accentColor`          | `Color?`           | null      | Custom accent color                  |
+| `containerDecoration`  | `BoxDecoration?`   | null      | Full style override                  |
+| `theme`                | `ToastrTheme`      | light     | Color theme (light/dark)             |
+| `reverseOrder`         | `bool`             | false     | Stack order for new toasts           |
+| `compact`              | `bool`             | false     | Reduced-padding compact layout       |
+| `borderRadius`         | `BorderRadius?`    | null      | Custom border radius                 |
+| `avoidKeyboard`        | `bool`             | true      | Slide above soft keyboard            |
+| `stackOverlap`         | `double?`          | null      | Vertical overlap between toasts      |
+| `showCircularProgress` | `bool`             | false     | Circular countdown indicator         |
+| `gutter`               | `double`           | 8         | Spacing between stacked toasts       |
+| `iconTheme`            | `ToastrIconTheme?` | null      | Custom icon primary/secondary colors |
 
 ## Responsive Design 📱
 

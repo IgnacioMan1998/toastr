@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0] - 2026-05-11
+
+### Added
+
+- 📦 **Compact mode**: Reduced-padding layout for dense UIs — `compact: true`
+- 🔵 **Circular progress indicator**: Show a circular countdown ring instead of a linear bar — `showCircularProgress: true`
+- ⌨️ **Keyboard avoidance**: Toast automatically slides above the soft keyboard when it appears — `avoidKeyboard: true` (default)
+- 🎨 **`iconTheme`**: Override type-based icon colors independently — `iconTheme: ToastrIconTheme(primary: Colors.purple, secondary: Colors.white)`
+- 📐 **`borderRadius`**: Custom border radius for the toast container — `borderRadius: BorderRadius.circular(16)`
+- 🔢 **`gutter`**: Configurable spacing between stacked toasts (mirrors react-hot-toast's `gutter` prop) — `gutter: 12`
+- 🔢 **`stackOverlap`**: Configurable vertical overlap between stacked toasts — `stackOverlap: 4`
+- 🆕 **New type**: `ToastrIconTheme` class with `primary` and `secondary` color properties
+
 ## [2.3.0] - 2026-04-19
 
 ### Added
