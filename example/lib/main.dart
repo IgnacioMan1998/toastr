@@ -122,7 +122,7 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                     children: [
                       _QuickActionChip(
                         label: 'Success',
-                        icon: Icons.check_circle_rounded,
+                        icon: Icons.check,
                         color: const Color(0xFF16A34A),
                         onTap: () => ToastrHelper.success(
                           'Operation completed successfully!',
@@ -130,7 +130,7 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                       ),
                       _QuickActionChip(
                         label: 'Error',
-                        icon: Icons.cancel_rounded,
+                        icon: Icons.cancel_outlined,
                         color: const Color(0xFFDC2626),
                         onTap: () => ToastrHelper.error(
                           'Something went wrong. Please try again.',
@@ -139,7 +139,7 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                       ),
                       _QuickActionChip(
                         label: 'Warning',
-                        icon: Icons.warning_rounded,
+                        icon: Icons.warning_amber_rounded,
                         color: const Color(0xFFD97706),
                         onTap: () => ToastrHelper.warning(
                           'Please check your input before continuing.',
@@ -148,7 +148,7 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                       ),
                       _QuickActionChip(
                         label: 'Info',
-                        icon: Icons.info_rounded,
+                        icon: Icons.info_outlined,
                         color: const Color(0xFF2563EB),
                         onTap: () => ToastrHelper.info(
                           'Here is some useful information for you.',
@@ -290,12 +290,50 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                               () => Toastr.success('Queued toast #$i'),
                             );
                           }
-                          // Reset after demo
                           Future.delayed(
                             const Duration(seconds: 8),
                             () => Toastr.configure(maxVisible: 5),
                           );
                         },
+                      ),
+                      _QuickActionChip(
+                        label: 'Icon Theme',
+                        icon: Icons.palette_rounded,
+                        color: const Color(0xFF0D9488),
+                        onTap: () => Toastr.success(
+                          'Custom colored checkmark!',
+                          iconTheme: ToastrIconTheme(
+                            primary: const Color(0xFF8B5CF6),
+                            secondary: const Color(0xFFFDE047),
+                          ),
+                        ),
+                      ),
+                      _QuickActionChip(
+                        label: 'Gutter Stack',
+                        icon: Icons.vertical_distribute_rounded,
+                        color: const Color(0xFFEA580C),
+                        onTap: () {
+                          Toastr.configure(gutter: 2);
+                          for (var i = 1; i <= 3; i++) {
+                            Future.delayed(
+                              Duration(milliseconds: i * 300),
+                              () => Toastr.info('Tight stack #$i'),
+                            );
+                          }
+                          Future.delayed(
+                            const Duration(seconds: 5),
+                            () => Toastr.configure(gutter: 8),
+                          );
+                        },
+                      ),
+                      _QuickActionChip(
+                        label: 'Compact',
+                        icon: Icons.compress_rounded,
+                        color: const Color(0xFF6B7280),
+                        onTap: () => Toastr.success(
+                          'Compact toast with reduced padding',
+                          compact: true,
+                        ),
                       ),
                       _QuickActionChip(
                         label: 'Full Featured',

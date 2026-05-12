@@ -42,8 +42,7 @@ class ToastrWidget extends StatefulWidget {
   State<ToastrWidget> createState() => _ToastrWidgetState();
 }
 
-class _ToastrWidgetState extends State<ToastrWidget>
-    with TickerProviderStateMixin {
+class _ToastrWidgetState extends State<ToastrWidget> with TickerProviderStateMixin {
   // --- Toast enter/exit animation controllers ---
   late AnimationController _enterController;
   late Animation<double> _enterScale;
@@ -87,11 +86,7 @@ class _ToastrWidgetState extends State<ToastrWidget>
   bool _isHovering = false;
   bool _isDismissing = false;
   Timer? _autoDismissTimer;
-  Timer? _iconCircleDelayTimer;
-  Timer? _checkmarkDelayTimer;
-  Timer? _errorLine1DelayTimer;
-  Timer? _errorLine2DelayTimer;
-  Timer? _iconWrapperDelayTimer;
+  final List<Timer> _delayTimers = [];
   double _dragOffset = 0;
 
   @override
@@ -247,41 +242,34 @@ class _ToastrWidgetState extends State<ToastrWidget>
     _startIconAnimations();
   }
 
+  void _scheduleDelay(int milliseconds, VoidCallback callback) {
+    _delayTimers.add(
+      Timer(Duration(milliseconds: milliseconds), () {
+        if (mounted) callback();
+      }),
+    );
+  }
+
   void _startIconAnimations() {
     final type = widget.config.type;
 
     if (type == ToastrType.success || type == ToastrType.error) {
-      // Circle scale-in: delay 100ms
-      _iconCircleDelayTimer = Timer(const Duration(milliseconds: 100), () {
-        if (mounted) _iconCircleController.forward();
-      });
+      _scheduleDelay(100, () => _iconCircleController.forward());
     }
 
     if (type == ToastrType.success) {
-      // Checkmark draw: delay 200ms
-      _checkmarkDelayTimer = Timer(const Duration(milliseconds: 200), () {
-        if (mounted) _checkmarkController.forward();
-      });
+      _scheduleDelay(200, () => _checkmarkController.forward());
     }
 
     if (type == ToastrType.error) {
-      // Error line 1: delay 150ms
-      _errorLine1DelayTimer = Timer(const Duration(milliseconds: 150), () {
-        if (mounted) _errorLine1Controller.forward();
-      });
-      // Error line 2: delay 180ms
-      _errorLine2DelayTimer = Timer(const Duration(milliseconds: 180), () {
-        if (mounted) _errorLine2Controller.forward();
-      });
+      _scheduleDelay(150, () => _errorLine1Controller.forward());
+      _scheduleDelay(180, () => _errorLine2Controller.forward());
     }
 
-    // Icon wrapper for custom icons, warning, info: delay 120ms
     if (widget.config.customIcon != null ||
         type == ToastrType.warning ||
         type == ToastrType.info) {
-      _iconWrapperDelayTimer = Timer(const Duration(milliseconds: 120), () {
-        if (mounted) _iconWrapperController.forward();
-      });
+      _scheduleDelay(120, () => _iconWrapperController.forward());
     }
   }
 
@@ -365,16 +353,15 @@ class _ToastrWidgetState extends State<ToastrWidget>
 
     // Loading → only LoaderIcon (no overlay)
     if (widget.config.type == ToastrType.loading) {
-      return const SizedBox(
+      return SizedBox(
         width: 20,
         height: 20,
-        child: Center(child: _LoaderIcon()),
+        child: Center(child: _LoaderIcon(primary: _iconPrimary(), secondary: _iconSecondary())),
       );
     }
 
     // Success/Error → IndicatorWrapper: LoaderIcon underneath + StatusWrapper on top
-    if (widget.config.type == ToastrType.success ||
-        widget.config.type == ToastrType.error) {
+    if (widget.config.type == ToastrType.success || widget.config.type == ToastrType.error) {
       return SizedBox(
         width: 20,
         height: 20,
@@ -382,7 +369,7 @@ class _ToastrWidgetState extends State<ToastrWidget>
           alignment: Alignment.center,
           children: [
             // LoaderIcon always underneath (visible briefly before status appears)
-            const _LoaderIcon(),
+            const _LoaderIcon(primary: Color(0xFF616161), secondary: Color(0xFFE0E0E0)),
             // StatusWrapper (absolute positioned) with animated icon on top
             Positioned.fill(
               child: _buildAnimatedStatusIcon(),
@@ -431,8 +418,8 @@ class _ToastrWidgetState extends State<ToastrWidget>
               child: Container(
                 width: 20,
                 height: 20,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF61D345),
+                decoration: BoxDecoration(
+                  color: _iconPrimary(),
                   shape: BoxShape.circle,
                 ),
                 child: AnimatedBuilder(
@@ -444,6 +431,7 @@ class _ToastrWidgetState extends State<ToastrWidget>
                       painter: _AnimatedCheckPaint(
                         widthFactor: _checkmarkWidth.value,
                         heightFactor: _checkmarkHeight.value,
+                        color: _iconSecondary(),
                       ),
                     ),
                   ),
@@ -467,14 +455,13 @@ class _ToastrWidgetState extends State<ToastrWidget>
               child: Container(
                 width: 20,
                 height: 20,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFF4B4B),
+                decoration: BoxDecoration(
+                  color: _iconPrimary(),
                   shape: BoxShape.circle,
                 ),
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    // First line (horizontal)
                     AnimatedBuilder(
                       animation: _errorLine1Scale,
                       builder: (context, _) => Opacity(
@@ -485,14 +472,13 @@ class _ToastrWidgetState extends State<ToastrWidget>
                             width: 12,
                             height: 2,
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: _iconSecondary(),
                               borderRadius: BorderRadius.circular(3),
                             ),
                           ),
                         ),
                       ),
                     ),
-                    // Second line (vertical — rotated 90deg relative)
                     AnimatedBuilder(
                       animation: _errorLine2Scale,
                       builder: (context, _) => Opacity(
@@ -505,7 +491,7 @@ class _ToastrWidgetState extends State<ToastrWidget>
                               width: 12,
                               height: 2,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: _iconSecondary(),
                                 borderRadius: BorderRadius.circular(3),
                               ),
                             ),
@@ -528,28 +514,28 @@ class _ToastrWidgetState extends State<ToastrWidget>
         return Container(
           width: 20,
           height: 20,
-          decoration: const BoxDecoration(
-            color: Color(0xFFF59E0B),
+          decoration: BoxDecoration(
+            color: _iconPrimary(),
             shape: BoxShape.circle,
           ),
-          child: const Icon(
+          child: Icon(
             Icons.priority_high_rounded,
             size: 14,
-            color: Colors.white,
+            color: _iconSecondary(),
           ),
         );
       case ToastrType.info:
         return Container(
           width: 20,
           height: 20,
-          decoration: const BoxDecoration(
-            color: Color(0xFF3B82F6),
+          decoration: BoxDecoration(
+            color: _iconPrimary(),
             shape: BoxShape.circle,
           ),
-          child: const Icon(
+          child: Icon(
             Icons.info_outline_rounded,
             size: 14,
-            color: Colors.white,
+            color: _iconSecondary(),
           ),
         );
       default:
@@ -601,22 +587,32 @@ class _ToastrWidgetState extends State<ToastrWidget>
     );
   }
 
-  Color _getAccentColor() {
-    if (widget.config.accentColor != null) return widget.config.accentColor!;
+  Color _iconPrimary() {
+    if (widget.config.iconTheme?.primary != null) return widget.config.iconTheme!.primary!;
+    switch (widget.config.type) {
+      case ToastrType.success: return const Color(0xFF61D345);
+      case ToastrType.error: return const Color(0xFFFF4B4B);
+      case ToastrType.warning: return const Color(0xFFF59E0B);
+      case ToastrType.info: return const Color(0xFF3B82F6);
+      case ToastrType.loading: return const Color(0xFF616161);
+      case ToastrType.blank: return const Color(0xFF9CA3AF);
+    }
+  }
+
+  Color _iconSecondary() {
+    if (widget.config.iconTheme?.secondary != null) return widget.config.iconTheme!.secondary!;
     switch (widget.config.type) {
       case ToastrType.success:
-        return const Color(0xFF61D345);
       case ToastrType.error:
-        return const Color(0xFFFF4B4B);
-      case ToastrType.warning:
-        return const Color(0xFFF59E0B);
-      case ToastrType.info:
-        return const Color(0xFF3B82F6);
-      case ToastrType.loading:
-        return const Color(0xFF616161);
-      case ToastrType.blank:
-        return const Color(0xFF9CA3AF);
+        return Colors.white;
+      case ToastrType.loading: return const Color(0xFFE0E0E0);
+      default: return Colors.white;
     }
+  }
+
+  Color _getAccentColor() {
+    if (widget.config.accentColor != null) return widget.config.accentColor!;
+    return _iconPrimary();
   }
 
   @override
@@ -860,11 +856,10 @@ class _ToastrWidgetState extends State<ToastrWidget>
   @override
   void dispose() {
     _autoDismissTimer?.cancel();
-    _iconCircleDelayTimer?.cancel();
-    _checkmarkDelayTimer?.cancel();
-    _errorLine1DelayTimer?.cancel();
-    _errorLine2DelayTimer?.cancel();
-    _iconWrapperDelayTimer?.cancel();
+    for (final timer in _delayTimers) {
+      timer.cancel();
+    }
+    _delayTimers.clear();
     _enterController.dispose();
     _exitController.dispose();
     _progressController.dispose();
@@ -888,40 +883,38 @@ class _AnimatedCheckPaint extends CustomPainter {
   _AnimatedCheckPaint({
     required this.widthFactor,
     required this.heightFactor,
+    required this.color,
   });
 
   final double widthFactor;
   final double heightFactor;
+  final Color color;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
+    final borderW = size.width * 0.1;
+    final vLeft = size.width * 0.5;
+    final vTop = size.height * 0.2;
+    final fullVH = size.height * 0.5;
+    final hLeft = size.width * 0.3;
+    final hTop = size.height * 0.6;
+    final fullHW = size.width * 0.3;
 
-    // In checkmark.tsx the pseudo-element :after is positioned:
-    // bottom:6px left:6px → origin of the L-shape
-    // border-right + border-bottom form an L rotated 45deg (parent already rotated)
-    // width:6px height:10px
-    const originX = 6.0;
-    final originY = size.height - 6.0; // bottom: 6px
+    final currentHeight = fullVH * heightFactor;
+    final currentWidth = fullHW * widthFactor;
 
-    // The L-shape: bottom line goes right (width), right line goes up (height)
-    final currentWidth = 6.0 * widthFactor;
-    final currentHeight = 10.0 * heightFactor;
+    final paint = Paint()..color = color;
 
-    final path = Path()..moveTo(originX, originY - currentHeight);
-    if (currentHeight > 0) {
-      path.lineTo(originX, originY);
-    }
-    if (currentWidth > 0) {
-      path.lineTo(originX + currentWidth, originY);
-    }
-
-    canvas.drawPath(path, paint);
+    final vGap = fullVH - currentHeight;
+    canvas
+      ..drawRect(
+        Rect.fromLTWH(vLeft, vTop + vGap, borderW, currentHeight),
+        paint,
+      )
+      ..drawRect(
+        Rect.fromLTWH(hLeft, hTop, currentWidth, borderW),
+        paint,
+      );
   }
 
   @override
@@ -934,7 +927,10 @@ class _AnimatedCheckPaint extends CustomPainter {
 /// 12px, border: 2px solid #e0e0e0, border-right-color: #616161
 /// animation: rotate 1s linear infinite
 class _LoaderIcon extends StatefulWidget {
-  const _LoaderIcon();
+  const _LoaderIcon({required this.primary, required this.secondary});
+
+  final Color primary;
+  final Color secondary;
 
   @override
   State<_LoaderIcon> createState() => _LoaderIconState();
@@ -967,28 +963,35 @@ class _LoaderIconState extends State<_LoaderIcon> with SingleTickerProviderState
         ),
         child: CustomPaint(
           size: const Size(12, 12),
-          painter: _LoaderPaint(),
+          painter: _LoaderPaint(
+            primary: widget.primary,
+            secondary: widget.secondary,
+          ),
         ),
       );
 }
 
 class _LoaderPaint extends CustomPainter {
+  _LoaderPaint({required this.primary, required this.secondary});
+
+  final Color primary;
+  final Color secondary;
+
   @override
   void paint(Canvas canvas, Size size) {
+    const strokeWidth = 2.0;
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = (size.width - 2) / 2;
+    final radius = (size.width - strokeWidth) / 2;
 
-    // Base circle: #e0e0e0
     final basePaint = Paint()
-      ..color = const Color(0xFFE0E0E0)
-      ..strokeWidth = 2
+      ..color = secondary
+      ..strokeWidth = strokeWidth
       ..style = PaintingStyle.stroke;
     canvas.drawCircle(center, radius, basePaint);
 
-    // Right arc: #616161
     final accentPaint = Paint()
-      ..color = const Color(0xFF616161)
-      ..strokeWidth = 2
+      ..color = primary
+      ..strokeWidth = strokeWidth
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
 

@@ -57,6 +57,13 @@ class ToastrConfig {
     this.swipeDismissDirection = SwipeDismissDirection.horizontal,
     this.enterAnimationBuilder,
     this.exitAnimationBuilder,
+    this.compact = false,
+    this.borderRadius,
+    this.avoidKeyboard = true,
+    this.stackOverlap,
+    this.showCircularProgress = false,
+    this.gutter = 8,
+    this.iconTheme,
   });
 
   /// The type of toastr notification
@@ -166,6 +173,32 @@ class ToastrConfig {
   final Widget Function(Widget child, Animation<double> animation)?
       exitAnimationBuilder;
 
+  /// Use compact layout with reduced padding, font and icon sizes.
+  final bool compact;
+
+  /// Custom border radius for the toast container.
+  /// When set, overrides the default `BorderRadius.circular(8)`.
+  final BorderRadius? borderRadius;
+
+  /// Whether to automatically move the toast above the keyboard when it appears.
+  final bool avoidKeyboard;
+
+  /// Vertical overlap (in logical pixels) between stacked toasts at the same position.
+  /// Positive values make toasts overlap by that amount.
+  final double? stackOverlap;
+
+  /// Whether to show a circular countdown progress indicator instead of a linear bar.
+  final bool showCircularProgress;
+
+  /// Spacing (in logical pixels) between stacked toasts at the same position.
+  /// Mirrors react-hot-toast's `gutter` prop.
+  final double gutter;
+
+  /// Custom icon theme to override type-based icon colors.
+  /// [ToastrIconTheme.primary] sets the circle/background color.
+  /// [ToastrIconTheme.secondary] sets the checkmark/line color.
+  final ToastrIconTheme? iconTheme;
+
   /// Creates a copy of this config with updated values
   ToastrConfig copyWith({
     ToastrType? type,
@@ -205,6 +238,13 @@ class ToastrConfig {
         enterAnimationBuilder,
     Widget Function(Widget child, Animation<double> animation)?
         exitAnimationBuilder,
+    bool? compact,
+    BorderRadius? borderRadius,
+    bool? avoidKeyboard,
+    double? stackOverlap,
+    bool? showCircularProgress,
+    double? gutter,
+    ToastrIconTheme? iconTheme,
   }) => ToastrConfig(
     type: type ?? this.type,
     message: message ?? this.message,
@@ -244,6 +284,13 @@ class ToastrConfig {
         enterAnimationBuilder ?? this.enterAnimationBuilder,
     exitAnimationBuilder:
         exitAnimationBuilder ?? this.exitAnimationBuilder,
+    compact: compact ?? this.compact,
+    borderRadius: borderRadius ?? this.borderRadius,
+    avoidKeyboard: avoidKeyboard ?? this.avoidKeyboard,
+    stackOverlap: stackOverlap ?? this.stackOverlap,
+    showCircularProgress: showCircularProgress ?? this.showCircularProgress,
+    gutter: gutter ?? this.gutter,
+    iconTheme: iconTheme ?? this.iconTheme,
   );
 
   /// Generates a key for duplicate detection
@@ -386,4 +433,27 @@ class ToastrAction {
 
   /// Whether tapping the action also dismisses the toast
   final bool dismissOnPressed;
+}
+
+/// Icon theme configuration for toast types.
+///
+/// Mirrors react-hot-toast's `iconTheme` option — supports per-type primary
+/// (circle/background) and secondary (checkmark/line) color overrides.
+///
+/// ```dart
+/// Toastr.success('Done!',
+///   iconTheme: ToastrIconTheme(primary: Colors.green, secondary: Colors.white),
+/// );
+/// ```
+class ToastrIconTheme {
+  /// Creates an icon theme with optional primary and secondary colors.
+  const ToastrIconTheme({this.primary, this.secondary});
+
+  /// Primary color for the icon circle/background.
+  /// Defaults per type: success=#61D345, error=#FF4B4B, warning=#F59E0B, info=#3B82F6.
+  final Color? primary;
+
+  /// Secondary color for the icon checkmark/line.
+  /// Defaults to white for success/error types.
+  final Color? secondary;
 }

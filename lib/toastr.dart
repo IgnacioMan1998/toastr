@@ -1,7 +1,7 @@
 import 'src/utils/toastr_helper.dart';
 
 // Export all public APIs
-export 'src/models/toastr_config.dart';
+export 'src/models/toastr_config.dart' show ToastrConfig, ToastrPosition, ToastrShowMethod, ToastrHideMethod, ToastrTheme, SwipeDismissDirection, HapticFeedbackType, ToastrAction, ToastrIconTheme;
 export 'src/models/toastr_type.dart';
 export 'src/services/toastr_service.dart';
 export 'src/utils/toastr_helper.dart';

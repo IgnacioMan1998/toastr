@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import '../models/toastr_config.dart';
 import '../models/toastr_type.dart';
 
-/// Configuración de límites de seguridad para el paquete toastr
+/// Security limit configuration for toastr notifications.
 class ToastrSecurityConfig {
   /// Número máximo de notificaciones activas simultáneamente
   static const int maxActiveNotifications = 10;
@@ -152,8 +152,7 @@ class ToastrValidator {
     return true;
   }
 
-  /// Sanitizes a message string by trimming and limiting length with security
-  /// Sanitiza un mensaje
+  /// Sanitizes a message string by trimming and limiting length with security checks.
   static String sanitizeMessage(String message) {
     final sanitized = sanitizeHtml(message);
     if (sanitized.length <= ToastrSecurityConfig.maxMessageLength) {

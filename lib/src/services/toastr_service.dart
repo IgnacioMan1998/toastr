@@ -168,8 +168,7 @@ class ToastrService with WidgetsBindingObserver {
 
     final secureConfig = _sanitizeConfig(config);
 
-    if (secureConfig.preventDuplicates &&
-        _duplicateKeys.contains(secureConfig.key)) {
+    if (secureConfig.preventDuplicates && _duplicateKeys.contains(secureConfig.key)) {
       return '';
     }
 
@@ -189,8 +188,7 @@ class ToastrService with WidgetsBindingObserver {
 
     if (_activeToasts.length < maxVisible) {
       _showToast(entry);
-    } else if (_activeToasts.length >=
-        ToastrSecurityConfig.maxActiveNotifications) {
+    } else if (_activeToasts.length >= ToastrSecurityConfig.maxActiveNotifications) {
       _removeOldestToast();
       _showToast(entry);
     } else {
@@ -363,12 +361,16 @@ class ToastrService with WidgetsBindingObserver {
     switch (type) {
       case HapticFeedbackType.light:
         HapticFeedback.lightImpact();
+        break;
       case HapticFeedbackType.medium:
         HapticFeedback.mediumImpact();
+        break;
       case HapticFeedbackType.heavy:
         HapticFeedback.heavyImpact();
+        break;
       case HapticFeedbackType.selection:
         HapticFeedback.selectionClick();
+        break;
     }
   }
 
@@ -465,7 +467,7 @@ class _ToastrContainer extends StatelessWidget {
   }
 }
 
-class _StackedToastrWidget extends StatelessWidget {
+class _StackedToastrWidget extends StatefulWidget {
   const _StackedToastrWidget({
     required this.toastId,
     required this.config,
@@ -477,13 +479,38 @@ class _StackedToastrWidget extends StatelessWidget {
   final ToastrService service;
 
   @override
-  Widget build(BuildContext context) => ToastrWidget(
-        config: config,
-        onDismiss: () {
-          config.onDismiss?.call();
-          service.removeToast(toastId);
-        },
-        onHoverStart: () => service.pauseTimer(toastId),
-        onHoverEnd: () => service.resumeTimer(toastId),
-      );
+  State<_StackedToastrWidget> createState() => _StackedToastrWidgetState();
+}
+
+class _StackedToastrWidgetState extends State<_StackedToastrWidget> {
+  bool _visible = true;
+
+  void _handleDismiss() {
+    if (!_visible) return;
+    setState(() => _visible = false);
+    widget.config.onDismiss?.call();
+    widget.service.removeToast(widget.toastId);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final gutter = widget.config.gutter;
+
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 230),
+      curve: const Cubic(0.21, 1.02, 0.73, 1.0),
+      alignment: Alignment.topCenter,
+      child: _visible
+          ? Padding(
+              padding: EdgeInsets.only(bottom: gutter),
+              child: ToastrWidget(
+                config: widget.config,
+                onDismiss: _handleDismiss,
+                onHoverStart: () => widget.service.pauseTimer(widget.toastId),
+                onHoverEnd: () => widget.service.resumeTimer(widget.toastId),
+              ),
+            )
+          : const SizedBox.shrink(),
+    );
+  }
 }
