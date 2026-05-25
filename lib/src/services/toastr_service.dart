@@ -22,8 +22,8 @@ class _ToastEntry {
 /// **Zero setup required.** Just install the package and call methods directly:
 ///
 /// ```dart
-/// ToastrHelper.success('Done!');
-/// ToastrHelper.error('Something went wrong');
+/// Toastr.success('Done!');
+/// Toastr.error('Something went wrong');
 /// ```
 ///
 /// The service automatically finds the app's overlay — no `BuildContext`,
@@ -46,12 +46,18 @@ class ToastrService with WidgetsBindingObserver {
 
   OverlayEntry? _containerEntry;
 
+  // Fix 3: cache the OverlayState to avoid a full tree traversal on every show().
+  WeakReference<OverlayState>? _cachedOverlay;
+
   bool _isAppInBackground = false;
   final Map<String, Duration> _pausedTimerRemaining = {};
   final Map<String, DateTime> _timerStartTimes = {};
 
   int _notificationCount = 0;
   DateTime _lastResetTime = DateTime.now();
+
+  // Fix 2: monotonic counter for collision-free IDs.
+  int _idCounter = 0;
 
   bool _lifecycleRegistered = false;
 
@@ -101,7 +107,14 @@ class ToastrService with WidgetsBindingObserver {
   }
 
   /// Finds the app's [OverlayState] by traversing the element tree.
+  ///
+  /// The result is cached via [WeakReference] to avoid a full tree walk on
+  /// every [show] call. The cache is invalidated automatically when the
+  /// [OverlayState] is unmounted.
   OverlayState get _overlay {
+    final cached = _cachedOverlay?.target;
+    if (cached != null && cached.mounted) return cached;
+
     OverlayState? overlay;
     void visitor(Element element) {
       if (overlay != null) return;
@@ -125,6 +138,7 @@ class ToastrService with WidgetsBindingObserver {
       'Toastr: No Overlay found in the widget tree. '
       'Ensure your app uses MaterialApp, CupertinoApp, or has an Overlay widget.',
     );
+    _cachedOverlay = WeakReference(overlay!);
     return overlay!;
   }
 
@@ -172,7 +186,7 @@ class ToastrService with WidgetsBindingObserver {
       return '';
     }
 
-    final toastId = DateTime.now().millisecondsSinceEpoch.toString();
+    final toastId = 'toast_${_idCounter++}';
     final entry = _ToastEntry(id: toastId, config: secureConfig);
 
     if (secureConfig.preventDuplicates) {
@@ -183,7 +197,6 @@ class ToastrService with WidgetsBindingObserver {
       _triggerHaptic(secureConfig.hapticFeedbackType);
     }
 
-    _announceForAccessibility(secureConfig);
     _notificationCount++;
 
     if (_activeToasts.length < maxVisible) {
@@ -374,12 +387,6 @@ class ToastrService with WidgetsBindingObserver {
     }
   }
 
-  void _announceForAccessibility(ToastrConfig config) {
-    // Accessibility is handled by Semantics(liveRegion: true) in ToastrWidget.
-    // No manual SemanticsService call needed — the widget announces itself
-    // when inserted into the tree.
-  }
-
   /// Clean up resources and clear all active notifications
   void dispose() {
     clearAll();
@@ -387,9 +394,14 @@ class ToastrService with WidgetsBindingObserver {
       WidgetsBinding.instance.removeObserver(this);
       _lifecycleRegistered = false;
     }
+    _cachedOverlay = null;
+    _idCounter = 0;
     _notificationCount = 0;
     _lastResetTime = DateTime.now();
   }
+
+  /// Read-only view of active toasts for internal widgets in this library.
+  List<_ToastEntry> get _toastEntries => List.unmodifiable(_activeToasts);
 }
 
 // =============================================================================
@@ -402,12 +414,12 @@ class _ToastrContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (service._activeToasts.isEmpty) {
+    if (service._toastEntries.isEmpty) {
       return const SizedBox.shrink();
     }
 
     final Map<ToastrPosition, List<_ToastEntry>> grouped = {};
-    for (final entry in service._activeToasts) {
+    for (final entry in service._toastEntries) {
       grouped.putIfAbsent(entry.config.position, () => []).add(entry);
     }
 
@@ -420,7 +432,15 @@ class _ToastrContainer extends StatelessWidget {
         final reversed = toasts.isNotEmpty && toasts.first.config.reverseOrder;
         final orderedToasts = reversed ? toasts.reversed.toList() : toasts;
 
-        final m = toasts.first.config.margin;
+        // Fix 6: compute the group margin as the first non-null margin in the
+        // group. In debug mode, warn if toasts at the same position disagree.
+        final margins = toasts.map((t) => t.config.margin).toSet();
+        assert(
+          margins.length <= 1,
+          'Toastr: Multiple toasts at $position have different margins. '
+          'Set margin via Toastr.configure() for consistent positioning.',
+        );
+        final m = margins.first;
         final top = (m?.top ?? 0) + padding.top + 16;
         final bottom = (m?.bottom ?? 0) + padding.bottom + 16;
         final left = (m?.left ?? 0) + 16;

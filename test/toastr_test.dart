@@ -339,11 +339,11 @@ void main() {
     });
   });
 
-  // ===== ToastrHelper Tests =====
-  group('ToastrHelper', () {
+  // ===== Toastr Tests =====
+  group('Toastr', () {
     group('defaultConfig', () {
       test('has sensible defaults', () {
-        final config = ToastrHelper.defaultConfig;
+        final config = Toastr.defaultConfig;
         expect(config.position, ToastrPosition.topRight);
         expect(config.duration, const Duration(seconds: 5));
         expect(config.showMethod, ToastrShowMethod.fadeIn);
@@ -356,7 +356,7 @@ void main() {
     group('configure', () {
       tearDown(() {
         // Reset to defaults after each test
-        ToastrHelper.configure(
+        Toastr.configure(
           position: ToastrPosition.topRight,
           duration: const Duration(seconds: 5),
           showProgressBar: false,
@@ -365,23 +365,23 @@ void main() {
       });
 
       test('updates position', () {
-        ToastrHelper.configure(position: ToastrPosition.bottomCenter);
+        Toastr.configure(position: ToastrPosition.bottomCenter);
         expect(
-          ToastrHelper.defaultConfig.position,
+          Toastr.defaultConfig.position,
           ToastrPosition.bottomCenter,
         );
       });
 
       test('updates multiple values', () {
-        ToastrHelper.configure(
+        Toastr.configure(
           showProgressBar: true,
           showCloseButton: true,
           duration: const Duration(seconds: 10),
         );
-        expect(ToastrHelper.defaultConfig.showProgressBar, isTrue);
-        expect(ToastrHelper.defaultConfig.showCloseButton, isTrue);
+        expect(Toastr.defaultConfig.showProgressBar, isTrue);
+        expect(Toastr.defaultConfig.showCloseButton, isTrue);
         expect(
-          ToastrHelper.defaultConfig.duration,
+          Toastr.defaultConfig.duration,
           const Duration(seconds: 10),
         );
       });
@@ -804,31 +804,31 @@ void main() {
     });
   });
 
-  group('ToastrHelper configure new options', () {
+  group('Toastr configure new options', () {
     test('configure sets maxWidth', () {
-      ToastrHelper.configure(maxWidth: 500);
-      expect(ToastrHelper.defaultConfig.maxWidth, 500);
+      Toastr.configure(maxWidth: 500);
+      expect(Toastr.defaultConfig.maxWidth, 500);
       // Reset
-      ToastrHelper.configure(maxWidth: 350);
+      Toastr.configure(maxWidth: 350);
     });
 
     test('configure sets theme', () {
-      ToastrHelper.configure(theme: ToastrTheme.dark);
-      expect(ToastrHelper.defaultConfig.theme, ToastrTheme.dark);
+      Toastr.configure(theme: ToastrTheme.dark);
+      expect(Toastr.defaultConfig.theme, ToastrTheme.dark);
       // Reset
-      ToastrHelper.configure(theme: ToastrTheme.light);
+      Toastr.configure(theme: ToastrTheme.light);
     });
 
     test('configure sets reverseOrder', () {
-      ToastrHelper.configure(reverseOrder: true);
-      expect(ToastrHelper.defaultConfig.reverseOrder, isTrue);
+      Toastr.configure(reverseOrder: true);
+      expect(Toastr.defaultConfig.reverseOrder, isTrue);
       // Reset
-      ToastrHelper.configure(reverseOrder: false);
+      Toastr.configure(reverseOrder: false);
     });
 
     test('configure sets margin', () {
-      ToastrHelper.configure(margin: const EdgeInsets.all(32));
-      expect(ToastrHelper.defaultConfig.margin, const EdgeInsets.all(32));
+      Toastr.configure(margin: const EdgeInsets.all(32));
+      expect(Toastr.defaultConfig.margin, const EdgeInsets.all(32));
       // Reset — use copyWith to clear margin
     });
   });
@@ -1002,39 +1002,39 @@ void main() {
     });
   });
 
-  group('ToastrHelper configure v2.3.0 options', () {
+  group('Toastr configure v2.3.0 options', () {
     test('configure sets haptic feedback', () {
-      ToastrHelper.configure(enableHapticFeedback: true);
-      expect(ToastrHelper.defaultConfig.enableHapticFeedback, isTrue);
-      ToastrHelper.configure(enableHapticFeedback: false);
+      Toastr.configure(enableHapticFeedback: true);
+      expect(Toastr.defaultConfig.enableHapticFeedback, isTrue);
+      Toastr.configure(enableHapticFeedback: false);
     });
 
     test('configure sets haptic type', () {
-      ToastrHelper.configure(hapticFeedbackType: HapticFeedbackType.heavy);
+      Toastr.configure(hapticFeedbackType: HapticFeedbackType.heavy);
       expect(
-        ToastrHelper.defaultConfig.hapticFeedbackType,
+        Toastr.defaultConfig.hapticFeedbackType,
         HapticFeedbackType.heavy,
       );
-      ToastrHelper.configure(hapticFeedbackType: HapticFeedbackType.light);
+      Toastr.configure(hapticFeedbackType: HapticFeedbackType.light);
     });
 
     test('configure sets swipe direction', () {
-      ToastrHelper.configure(
+      Toastr.configure(
         swipeDismissDirection: SwipeDismissDirection.vertical,
       );
       expect(
-        ToastrHelper.defaultConfig.swipeDismissDirection,
+        Toastr.defaultConfig.swipeDismissDirection,
         SwipeDismissDirection.vertical,
       );
-      ToastrHelper.configure(
+      Toastr.configure(
         swipeDismissDirection: SwipeDismissDirection.horizontal,
       );
     });
 
     test('configure sets maxVisible', () {
-      ToastrHelper.configure(maxVisible: 3);
+      Toastr.configure(maxVisible: 3);
       expect(ToastrService.instance.maxVisible, 3);
-      ToastrHelper.configure(maxVisible: 5);
+      Toastr.configure(maxVisible: 5);
     });
   });
 }

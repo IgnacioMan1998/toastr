@@ -49,18 +49,18 @@ Import the package and start showing toasts from **anywhere** — no `BuildConte
 import 'package:toastr_flutter/toastr.dart';
 
 // That's it! No setup, no initialization, no context.
-ToastrHelper.success('Operation completed!');
-ToastrHelper.error('Something went wrong!');
-ToastrHelper.warning('Please check your input');
-ToastrHelper.info('Here is some information');
+Toastr.success('Operation completed!');
+Toastr.error('Something went wrong!');
+Toastr.warning('Please check your input');
+Toastr.info('Here is some information');
 
 // Loading toast (stays until dismissed)
-final id = ToastrHelper.loading('Saving...');
+final id = Toastr.loading('Saving...');
 // ... later
-ToastrHelper.dismiss(id);
+Toastr.dismiss(id);
 
 // Promise API — auto-transitions loading → success/error
-await ToastrHelper.promise(
+await Toastr.promise(
   myFuture,
   loading: 'Saving...',
   success: 'Saved!',
@@ -102,19 +102,19 @@ class HomeScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
-              onPressed: () => ToastrHelper.success('Saved successfully!'),
+              onPressed: () => Toastr.success('Saved successfully!'),
               child: const Text('Success'),
             ),
             ElevatedButton(
-              onPressed: () => ToastrHelper.error('Failed to save!'),
+              onPressed: () => Toastr.error('Failed to save!'),
               child: const Text('Error'),
             ),
             ElevatedButton(
-              onPressed: () => ToastrHelper.warning('Check your input'),
+              onPressed: () => Toastr.warning('Check your input'),
               child: const Text('Warning'),
             ),
             ElevatedButton(
-              onPressed: () => ToastrHelper.info('New update available'),
+              onPressed: () => Toastr.info('New update available'),
               child: const Text('Info'),
             ),
           ],
@@ -129,28 +129,28 @@ class HomeScreen extends StatelessWidget {
 
 ```dart
 // Success notification (green)
-ToastrHelper.success('Operation completed successfully!');
+Toastr.success('Operation completed successfully!');
 
 // Error notification (red)
-ToastrHelper.error('Something went wrong!');
+Toastr.error('Something went wrong!');
 
 // Warning notification (orange)
-ToastrHelper.warning('Please check your input');
+Toastr.warning('Please check your input');
 
 // Info notification (blue)
-ToastrHelper.info('Here is some useful information');
+Toastr.info('Here is some useful information');
 
 // Auto-detect type from message content
-ToastrHelper.show('Success! Operation completed'); // Auto-detects as success
+Toastr.show('Success! Operation completed'); // Auto-detects as success
 
 // Loading toast — stays on screen until dismissed
-final id = ToastrHelper.loading('Processing...');
+final id = Toastr.loading('Processing...');
 
 // Blank toast — no icon
-ToastrHelper.blank('Plain message');
+Toastr.blank('Plain message');
 
 // Promise API — loading → success/error automatically
-await ToastrHelper.promise<Data>(
+await Toastr.promise<Data>(
   fetchData(),
   loading: 'Fetching...',
   success: 'Data loaded!',
@@ -158,10 +158,10 @@ await ToastrHelper.promise<Data>(
 );
 
 // Dismiss a specific toast by ID
-ToastrHelper.dismiss(id);
+Toastr.dismiss(id);
 
 // Dismiss all toasts
-ToastrHelper.dismiss();
+Toastr.dismiss();
 
 // Short alias — same API, shorter name
 Toastr.success('Saved!');
@@ -169,7 +169,7 @@ Toastr.loading('Working...');
 await Toastr.promise(future, loading: '...', success: '...', error: '...');
 
 // Custom configuration
-ToastrHelper.custom(ToastrConfig(...));
+Toastr.custom(ToastrConfig(...));
 ```
 
 ## Advanced Usage 🔧
@@ -179,7 +179,7 @@ ToastrHelper.custom(ToastrConfig(...));
 For complete control over appearance and behavior:
 
 ```dart
-ToastrHelper.custom(ToastrConfig(
+Toastr.custom(ToastrConfig(
   type: ToastrType.success,
   message: 'Custom styled notification',
   title: 'Custom Title',
@@ -200,7 +200,7 @@ ToastrHelper.custom(ToastrConfig(
 All helper methods support these optional parameters:
 
 ```dart
-ToastrHelper.success(
+Toastr.success(
   'Your message here',                  // Required: message
   title: 'Optional Title',             // Optional: title text
   duration: Duration(seconds: 3),       // Optional: how long to show
@@ -220,7 +220,7 @@ ToastrHelper.success(
 Change default settings for all toasts:
 
 ```dart
-ToastrHelper.configure(
+Toastr.configure(
   position: ToastrPosition.bottomCenter,
   duration: Duration(seconds: 3),
   showProgressBar: true,
@@ -268,15 +268,15 @@ ToastrHideMethod.hide        // Instant
 
 ```dart
 // Clear all active notifications
-ToastrHelper.clearAll();
+Toastr.clearAll();
 
 // Clear only the last notification
-ToastrHelper.clearLast();
+Toastr.clearLast();
 ```
 
 ## API Reference 📚
 
-### ToastrHelper Methods
+### Toastr Methods
 
 | Method                    | Description                                  |
 | ------------------------- | -------------------------------------------- |
@@ -345,12 +345,12 @@ The package automatically adapts to different screen sizes:
 ```dart
 // Simple toast from a button
 ElevatedButton(
-  onPressed: () => ToastrHelper.success('Saved!'),
+  onPressed: () => Toastr.success('Saved!'),
   child: Text('Save'),
 )
 
 // Error with custom duration
-ToastrHelper.error(
+Toastr.error(
   'Failed to save!',
   duration: Duration(seconds: 10),
   showCloseButton: true,
@@ -360,9 +360,9 @@ ToastrHelper.error(
 Future<void> fetchData() async {
   try {
     await api.getData();
-    ToastrHelper.success('Data loaded');
+    Toastr.success('Data loaded');
   } catch (e) {
-    ToastrHelper.error('Failed to load data');
+    Toastr.error('Failed to load data');
   }
 }
 ```
@@ -371,13 +371,13 @@ Future<void> fetchData() async {
 
 ```dart
 // Show a loading toast, update it when done
-final id = ToastrHelper.loading('Uploading file...');
+final id = Toastr.loading('Uploading file...');
 await uploadFile();
-ToastrHelper.dismiss(id);
-ToastrHelper.success('File uploaded!');
+Toastr.dismiss(id);
+Toastr.success('File uploaded!');
 
 // Or use promise() for automatic transitions
-final result = await ToastrHelper.promise<User>(
+final result = await Toastr.promise<User>(
   authService.login(email, password),
   loading: 'Signing in...',
   success: 'Welcome back!',
@@ -385,7 +385,7 @@ final result = await ToastrHelper.promise<User>(
 );
 
 // Blank toast — just text, no icon
-ToastrHelper.blank('Copied to clipboard');
+Toastr.blank('Copied to clipboard');
 
 // Using the Toastr alias
 final loadId = Toastr.loading('Syncing...');
@@ -485,7 +485,7 @@ Toastr.info(
 ### Advanced Notifications
 
 ```dart
-ToastrHelper.custom(ToastrConfig(
+Toastr.custom(ToastrConfig(
   type: ToastrType.info,
   title: 'Update Available',
   message: 'A new version is available. Update now?',
@@ -554,17 +554,17 @@ ToastrHelper.custom(ToastrConfig(
 **Before:**
 
 ```dart
-ToastrHelper.success(context, 'Message');
-ToastrHelper.error(context, 'Error');
-ToastrHelper.custom(context, config);
+Toastr.success(context, 'Message');
+Toastr.error(context, 'Error');
+Toastr.custom(context, config);
 ```
 
 **After:**
 
 ```dart
-ToastrHelper.success('Message');
-ToastrHelper.error('Error');
-ToastrHelper.custom(config);
+Toastr.success('Message');
+Toastr.error('Error');
+Toastr.custom(config);
 ```
 
 No `init()`, no `navigatorKey`, no `builder` — just call the methods directly.

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/toastr_config.dart';
+import '../models/toastr_options.dart';
 import '../models/toastr_type.dart';
 import '../services/toastr_service.dart';
 
@@ -10,37 +11,91 @@ import '../services/toastr_service.dart';
 ///
 /// ```dart
 /// Toastr.success('Operation completed!');
-/// Toastr.error('Something went wrong!');
+/// Toastr.error('Something went wrong!', ToastrOptions(position: ToastrPosition.bottomCenter));
 /// Toastr.loading('Please wait...');
 /// Toastr.promise(myFuture, loading: 'Loading...', success: 'Done!', error: 'Failed');
 /// ```
 ///
 /// All methods return a `String` toast ID that can be used
 /// with [dismiss] or [update].
-class ToastrHelper {
+class Toastr {
   static final ToastrService _service = ToastrService.instance;
 
-  /// Quick method to show a toast with just a message (auto-detects type from message content).
+  /// Default configuration used as base for all toastrs.
   ///
-  /// Returns the toast ID.
-  static String show(String message, {ToastrType? type}) {
-    final toastType = type ?? _detectTypeFromMessage(message);
+  /// Use [configure] to change global defaults safely.
+  static ToastrConfig _defaultConfig = const ToastrConfig(
+    type: ToastrType.info,
+    message: '',
+    position: ToastrPosition.topRight,
+    duration: Duration(seconds: 5),
+    showDuration: Duration(milliseconds: 300),
+    hideDuration: Duration(milliseconds: 1000),
+    showMethod: ToastrShowMethod.fadeIn,
+    hideMethod: ToastrHideMethod.fadeOut,
+    showProgressBar: false,
+    showCloseButton: false,
+    preventDuplicates: false,
+  );
 
-    switch (toastType) {
-      case ToastrType.success:
-        return success(message);
-      case ToastrType.error:
-        return error(message);
-      case ToastrType.warning:
-        return warning(message);
-      case ToastrType.info:
-        return info(message);
-      case ToastrType.loading:
-        return loading(message);
-      case ToastrType.blank:
-        return blank(message);
-    }
-  }
+  /// Returns the current default configuration (read-only).
+  static ToastrConfig get defaultConfig => _defaultConfig;
+
+  // ---------------------------------------------------------------------------
+  // Internal helpers
+  // ---------------------------------------------------------------------------
+
+  /// Applies [options] on top of [_defaultConfig] for the given [type]/[message].
+  /// [title] overrides [ToastrOptions.title] when both are provided.
+  static ToastrConfig _applyOptions(
+    ToastrType type,
+    String message,
+    ToastrOptions? options, {
+    String? title,
+  }) =>
+      _defaultConfig.copyWith(
+        type: type,
+        message: message,
+        title: title ?? options?.title,
+        duration: options?.duration,
+        position: options?.position,
+        showMethod: options?.showMethod,
+        hideMethod: options?.hideMethod,
+        showDuration: options?.showDuration,
+        hideDuration: options?.hideDuration,
+        showProgressBar: options?.showProgressBar,
+        showCloseButton: options?.showCloseButton,
+        preventDuplicates: options?.preventDuplicates,
+        onTap: options?.onTap,
+        onDismiss: options?.onDismiss,
+        content: options?.content,
+        maxWidth: options?.maxWidth,
+        margin: options?.margin,
+        accentColor: options?.accentColor,
+        containerDecoration: options?.containerDecoration,
+        theme: options?.theme,
+        action: options?.action,
+        enableHapticFeedback: options?.enableHapticFeedback,
+        hapticFeedbackType: options?.hapticFeedbackType,
+        swipeDismissDirection: options?.swipeDismissDirection,
+        enterAnimationBuilder: options?.enterAnimationBuilder,
+        exitAnimationBuilder: options?.exitAnimationBuilder,
+        compact: options?.compact,
+        borderRadius: options?.borderRadius,
+        avoidKeyboard: options?.avoidKeyboard,
+        stackOverlap: options?.stackOverlap,
+        showCircularProgress: options?.showCircularProgress,
+        gutter: options?.gutter,
+        iconTheme: options?.iconTheme,
+      );
+
+  static String _showWithOptions(
+    ToastrType type,
+    String message, {
+    String? title,
+    ToastrOptions? options,
+  }) =>
+      _service.show(_applyOptions(type, message, options, title: title));
 
   /// Auto-detect toast type from message content.
   ///
@@ -77,393 +132,52 @@ class ToastrHelper {
     return ToastrType.info;
   }
 
-  /// Default configuration used as base for all toastrs.
-  ///
-  /// Use [configure] to change global defaults safely.
-  static ToastrConfig _defaultConfig = const ToastrConfig(
-    type: ToastrType.info,
-    message: '',
-    position: ToastrPosition.topRight,
-    duration: Duration(seconds: 5),
-    showDuration: Duration(milliseconds: 300),
-    hideDuration: Duration(milliseconds: 1000),
-    showMethod: ToastrShowMethod.fadeIn,
-    hideMethod: ToastrHideMethod.fadeOut,
-    showProgressBar: false,
-    showCloseButton: false,
-    preventDuplicates: false,
-  );
+  // ---------------------------------------------------------------------------
+  // Public API
+  // ---------------------------------------------------------------------------
 
-  /// Returns the current default configuration (read-only).
-  static ToastrConfig get defaultConfig => _defaultConfig;
-
-  /// Show a toastr notification with the given [type] and optional parameters.
-  ///
-  /// All named parameters use [defaultConfig] as fallback when omitted.
-  static String _showWithOptions(
-    ToastrType type,
-    String message, {
-    String? title,
-    Duration? duration,
-    ToastrPosition? position,
-    ToastrShowMethod? showMethod,
-    ToastrHideMethod? hideMethod,
-    Duration? showDuration,
-    Duration? hideDuration,
-    bool? showProgressBar,
-    bool? showCloseButton,
-    bool? preventDuplicates,
-    VoidCallback? onTap,
-    VoidCallback? onDismiss,
-    Widget? content,
-    double? maxWidth,
-    EdgeInsets? margin,
-    Color? accentColor,
-    BoxDecoration? containerDecoration,
-    ToastrTheme? theme,
-    ToastrAction? action,
-    bool? enableHapticFeedback,
-    HapticFeedbackType? hapticFeedbackType,
-    SwipeDismissDirection? swipeDismissDirection,
-    Widget Function(Widget child, Animation<double> animation)? enterAnimationBuilder,
-    Widget Function(Widget child, Animation<double> animation)? exitAnimationBuilder,
-    bool? compact,
-    BorderRadius? borderRadius,
-    bool? avoidKeyboard,
-    double? stackOverlap,
-    bool? showCircularProgress,
-    double? gutter,
-    ToastrIconTheme? iconTheme,
-  }) =>
-      _service.show(
-        _defaultConfig.copyWith(
-          type: type,
-          message: message,
-          title: title,
-          duration: duration,
-          position: position,
-          showMethod: showMethod,
-          hideMethod: hideMethod,
-          showDuration: showDuration,
-          hideDuration: hideDuration,
-          showProgressBar: showProgressBar,
-          showCloseButton: showCloseButton,
-          preventDuplicates: preventDuplicates,
-          onTap: onTap,
-          onDismiss: onDismiss,
-          content: content,
-          maxWidth: maxWidth,
-          margin: margin,
-          accentColor: accentColor,
-          containerDecoration: containerDecoration,
-          theme: theme,
-          action: action,
-          enableHapticFeedback: enableHapticFeedback,
-          hapticFeedbackType: hapticFeedbackType,
-          swipeDismissDirection: swipeDismissDirection,
-          enterAnimationBuilder: enterAnimationBuilder,
-          exitAnimationBuilder: exitAnimationBuilder,
-          compact: compact,
-          borderRadius: borderRadius,
-          avoidKeyboard: avoidKeyboard,
-          stackOverlap: stackOverlap,
-          showCircularProgress: showCircularProgress,
-          gutter: gutter,
-          iconTheme: iconTheme,
-        ),
-      );
-
-  /// Show a success toastr with the given message.
+  /// Quick method to show a toast with just a message (auto-detects type from
+  /// message content). Pass [type] to override detection.
   ///
   /// Returns the toast ID.
-  static String success(
+  static String show(
     String message, {
+    ToastrType? type,
     String? title,
-    Duration? duration,
-    ToastrPosition? position,
-    ToastrShowMethod? showMethod,
-    ToastrHideMethod? hideMethod,
-    Duration? showDuration,
-    Duration? hideDuration,
-    bool? showProgressBar,
-    bool? showCloseButton,
-    bool? preventDuplicates,
-    VoidCallback? onTap,
-    VoidCallback? onDismiss,
-    Widget? content,
-    double? maxWidth,
-    EdgeInsets? margin,
-    Color? accentColor,
-    BoxDecoration? containerDecoration,
-    ToastrTheme? theme,
-    ToastrAction? action,
-    bool? enableHapticFeedback,
-    HapticFeedbackType? hapticFeedbackType,
-    SwipeDismissDirection? swipeDismissDirection,
-    Widget Function(Widget child, Animation<double> animation)? enterAnimationBuilder,
-    Widget Function(Widget child, Animation<double> animation)? exitAnimationBuilder,
-    bool? compact,
-    BorderRadius? borderRadius,
-    bool? avoidKeyboard,
-    double? stackOverlap,
-    bool? showCircularProgress,
-    double? gutter,
-    ToastrIconTheme? iconTheme,
-  }) =>
-      _showWithOptions(
-        ToastrType.success,
-        message,
-        title: title,
-        duration: duration,
-        position: position,
-        showMethod: showMethod,
-        hideMethod: hideMethod,
-        showDuration: showDuration,
-        hideDuration: hideDuration,
-        showProgressBar: showProgressBar,
-        showCloseButton: showCloseButton,
-        preventDuplicates: preventDuplicates,
-        onTap: onTap,
-        onDismiss: onDismiss,
-        content: content,
-        maxWidth: maxWidth,
-        margin: margin,
-        accentColor: accentColor,
-        containerDecoration: containerDecoration,
-        theme: theme,
-        action: action,
-        enableHapticFeedback: enableHapticFeedback,
-        hapticFeedbackType: hapticFeedbackType,
-        swipeDismissDirection: swipeDismissDirection,
-        enterAnimationBuilder: enterAnimationBuilder,
-        exitAnimationBuilder: exitAnimationBuilder,
-        compact: compact,
-        borderRadius: borderRadius,
-        avoidKeyboard: avoidKeyboard,
-        stackOverlap: stackOverlap,
-        showCircularProgress: showCircularProgress,
-        gutter: gutter,
-        iconTheme: iconTheme,
-      );
+    ToastrOptions? options,
+  }) {
+    final toastType = type ?? _detectTypeFromMessage(message);
+    switch (toastType) {
+      case ToastrType.success:
+        return success(message, title: title, options: options);
+      case ToastrType.error:
+        return error(message, title: title, options: options);
+      case ToastrType.warning:
+        return warning(message, title: title, options: options);
+      case ToastrType.info:
+        return info(message, title: title, options: options);
+      case ToastrType.loading:
+        return loading(message, title: title, options: options);
+      case ToastrType.blank:
+        return blank(message, title: title, options: options);
+    }
+  }
 
-  /// Show an error toastr with the given message.
-  ///
-  /// Returns the toast ID.
-  static String error(
-    String message, {
-    String? title,
-    Duration? duration,
-    ToastrPosition? position,
-    ToastrShowMethod? showMethod,
-    ToastrHideMethod? hideMethod,
-    Duration? showDuration,
-    Duration? hideDuration,
-    bool? showProgressBar,
-    bool? showCloseButton,
-    bool? preventDuplicates,
-    VoidCallback? onTap,
-    VoidCallback? onDismiss,
-    Widget? content,
-    double? maxWidth,
-    EdgeInsets? margin,
-    Color? accentColor,
-    BoxDecoration? containerDecoration,
-    ToastrTheme? theme,
-    ToastrAction? action,
-    bool? enableHapticFeedback,
-    HapticFeedbackType? hapticFeedbackType,
-    SwipeDismissDirection? swipeDismissDirection,
-    Widget Function(Widget child, Animation<double> animation)? enterAnimationBuilder,
-    Widget Function(Widget child, Animation<double> animation)? exitAnimationBuilder,
-    bool? compact,
-    BorderRadius? borderRadius,
-    bool? avoidKeyboard,
-    double? stackOverlap,
-    bool? showCircularProgress,
-    double? gutter,
-    ToastrIconTheme? iconTheme,
-  }) =>
-      _showWithOptions(
-        ToastrType.error,
-        message,
-        title: title,
-        duration: duration,
-        position: position,
-        showMethod: showMethod,
-        hideMethod: hideMethod,
-        showDuration: showDuration,
-        hideDuration: hideDuration,
-        showProgressBar: showProgressBar,
-        showCloseButton: showCloseButton,
-        preventDuplicates: preventDuplicates,
-        onTap: onTap,
-        onDismiss: onDismiss,
-        content: content,
-        maxWidth: maxWidth,
-        margin: margin,
-        accentColor: accentColor,
-        containerDecoration: containerDecoration,
-        theme: theme,
-        action: action,
-        enableHapticFeedback: enableHapticFeedback,
-        hapticFeedbackType: hapticFeedbackType,
-        swipeDismissDirection: swipeDismissDirection,
-        enterAnimationBuilder: enterAnimationBuilder,
-        exitAnimationBuilder: exitAnimationBuilder,
-        compact: compact,
-        borderRadius: borderRadius,
-        avoidKeyboard: avoidKeyboard,
-        stackOverlap: stackOverlap,
-        showCircularProgress: showCircularProgress,
-        gutter: gutter,
-        iconTheme: iconTheme,
-      );
+  /// Show a success toastr. Returns the toast ID.
+  static String success(String message, {String? title, ToastrOptions? options}) =>
+      _showWithOptions(ToastrType.success, message, title: title, options: options);
 
-  /// Show a warning toastr with the given message.
-  ///
-  /// Returns the toast ID.
-  static String warning(
-    String message, {
-    String? title,
-    Duration? duration,
-    ToastrPosition? position,
-    ToastrShowMethod? showMethod,
-    ToastrHideMethod? hideMethod,
-    Duration? showDuration,
-    Duration? hideDuration,
-    bool? showProgressBar,
-    bool? showCloseButton,
-    bool? preventDuplicates,
-    VoidCallback? onTap,
-    VoidCallback? onDismiss,
-    Widget? content,
-    double? maxWidth,
-    EdgeInsets? margin,
-    Color? accentColor,
-    BoxDecoration? containerDecoration,
-    ToastrTheme? theme,
-    ToastrAction? action,
-    bool? enableHapticFeedback,
-    HapticFeedbackType? hapticFeedbackType,
-    SwipeDismissDirection? swipeDismissDirection,
-    Widget Function(Widget child, Animation<double> animation)? enterAnimationBuilder,
-    Widget Function(Widget child, Animation<double> animation)? exitAnimationBuilder,
-    bool? compact,
-    BorderRadius? borderRadius,
-    bool? avoidKeyboard,
-    double? stackOverlap,
-    bool? showCircularProgress,
-    double? gutter,
-    ToastrIconTheme? iconTheme,
-  }) =>
-      _showWithOptions(
-        ToastrType.warning,
-        message,
-        title: title,
-        duration: duration,
-        position: position,
-        showMethod: showMethod,
-        hideMethod: hideMethod,
-        showDuration: showDuration,
-        hideDuration: hideDuration,
-        showProgressBar: showProgressBar,
-        showCloseButton: showCloseButton,
-        preventDuplicates: preventDuplicates,
-        onTap: onTap,
-        onDismiss: onDismiss,
-        content: content,
-        maxWidth: maxWidth,
-        margin: margin,
-        accentColor: accentColor,
-        containerDecoration: containerDecoration,
-        theme: theme,
-        action: action,
-        enableHapticFeedback: enableHapticFeedback,
-        hapticFeedbackType: hapticFeedbackType,
-        swipeDismissDirection: swipeDismissDirection,
-        enterAnimationBuilder: enterAnimationBuilder,
-        exitAnimationBuilder: exitAnimationBuilder,
-        compact: compact,
-        borderRadius: borderRadius,
-        avoidKeyboard: avoidKeyboard,
-        stackOverlap: stackOverlap,
-        showCircularProgress: showCircularProgress,
-        gutter: gutter,
-        iconTheme: iconTheme,
-      );
+  /// Show an error toastr. Returns the toast ID.
+  static String error(String message, {String? title, ToastrOptions? options}) =>
+      _showWithOptions(ToastrType.error, message, title: title, options: options);
 
-  /// Show an info toastr with the given message.
-  ///
-  /// Returns the toast ID.
-  static String info(
-    String message, {
-    String? title,
-    Duration? duration,
-    ToastrPosition? position,
-    ToastrShowMethod? showMethod,
-    ToastrHideMethod? hideMethod,
-    Duration? showDuration,
-    Duration? hideDuration,
-    bool? showProgressBar,
-    bool? showCloseButton,
-    bool? preventDuplicates,
-    VoidCallback? onTap,
-    VoidCallback? onDismiss,
-    Widget? content,
-    double? maxWidth,
-    EdgeInsets? margin,
-    Color? accentColor,
-    BoxDecoration? containerDecoration,
-    ToastrTheme? theme,
-    ToastrAction? action,
-    bool? enableHapticFeedback,
-    HapticFeedbackType? hapticFeedbackType,
-    SwipeDismissDirection? swipeDismissDirection,
-    Widget Function(Widget child, Animation<double> animation)? enterAnimationBuilder,
-    Widget Function(Widget child, Animation<double> animation)? exitAnimationBuilder,
-    bool? compact,
-    BorderRadius? borderRadius,
-    bool? avoidKeyboard,
-    double? stackOverlap,
-    bool? showCircularProgress,
-    double? gutter,
-    ToastrIconTheme? iconTheme,
-  }) =>
-      _showWithOptions(
-        ToastrType.info,
-        message,
-        title: title,
-        duration: duration,
-        position: position,
-        showMethod: showMethod,
-        hideMethod: hideMethod,
-        showDuration: showDuration,
-        hideDuration: hideDuration,
-        showProgressBar: showProgressBar,
-        showCloseButton: showCloseButton,
-        preventDuplicates: preventDuplicates,
-        onTap: onTap,
-        onDismiss: onDismiss,
-        content: content,
-        maxWidth: maxWidth,
-        margin: margin,
-        accentColor: accentColor,
-        containerDecoration: containerDecoration,
-        theme: theme,
-        action: action,
-        enableHapticFeedback: enableHapticFeedback,
-        hapticFeedbackType: hapticFeedbackType,
-        swipeDismissDirection: swipeDismissDirection,
-        enterAnimationBuilder: enterAnimationBuilder,
-        exitAnimationBuilder: exitAnimationBuilder,
-        compact: compact,
-        borderRadius: borderRadius,
-        avoidKeyboard: avoidKeyboard,
-        stackOverlap: stackOverlap,
-        showCircularProgress: showCircularProgress,
-        gutter: gutter,
-        iconTheme: iconTheme,
-      );
+  /// Show a warning toastr. Returns the toast ID.
+  static String warning(String message, {String? title, ToastrOptions? options}) =>
+      _showWithOptions(ToastrType.warning, message, title: title, options: options);
+
+  /// Show an info toastr. Returns the toast ID.
+  static String info(String message, {String? title, ToastrOptions? options}) =>
+      _showWithOptions(ToastrType.info, message, title: title, options: options);
 
   /// Show a loading toastr with an animated spinner.
   ///
@@ -475,145 +189,19 @@ class ToastrHelper {
   /// await uploadFile();
   /// Toastr.dismiss(id);
   /// ```
-  static String loading(
-    String message, {
-    String? title,
-    ToastrPosition? position,
-    ToastrShowMethod? showMethod,
-    ToastrHideMethod? hideMethod,
-    Duration? showDuration,
-    Duration? hideDuration,
-    bool? showCloseButton,
-    VoidCallback? onTap,
-    VoidCallback? onDismiss,
-    Widget? content,
-    double? maxWidth,
-    EdgeInsets? margin,
-    Color? accentColor,
-    BoxDecoration? containerDecoration,
-    ToastrTheme? theme,
-    ToastrAction? action,
-    bool? enableHapticFeedback,
-    HapticFeedbackType? hapticFeedbackType,
-    SwipeDismissDirection? swipeDismissDirection,
-    Widget Function(Widget child, Animation<double> animation)? enterAnimationBuilder,
-    Widget Function(Widget child, Animation<double> animation)? exitAnimationBuilder,
-    bool? compact,
-    BorderRadius? borderRadius,
-    bool? avoidKeyboard,
-    double? stackOverlap,
-    bool? showCircularProgress,
-    double? gutter,
-    ToastrIconTheme? iconTheme,
-  }) =>
-      _showWithOptions(
-        ToastrType.loading,
-        message,
-        title: title,
-        duration: const Duration(days: 365),
-        position: position,
-        showMethod: showMethod,
-        hideMethod: hideMethod,
-        showDuration: showDuration,
-        hideDuration: hideDuration,
-        showProgressBar: false,
-        showCloseButton: showCloseButton ?? false,
-        preventDuplicates: false,
-        onTap: onTap,
-        onDismiss: onDismiss,
-        content: content,
-        maxWidth: maxWidth,
-        margin: margin,
-        accentColor: accentColor,
-        containerDecoration: containerDecoration,
-        theme: theme,
-        action: action,
-        enableHapticFeedback: enableHapticFeedback,
-        hapticFeedbackType: hapticFeedbackType,
-        swipeDismissDirection: swipeDismissDirection,
-        enterAnimationBuilder: enterAnimationBuilder,
-        exitAnimationBuilder: exitAnimationBuilder,
-        compact: compact,
-        borderRadius: borderRadius,
-        avoidKeyboard: avoidKeyboard,
-        stackOverlap: stackOverlap,
-        showCircularProgress: showCircularProgress,
-        gutter: gutter,
-        iconTheme: iconTheme,
+  static String loading(String message, {String? title, ToastrOptions? options}) =>
+      _service.show(
+        _applyOptions(ToastrType.loading, message, options, title: title).copyWith(
+          duration: const Duration(days: 365),
+          showProgressBar: false,
+          preventDuplicates: false,
+          showCloseButton: options?.showCloseButton ?? false,
+        ),
       );
 
-  /// Show a blank toastr (plain text, no icon).
-  ///
-  /// Returns the toast ID.
-  static String blank(
-    String message, {
-    String? title,
-    Duration? duration,
-    ToastrPosition? position,
-    ToastrShowMethod? showMethod,
-    ToastrHideMethod? hideMethod,
-    Duration? showDuration,
-    Duration? hideDuration,
-    bool? showProgressBar,
-    bool? showCloseButton,
-    bool? preventDuplicates,
-    VoidCallback? onTap,
-    VoidCallback? onDismiss,
-    Widget? content,
-    double? maxWidth,
-    EdgeInsets? margin,
-    Color? accentColor,
-    BoxDecoration? containerDecoration,
-    ToastrTheme? theme,
-    ToastrAction? action,
-    bool? enableHapticFeedback,
-    HapticFeedbackType? hapticFeedbackType,
-    SwipeDismissDirection? swipeDismissDirection,
-    Widget Function(Widget child, Animation<double> animation)? enterAnimationBuilder,
-    Widget Function(Widget child, Animation<double> animation)? exitAnimationBuilder,
-    bool? compact,
-    BorderRadius? borderRadius,
-    bool? avoidKeyboard,
-    double? stackOverlap,
-    bool? showCircularProgress,
-    double? gutter,
-    ToastrIconTheme? iconTheme,
-  }) =>
-      _showWithOptions(
-        ToastrType.blank,
-        message,
-        title: title,
-        duration: duration,
-        position: position,
-        showMethod: showMethod,
-        hideMethod: hideMethod,
-        showDuration: showDuration,
-        hideDuration: hideDuration,
-        showProgressBar: showProgressBar,
-        showCloseButton: showCloseButton,
-        preventDuplicates: preventDuplicates,
-        onTap: onTap,
-        onDismiss: onDismiss,
-        content: content,
-        maxWidth: maxWidth,
-        margin: margin,
-        accentColor: accentColor,
-        containerDecoration: containerDecoration,
-        theme: theme,
-        action: action,
-        enableHapticFeedback: enableHapticFeedback,
-        hapticFeedbackType: hapticFeedbackType,
-        swipeDismissDirection: swipeDismissDirection,
-        enterAnimationBuilder: enterAnimationBuilder,
-        exitAnimationBuilder: exitAnimationBuilder,
-        compact: compact,
-        borderRadius: borderRadius,
-        avoidKeyboard: avoidKeyboard,
-        stackOverlap: stackOverlap,
-        showCircularProgress: showCircularProgress,
-        gutter: gutter,
-        iconTheme: iconTheme,
-      );
+  /// Show a blank toastr (plain text, no icon). Returns the toast ID.
+  static String blank(String message, {String? title, ToastrOptions? options}) =>
+      _showWithOptions(ToastrType.blank, message, title: title, options: options);
 
   /// Show a toast that automatically tracks a [Future].
   ///
@@ -649,9 +237,9 @@ class ToastrHelper {
     Duration? successDuration,
     Duration? errorDuration,
   }) async {
-    final toastId = ToastrHelper.loading(
+    final toastId = Toastr.loading(
       loading,
-      position: position,
+      options: position != null ? ToastrOptions(position: position) : null,
     );
 
     try {
@@ -699,17 +287,13 @@ class ToastrHelper {
     }
   }
 
-  /// Clear all active toastrs
-  static void clearAll() {
-    _service.clearAll();
-  }
+  /// Clear all active toastrs.
+  static void clearAll() => _service.clearAll();
 
-  /// Clear the last (most recent) toastr
-  static void clearLast() {
-    _service.clearLast();
-  }
+  /// Clear the last (most recent) toastr.
+  static void clearLast() => _service.clearLast();
 
-  /// Configure global defaults for all toastrs
+  /// Configure global defaults for all toastrs.
   static void configure({
     ToastrPosition? position,
     Duration? duration,

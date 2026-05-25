@@ -74,11 +74,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ❌ **Animated error icon**: Circle scales in (300ms, delay 100ms) + two X lines appear sequentially (150ms each, delays 150ms/180ms)
 - 🔄 **Layered icon system**: Loader spinner underneath with status icon overlay (matches toast-icon.tsx architecture)
 - 🎯 **AnimatedIconWrapper**: Warning, info, and custom icons scale in from 0.6 with opacity 0.4 (300ms, delay 120ms, `cubic-bezier(0.175, 0.885, 0.32, 1.275)`)
-- 🍞 **Loading toast**: `ToastrHelper.loading('Loading...')` — shows animated spinner, stays until dismissed
-- 📨 **Blank toast**: `ToastrHelper.blank('Message')` — plain text toast without icon
-- 🔮 **Promise API**: `ToastrHelper.promise(future, loading:, success:, error:)` — auto-transitions loading → success/error
+- 🍞 **Loading toast**: `Toastr.loading('Loading...')` — shows animated spinner, stays until dismissed
+- 📨 **Blank toast**: `Toastr.blank('Message')` — plain text toast without icon
+- 🔮 **Promise API**: `Toastr.promise(future, loading:, success:, error:)` — auto-transitions loading → success/error
 - 🔖 **Toast IDs**: All methods return a `String` ID for programmatic control
-- 🗑️ **Dismiss by ID**: `ToastrHelper.dismiss(id)` — dismiss a specific toast, or `dismiss()` for all
+- 🗑️ **Dismiss by ID**: `Toastr.dismiss(id)` — dismiss a specific toast, or `dismiss()` for all
 - 🏷️ **`Toastr` alias**: Short alias class — `Toastr.success('Done!')`, `Toastr.promise(...)`, etc.
 
 ### Changed
@@ -96,8 +96,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### BREAKING CHANGES
 
 - 🚀 **Zero-setup API**: Removed `BuildContext` from all methods — no context, no `init()`, no `navigatorKey` needed
-  - `ToastrHelper.success('Message')` instead of `ToastrHelper.success(context, 'Message')`
-  - `ToastrHelper.custom(config)` instead of `ToastrHelper.custom(context, config)`
+  - `Toastr.success('Message')` instead of `Toastr.success(context, 'Message')`
+  - `Toastr.custom(config)` instead of `Toastr.custom(context, config)`
   - `ToastrService.show(config)` instead of `ToastrService.show(config, context)`
 
 ### Added
@@ -109,7 +109,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Gradient progress bar
   - Swipe-to-dismiss gesture (80px threshold)
   - Hover scale animation (1.02x)
-- 🔧 **`ToastrHelper.configure()`**: New method to set global defaults (position, duration, progress bar, etc.)
+- 🔧 **`Toastr.configure()`**: New method to set global defaults (position, duration, progress bar, etc.)
 - ✅ **56 unit tests**: Comprehensive coverage for config, validator, helper, widget, and enums
 
 ### Fixed
@@ -123,7 +123,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `BuildContext` parameter from all public methods
 - `improved_toastr_widget.dart` (dead code, was never exported)
-- `ToastrService.init()` and `ToastrHelper.init()` (no longer needed)
+- `ToastrService.init()` and `Toastr.init()` (no longer needed)
 
 ### Changed
 
@@ -135,12 +135,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ```dart
 // Before (v1.x)
-ToastrHelper.success(context, 'Done!');
-ToastrHelper.custom(context, config);
+Toastr.success(context, 'Done!');
+Toastr.custom(context, config);
 
 // After (v2.0.0)
-ToastrHelper.success('Done!');
-ToastrHelper.custom(config);
+Toastr.success('Done!');
+Toastr.custom(config);
 ```
 
 ## [1.0.0+7] - 2025-09-04
@@ -236,19 +236,19 @@ ToastrHelper.custom(config);
 
 - 🔄 **Context-Based Architecture**: Reverted auto-initialization approach for better performance and security
   - All methods now require `BuildContext` parameter (similar to SnackBar)
-  - `ToastrHelper.success(context, 'message')` instead of `ToastrHelper.success('message')`
+  - `Toastr.success(context, 'message')` instead of `Toastr.success('message')`
   - Removes performance overhead and security vulnerabilities of auto-detection
   - No more manual initialization required - context passed directly to each method
 
 ### Changed
 
-- **API Updates**: All ToastrHelper methods now require BuildContext as first parameter:
-  - `ToastrHelper.show(context, message)`
-  - `ToastrHelper.success(context, message)`
-  - `ToastrHelper.error(context, message)`
-  - `ToastrHelper.warning(context, message)`
-  - `ToastrHelper.info(context, message)`
-  - `ToastrHelper.custom(context, config)`
+- **API Updates**: All Toastr methods now require BuildContext as first parameter:
+  - `Toastr.show(context, message)`
+  - `Toastr.success(context, message)`
+  - `Toastr.error(context, message)`
+  - `Toastr.warning(context, message)`
+  - `Toastr.info(context, message)`
+  - `Toastr.custom(context, config)`
 
 ### Removed
 
@@ -274,11 +274,11 @@ Update your code to pass `BuildContext` as the first parameter:
 
 ```dart
 // Before (v1.0.0+2)
-ToastrHelper.success('Message');
+Toastr.success('Message');
 ToastrService.instance.initialize(Overlay.of(context)); // Manual initialization
 
 // After (v1.0.0+3)
-ToastrHelper.success(context, 'Message'); // No initialization needed
+Toastr.success(context, 'Message'); // No initialization needed
 ```
 
 ## [1.0.0+2]
@@ -304,7 +304,7 @@ ToastrHelper.success(context, 'Message'); // No initialization needed
 
 ### Technical Improvements
 
-- Enhanced `ToastrHelper.error()` method to use proper default duration
+- Enhanced `Toastr.error()` method to use proper default duration
 - Improved security validation in `ToastrValidator` with better error messaging
 - Added proper imports for Flutter foundation framework
 - Refined enum documentation for better API clarity
@@ -364,7 +364,7 @@ ToastrHelper.success(context, 'Message'); // No initialization needed
   - Maximum active notifications limit
   - Security event logging
 - 🎯 **Easy-to-use API**:
-  - Static helper methods: `ToastrHelper.success()`, `ToastrHelper.error()`, etc.
+  - Static helper methods: `Toastr.success()`, `Toastr.error()`, etc.
   - Full configuration support via `ToastrConfig` class
   - Global configuration management
   - Service-based architecture with `ToastrService`
@@ -402,13 +402,13 @@ ToastrHelper.success(context, 'Message'); // No initialization needed
 
 ```dart
 // Basic usage
-ToastrHelper.success('Operation completed successfully!');
-ToastrHelper.error('Something went wrong!');
-ToastrHelper.warning('Please check your input');
-ToastrHelper.info('Here is some useful information');
+Toastr.success('Operation completed successfully!');
+Toastr.error('Something went wrong!');
+Toastr.warning('Please check your input');
+Toastr.info('Here is some useful information');
 
 // Advanced usage with custom configuration
-ToastrHelper.custom(
+Toastr.custom(
   ToastrConfig(
     type: ToastrType.success,
     message: 'Custom notification',

@@ -13,10 +13,10 @@ flutter run
 
 ### 1. Métodos rápidos (sin BuildContext)
 
-- `ToastrHelper.success('mensaje')`
-- `ToastrHelper.error('mensaje')`
-- `ToastrHelper.warning('mensaje')`
-- `ToastrHelper.info('mensaje')`
+- `Toastr.success('mensaje')`
+- `Toastr.error('mensaje')`
+- `Toastr.warning('mensaje')`
+- `Toastr.info('mensaje')`
 
 ### 2. Configuración personalizada
 
@@ -40,7 +40,7 @@ import 'package:toastr_flutter/toastr.dart';
 
 // Dentro de cualquier widget con BuildContext
 ElevatedButton(
-  onPressed: () => ToastrHelper.success(context, '¡Éxito!'),
+  onPressed: () => Toastr.success(context, '¡Éxito!'),
   child: Text('Mostrar Éxito'),
 )
 ```

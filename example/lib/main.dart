@@ -76,7 +76,7 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
       swipeDismissDirection: _swipeDismissDirection,
     );
 
-    ToastrHelper.custom(config);
+    Toastr.custom(config);
   }
 
   @override
@@ -94,7 +94,7 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
             centerTitle: false,
             actions: [
               IconButton(
-                onPressed: ToastrHelper.clearAll,
+                onPressed: Toastr.clearAll,
                 icon: const Icon(Icons.clear_all_rounded),
                 tooltip: 'Clear all toasts',
               ),
@@ -124,7 +124,7 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                         label: 'Success',
                         icon: Icons.check,
                         color: const Color(0xFF16A34A),
-                        onTap: () => ToastrHelper.success(
+                        onTap: () => Toastr.success(
                           'Operation completed successfully!',
                         ),
                       ),
@@ -132,7 +132,7 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                         label: 'Error',
                         icon: Icons.cancel_outlined,
                         color: const Color(0xFFDC2626),
-                        onTap: () => ToastrHelper.error(
+                        onTap: () => Toastr.error(
                           'Something went wrong. Please try again.',
                           title: 'Error',
                         ),
@@ -141,7 +141,7 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                         label: 'Warning',
                         icon: Icons.warning_amber_rounded,
                         color: const Color(0xFFD97706),
-                        onTap: () => ToastrHelper.warning(
+                        onTap: () => Toastr.warning(
                           'Please check your input before continuing.',
                           title: 'Warning',
                         ),
@@ -150,7 +150,7 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                         label: 'Info',
                         icon: Icons.info_outlined,
                         color: const Color(0xFF2563EB),
-                        onTap: () => ToastrHelper.info(
+                        onTap: () => Toastr.info(
                           'Here is some useful information for you.',
                           title: 'Info',
                         ),
@@ -214,9 +214,11 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                         color: const Color(0xFFEC4899),
                         onTap: () => Toastr.success(
                           'File deleted',
-                          action: ToastrAction(
-                            label: 'Undo',
-                            onPressed: () => Toastr.info('Restored!'),
+                          options: ToastrOptions(
+                            action: ToastrAction(
+                              label: 'Undo',
+                              onPressed: () => Toastr.info('Restored!'),
+                            ),
                           ),
                         ),
                       ),
@@ -226,8 +228,10 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                         color: const Color(0xFF7C3AED),
                         onTap: () => Toastr.success(
                           'Saved with haptic feedback!',
-                          enableHapticFeedback: true,
-                          hapticFeedbackType: HapticFeedbackType.heavy,
+                          options: ToastrOptions(
+                            enableHapticFeedback: true,
+                            hapticFeedbackType: HapticFeedbackType.heavy,
+                          ),
                         ),
                       ),
                       _QuickActionChip(
@@ -236,7 +240,9 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                         color: const Color(0xFF059669),
                         onTap: () => Toastr.info(
                           'Swipe up or down to dismiss!',
-                          swipeDismissDirection: SwipeDismissDirection.vertical,
+                          options: ToastrOptions(
+                            swipeDismissDirection: SwipeDismissDirection.vertical,
+                          ),
                         ),
                       ),
                       _QuickActionChip(
@@ -245,8 +251,10 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                         color: const Color(0xFFB91C1C),
                         onTap: () => Toastr.warning(
                           'This toast cannot be swiped away',
-                          swipeDismissDirection: SwipeDismissDirection.none,
-                          showCloseButton: true,
+                          options: ToastrOptions(
+                            swipeDismissDirection: SwipeDismissDirection.none,
+                            showCloseButton: true,
+                          ),
                         ),
                       ),
                       _QuickActionChip(
@@ -255,12 +263,14 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                         color: const Color(0xFFD946EF),
                         onTap: () => Toastr.info(
                           'Custom scale + fade animation!',
-                          enterAnimationBuilder: (child, animation) =>
-                              ScaleTransition(
-                            scale: animation,
-                            child: FadeTransition(
-                              opacity: animation,
-                              child: child,
+                          options: ToastrOptions(
+                            enterAnimationBuilder: (child, animation) =>
+                                ScaleTransition(
+                              scale: animation,
+                              child: FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              ),
                             ),
                           ),
                         ),
@@ -302,9 +312,11 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                         color: const Color(0xFF0D9488),
                         onTap: () => Toastr.success(
                           'Custom colored checkmark!',
-                          iconTheme: ToastrIconTheme(
-                            primary: const Color(0xFF8B5CF6),
-                            secondary: const Color(0xFFFDE047),
+                          options: ToastrOptions(
+                            iconTheme: ToastrIconTheme(
+                              primary: const Color(0xFF8B5CF6),
+                              secondary: const Color(0xFFFDE047),
+                            ),
                           ),
                         ),
                       ),
@@ -332,7 +344,7 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                         color: const Color(0xFF6B7280),
                         onTap: () => Toastr.success(
                           'Compact toast with reduced padding',
-                          compact: true,
+                          options: const ToastrOptions(compact: true),
                         ),
                       ),
                       _QuickActionChip(
