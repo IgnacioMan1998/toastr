@@ -87,6 +87,8 @@ class Toastr {
         showCircularProgress: options?.showCircularProgress,
         gutter: options?.gutter,
         iconTheme: options?.iconTheme,
+        titleStyle: options?.titleStyle,
+        messageStyle: options?.messageStyle,
       );
 
   static String _showWithOptions(

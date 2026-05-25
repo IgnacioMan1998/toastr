@@ -9,17 +9,21 @@ A highly customizable Flutter package for displaying beautiful toast notificatio
 
 - **react-hot-toast animations**: Faithful recreation of enter/exit animations with spring curves
 - **Multiple notification types**: Success, Error, Warning, Info, Loading, Blank
-- **Flexible positioning**: Top/Bottom with Left/Center/Right alignment + Center
+- **Flexible positioning**: Top/Bottom with Left/Center/Right alignment + Center (default: `bottomCenter`)
 - **Animated icons**: Checkmark draws in, X lines appear sequentially, spinner rotates — all with staggered delays
 - **Promise API**: Auto-transition loading → success/error based on `Future` result
 - **Highly customizable**: Colors, icons, duration, progress bars, and more
+- **`ToastrOptions`**: Clean single-object API for all optional parameters — no parameter explosion
+- **Custom text styles**: `titleStyle` and `messageStyle` let devs plug in their app's font and sizes
 - **Interactive**: Tap to dismiss, swipe-to-dismiss, and close button
 - **Dark theme**: Built-in dark theme support (`ToastrTheme.dark`)
 - **Custom content**: Pass any `Widget` as toast content
-- **Callbacks**: `onTap` and `onDismiss` callbacks for interactive toasts- **Compact mode**: Reduced-padding layout for dense UIs
+- **Callbacks**: `onTap` and `onDismiss` callbacks for interactive toasts
+- **Compact mode**: Reduced-padding layout for dense UIs
 - **Circular progress**: Circular countdown ring as an alternative to the linear bar
 - **Keyboard avoidance**: Toast auto-slides above the soft keyboard
-- **Icon theme**: Per-toast icon color overrides via `ToastrIconTheme`- **Well tested**: 91 unit tests with comprehensive coverage
+- **Icon theme**: Per-toast icon color overrides via `ToastrIconTheme`
+- **Well tested**: 91 unit tests with comprehensive coverage
 - **Responsive**: Adaptive design for mobile, tablet, and desktop
 - **Zero setup**: No `BuildContext`, no `init()`, no `navigatorKey` — just call and go!
 - **Secure**: Built-in XSS sanitization, rate limiting, and input validation
@@ -30,7 +34,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  toastr_flutter: ^2.4.0
+  toastr_flutter: ^2.5.0
 ```
 
 Then run:
@@ -197,21 +201,25 @@ Toastr.custom(ToastrConfig(
 
 ### Method Parameters
 
-All helper methods support these optional parameters:
+All helper methods accept a `title` named parameter and an optional `ToastrOptions` object for everything else:
 
 ```dart
 Toastr.success(
-  'Your message here',                  // Required: message
-  title: 'Optional Title',             // Optional: title text
-  duration: Duration(seconds: 3),       // Optional: how long to show
-  position: ToastrPosition.topRight,    // Optional: where to show
-  showMethod: ToastrShowMethod.fadeIn,  // Optional: show animation
-  hideMethod: ToastrHideMethod.fadeOut, // Optional: hide animation
-  showDuration: Duration(milliseconds: 300),  // Optional: show animation speed
-  hideDuration: Duration(milliseconds: 1000), // Optional: hide animation speed
-  showProgressBar: false,               // Optional: show progress bar
-  showCloseButton: false,               // Optional: show close button
-  preventDuplicates: false,             // Optional: prevent duplicates
+  'Your message here',              // Required: message text
+  title: 'Optional Title',          // Optional: direct named param
+  options: ToastrOptions(
+    duration: Duration(seconds: 3),
+    position: ToastrPosition.topRight,
+    showMethod: ToastrShowMethod.fadeIn,
+    hideMethod: ToastrHideMethod.fadeOut,
+    showDuration: Duration(milliseconds: 300),
+    hideDuration: Duration(milliseconds: 1000),
+    showProgressBar: false,
+    showCloseButton: false,
+    preventDuplicates: false,
+    titleStyle: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w800),
+    messageStyle: TextStyle(fontFamily: 'Poppins', fontSize: 14),
+  ),
 );
 ```
 
@@ -235,9 +243,9 @@ Choose where your notifications appear:
 ```dart
 ToastrPosition.topLeft      // Top-left corner
 ToastrPosition.topCenter    // Top-center
-ToastrPosition.topRight     // Top-right corner (default)
+ToastrPosition.topRight     // Top-right corner
 ToastrPosition.bottomLeft   // Bottom-left corner
-ToastrPosition.bottomCenter // Bottom-center
+ToastrPosition.bottomCenter // Bottom-center (default)
 ToastrPosition.bottomRight  // Bottom-right corner
 ToastrPosition.center       // Center of screen
 ```
@@ -298,37 +306,39 @@ Toastr.clearLast();
 
 ### ToastrConfig Properties
 
-| Property               | Type               | Default   | Description                          |
-| ---------------------- | ------------------ | --------- | ------------------------------------ |
-| `type`                 | `ToastrType`       | required  | success, error, warning, info        |
-| `message`              | `String`           | required  | Main message text                    |
-| `title`                | `String?`          | null      | Optional title text                  |
-| `duration`             | `Duration`         | 5 seconds | How long to display                  |
-| `position`             | `ToastrPosition`   | topRight  | Where to position                    |
-| `showMethod`           | `ToastrShowMethod` | fadeIn    | Show animation type                  |
-| `hideMethod`           | `ToastrHideMethod` | fadeOut   | Hide animation type                  |
-| `showDuration`         | `Duration`         | 300ms     | Show animation duration              |
-| `hideDuration`         | `Duration`         | 1000ms    | Hide animation duration              |
-| `showProgressBar`      | `bool`             | false     | Show progress bar                    |
-| `showCloseButton`      | `bool`             | false     | Show close button                    |
-| `dismissible`          | `bool`             | true      | Allow tap to dismiss                 |
-| `preventDuplicates`    | `bool`             | false     | Prevent duplicate messages           |
-| `onTap`                | `VoidCallback?`    | null      | Callback when toast is tapped        |
-| `onDismiss`            | `VoidCallback?`    | null      | Callback when toast exits            |
-| `content`              | `Widget?`          | null      | Custom widget content                |
-| `maxWidth`             | `double`           | 350       | Maximum toast width                  |
-| `margin`               | `EdgeInsets?`      | null      | Custom margin from edges             |
-| `accentColor`          | `Color?`           | null      | Custom accent color                  |
-| `containerDecoration`  | `BoxDecoration?`   | null      | Full style override                  |
-| `theme`                | `ToastrTheme`      | light     | Color theme (light/dark)             |
-| `reverseOrder`         | `bool`             | false     | Stack order for new toasts           |
-| `compact`              | `bool`             | false     | Reduced-padding compact layout       |
-| `borderRadius`         | `BorderRadius?`    | null      | Custom border radius                 |
-| `avoidKeyboard`        | `bool`             | true      | Slide above soft keyboard            |
-| `stackOverlap`         | `double?`          | null      | Vertical overlap between toasts      |
-| `showCircularProgress` | `bool`             | false     | Circular countdown indicator         |
-| `gutter`               | `double`           | 8         | Spacing between stacked toasts       |
-| `iconTheme`            | `ToastrIconTheme?` | null      | Custom icon primary/secondary colors |
+| Property               | Type               | Default      | Description                          |
+| ---------------------- | ------------------ | ------------ | ------------------------------------ |
+| `type`                 | `ToastrType`       | required     | success, error, warning, info        |
+| `message`              | `String`           | required     | Main message text                    |
+| `title`                | `String?`          | null         | Optional title text                  |
+| `duration`             | `Duration`         | 5 seconds    | How long to display                  |
+| `position`             | `ToastrPosition`   | bottomCenter | Where to position                    |
+| `showMethod`           | `ToastrShowMethod` | fadeIn       | Show animation type                  |
+| `hideMethod`           | `ToastrHideMethod` | fadeOut      | Hide animation type                  |
+| `showDuration`         | `Duration`         | 300ms        | Show animation duration              |
+| `hideDuration`         | `Duration`         | 1000ms       | Hide animation duration              |
+| `showProgressBar`      | `bool`             | false        | Show progress bar                    |
+| `showCloseButton`      | `bool`             | false        | Show close button                    |
+| `dismissible`          | `bool`             | true         | Allow tap to dismiss                 |
+| `preventDuplicates`    | `bool`             | false        | Prevent duplicate messages           |
+| `onTap`                | `VoidCallback?`    | null         | Callback when toast is tapped        |
+| `onDismiss`            | `VoidCallback?`    | null         | Callback when toast exits            |
+| `content`              | `Widget?`          | null         | Custom widget content                |
+| `maxWidth`             | `double`           | 350          | Maximum toast width                  |
+| `margin`               | `EdgeInsets?`      | null         | Custom margin from edges             |
+| `accentColor`          | `Color?`           | null         | Custom accent color                  |
+| `containerDecoration`  | `BoxDecoration?`   | null         | Full style override                  |
+| `theme`                | `ToastrTheme`      | light        | Color theme (light/dark)             |
+| `reverseOrder`         | `bool`             | false        | Stack order for new toasts           |
+| `compact`              | `bool`             | false        | Reduced-padding compact layout       |
+| `borderRadius`         | `BorderRadius?`    | null         | Custom border radius (default: 12px) |
+| `avoidKeyboard`        | `bool`             | true         | Slide above soft keyboard            |
+| `stackOverlap`         | `double?`          | null         | Vertical overlap between toasts      |
+| `showCircularProgress` | `bool`             | false        | Circular countdown indicator         |
+| `gutter`               | `double`           | 8            | Spacing between stacked toasts       |
+| `iconTheme`            | `ToastrIconTheme?` | null         | Custom icon primary/secondary colors |
+| `titleStyle`           | `TextStyle?`       | null         | Custom text style for title          |
+| `messageStyle`         | `TextStyle?`       | null         | Custom text style for message        |
 
 ## Responsive Design 📱
 
@@ -427,6 +437,34 @@ Toastr.blank(
     ],
   ),
 );
+```
+
+### Custom Font / Text Style
+
+```dart
+// Apply your app's font family and sizing to every toast
+Toastr.configure(
+  titleStyle: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w800),
+  messageStyle: TextStyle(fontFamily: 'Poppins', letterSpacing: 0.1),
+);
+
+// Or override per-toast
+Toastr.success(
+  'Saved!',
+  title: 'Success',
+  options: ToastrOptions(
+    titleStyle: TextStyle(fontFamily: 'Inter', fontSize: 16),
+    messageStyle: TextStyle(fontFamily: 'Inter', color: Colors.green.shade700),
+  ),
+);
+
+// Full config
+Toastr.custom(ToastrConfig(
+  type: ToastrType.info,
+  message: 'Notification',
+  titleStyle: TextStyle(fontFamily: 'Roboto', fontWeight: FontWeight.w900),
+  messageStyle: TextStyle(fontFamily: 'Roboto', fontSize: 12),
+));
 ```
 
 ### Custom Styling

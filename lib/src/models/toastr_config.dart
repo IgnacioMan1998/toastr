@@ -64,6 +64,8 @@ class ToastrConfig {
     this.showCircularProgress = false,
     this.gutter = 8,
     this.iconTheme,
+    this.titleStyle,
+    this.messageStyle,
   });
 
   /// The type of toastr notification
@@ -199,6 +201,14 @@ class ToastrConfig {
   /// [ToastrIconTheme.secondary] sets the checkmark/line color.
   final ToastrIconTheme? iconTheme;
 
+  /// Custom [TextStyle] for the toast title.
+  /// When set, overrides the default font size and weight.
+  final TextStyle? titleStyle;
+
+  /// Custom [TextStyle] for the toast message.
+  /// When set, overrides the default font size, weight, and opacity.
+  final TextStyle? messageStyle;
+
   /// Creates a copy of this config with updated values
   ToastrConfig copyWith({
     ToastrType? type,
@@ -245,6 +255,8 @@ class ToastrConfig {
     bool? showCircularProgress,
     double? gutter,
     ToastrIconTheme? iconTheme,
+    TextStyle? titleStyle,
+    TextStyle? messageStyle,
   }) => ToastrConfig(
     type: type ?? this.type,
     message: message ?? this.message,
@@ -291,6 +303,8 @@ class ToastrConfig {
     showCircularProgress: showCircularProgress ?? this.showCircularProgress,
     gutter: gutter ?? this.gutter,
     iconTheme: iconTheme ?? this.iconTheme,
+    titleStyle: titleStyle ?? this.titleStyle,
+    messageStyle: messageStyle ?? this.messageStyle,
   );
 
   /// Generates a key for duplicate detection

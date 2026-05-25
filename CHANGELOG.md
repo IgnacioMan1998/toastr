@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.0] - 2026-05-25
+
+### Added
+
+- 🎨 **`titleStyle`**: Custom `TextStyle` for the toast title — `titleStyle: TextStyle(fontFamily: 'Poppins', fontSize: 16)`. Merged on top of defaults so only the fields you set are overridden.
+- 📝 **`messageStyle`**: Custom `TextStyle` for the toast message — `messageStyle: TextStyle(fontFamily: 'Poppins', letterSpacing: 0.2)`. Same merge behavior.
+- Both properties available on `ToastrOptions` and `ToastrConfig`.
+
+### Changed
+
+- 🔵 **Default position**: Changed from `topRight` to `bottomCenter` — better UX on mobile.
+- 📐 **Border radius**: Increased from `8px` to `12px` for a more modern look. Still overridable via `borderRadius`.
+- 🔤 **Typography hierarchy**: Title is now `15px / w700`; message is `13px / w400` with `75%` opacity when a title is present, giving a clear visual hierarchy.
+- 🔘 **Action button style**: Replaced underline text with a pill-shaped container (`border-radius: 20px`, accent color at `12%` opacity) — consistent with modern mobile design.
+- 📦 **`ToastrOptions`**: Unified optional-parameter object now passed as second argument to all helper methods, eliminating parameter duplication across the API.
+
 ## [2.4.0] - 2026-05-11
 
 ### Added

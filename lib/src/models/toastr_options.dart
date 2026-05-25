@@ -44,6 +44,8 @@ class ToastrOptions {
     this.showCircularProgress,
     this.gutter,
     this.iconTheme,
+    this.titleStyle,
+    this.messageStyle,
   });
 
   /// Optional title shown above the message.
@@ -138,4 +140,12 @@ class ToastrOptions {
 
   /// Custom icon colors, overriding the type-based defaults.
   final ToastrIconTheme? iconTheme;
+
+  /// Custom [TextStyle] for the toast title.
+  /// Merged on top of the default style — only set fields are overridden.
+  final TextStyle? titleStyle;
+
+  /// Custom [TextStyle] for the toast message.
+  /// Merged on top of the default style — only set fields are overridden.
+  final TextStyle? messageStyle;
 }

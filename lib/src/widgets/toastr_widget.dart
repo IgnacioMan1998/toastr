@@ -707,12 +707,13 @@ class _ToastrWidgetState extends State<ToastrWidget> with TickerProviderStateMix
                               if (widget.config.title != null) ...[
                                 Text(
                                   widget.config.title!,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w700,
-                                    color: textColor,
                                     height: 1.3,
                                     decoration: TextDecoration.none,
+                                  ).merge(widget.config.titleStyle).copyWith(
+                                    color: widget.config.titleStyle?.color ?? textColor,
                                   ),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
@@ -729,6 +730,11 @@ class _ToastrWidgetState extends State<ToastrWidget> with TickerProviderStateMix
                                       : textColor,
                                   height: 1.3,
                                   decoration: TextDecoration.none,
+                                ).merge(widget.config.messageStyle).copyWith(
+                                  color: widget.config.messageStyle?.color ??
+                                      (widget.config.title != null
+                                          ? textColor.withValues(alpha: 0.75)
+                                          : textColor),
                                 ),
                               ),
                             ],
