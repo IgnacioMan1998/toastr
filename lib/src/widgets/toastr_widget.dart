@@ -568,8 +568,8 @@ class _ToastrWidgetState extends State<ToastrWidget> with TickerProviderStateMix
         height: 2,
         decoration: const BoxDecoration(
           borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(8),
-            bottomRight: Radius.circular(8),
+            bottomLeft: Radius.circular(12),
+            bottomRight: Radius.circular(12),
           ),
           color: Color(0xFFE5E7EB),
         ),
@@ -666,7 +666,7 @@ class _ToastrWidgetState extends State<ToastrWidget> with TickerProviderStateMix
           margin: widget.config.margin ?? const EdgeInsets.symmetric(vertical: 4),
           decoration: widget.config.containerDecoration ?? BoxDecoration(
             color: bgColor,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: widget.config.borderRadius ?? BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
                 color: Color.fromRGBO(0, 0, 0, isDark ? 0.3 : 0.1),
@@ -681,7 +681,7 @@ class _ToastrWidgetState extends State<ToastrWidget> with TickerProviderStateMix
             ],
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: widget.config.borderRadius ?? BorderRadius.circular(12),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -708,8 +708,8 @@ class _ToastrWidgetState extends State<ToastrWidget> with TickerProviderStateMix
                                 Text(
                                   widget.config.title!,
                                   style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w700,
                                     color: textColor,
                                     height: 1.3,
                                     decoration: TextDecoration.none,
@@ -722,9 +722,11 @@ class _ToastrWidgetState extends State<ToastrWidget> with TickerProviderStateMix
                               Text(
                                 widget.config.message,
                                 style: TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 13,
                                   fontWeight: FontWeight.w400,
-                                  color: textColor,
+                                  color: widget.config.title != null
+                                      ? textColor.withValues(alpha: 0.75)
+                                      : textColor,
                                   height: 1.3,
                                   decoration: TextDecoration.none,
                                 ),
@@ -832,21 +834,28 @@ class _ToastrWidgetState extends State<ToastrWidget> with TickerProviderStateMix
   Widget _buildActionButton(Color textColor) {
     final action = widget.config.action!;
     final accentColor = action.textColor ?? _getAccentColor();
+    final bgColor = action.backgroundColor ?? accentColor.withValues(alpha: 0.12);
     return Padding(
-      padding: const EdgeInsets.only(left: 12),
+      padding: const EdgeInsets.only(left: 10),
       child: GestureDetector(
         onTap: () {
           action.onPressed();
           if (action.dismissOnPressed) _dismiss();
         },
-        child: Text(
-          action.label,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: accentColor,
-            decoration: TextDecoration.underline,
-            decorationColor: accentColor.withValues(alpha: 0.4),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            action.label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: accentColor,
+              decoration: TextDecoration.none,
+            ),
           ),
         ),
       ),

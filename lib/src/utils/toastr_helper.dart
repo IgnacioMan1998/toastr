@@ -27,7 +27,7 @@ class Toastr {
   static ToastrConfig _defaultConfig = const ToastrConfig(
     type: ToastrType.info,
     message: '',
-    position: ToastrPosition.topRight,
+    position: ToastrPosition.bottomCenter,
     duration: Duration(seconds: 5),
     showDuration: Duration(milliseconds: 300),
     hideDuration: Duration(milliseconds: 1000),
