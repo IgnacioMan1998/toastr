@@ -320,6 +320,8 @@ class Toastr {
     bool? showCircularProgress,
     double? gutter,
     ToastrIconTheme? iconTheme,
+    TextStyle? titleStyle,
+    TextStyle? messageStyle,
     int? maxVisible,
   }) {
     _defaultConfig = _defaultConfig.copyWith(
@@ -346,6 +348,8 @@ class Toastr {
       showCircularProgress: showCircularProgress,
       gutter: gutter,
       iconTheme: iconTheme,
+      titleStyle: titleStyle,
+      messageStyle: messageStyle,
     );
     if (maxVisible != null) {
       _service.maxVisible = maxVisible;
