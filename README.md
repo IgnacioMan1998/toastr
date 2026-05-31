@@ -1,6 +1,6 @@
 # Toastr Flutter
 
-A highly customizable Flutter package for displaying beautiful toast notifications with smooth animations, multiple types, and flexible positioning. **Zero setup — just install and use!**
+The **react-hot-toast** experience for Flutter. Spring animations, a Promise API, toast stacking, and zero setup — no `BuildContext`, no `init()`, no wrappers required.
 
 [![pub package](https://img.shields.io/pub/v/toastr_flutter.svg)](https://pub.dev/packages/toastr_flutter)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -26,7 +26,19 @@ A highly customizable Flutter package for displaying beautiful toast notificatio
 - **Well tested**: 91 unit tests with comprehensive coverage
 - **Responsive**: Adaptive design for mobile, tablet, and desktop
 - **Zero setup**: No `BuildContext`, no `init()`, no `navigatorKey` — just call and go!
-- **Secure**: Built-in XSS sanitization, rate limiting, and input validation
+- **Input validated**: Rate limiting and message validation keep notifications predictable
+
+## Why toastr_flutter?
+
+| Feature                               | toastr_flutter | fluttertoast           | toastification           |
+| ------------------------------------- | -------------- | ---------------------- | ------------------------ |
+| Zero setup — no context needed        | ✅             | ✅ (platform channels) | ❌ builder wrap required |
+| Promise API (loading → success/error) | ✅             | ❌                     | ❌                       |
+| Spring / react-hot-toast animations   | ✅             | ❌                     | partial                  |
+| Toast stacking + queue                | ✅             | ❌                     | ✅                       |
+| Custom widget content                 | ✅             | ❌                     | ✅                       |
+| Action buttons                        | ✅             | ❌                     | ✅                       |
+| Works on all platforms                | ✅             | ❌ (no Linux/macOS)    | ✅                       |
 
 ## Installation
 
@@ -127,6 +139,17 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
+```
+
+### MaterialApp Setup _(recommended for complex apps)_
+
+Zero-setup works for most apps. For **nested navigators**, **go_router**, or any multi-navigator setup, pass `Toastr.builder` to guarantee reliable overlay discovery:
+
+```dart
+MaterialApp(
+  builder: Toastr.builder, // ← add this line
+  home: const HomeScreen(),
+)
 ```
 
 ### All Available Methods
@@ -362,8 +385,7 @@ ElevatedButton(
 // Error with custom duration
 Toastr.error(
   'Failed to save!',
-  duration: Duration(seconds: 10),
-  showCloseButton: true,
+  options: ToastrOptions(duration: Duration(seconds: 10), showCloseButton: true),
 )
 
 // From a callback, async handler, service — anywhere!
@@ -407,7 +429,7 @@ Toastr.dismiss(loadId);
 
 ```dart
 // Single toast
-Toastr.success('Saved!', theme: ToastrTheme.dark);
+Toastr.success('Saved!', options: ToastrOptions(theme: ToastrTheme.dark));
 
 // Global default
 Toastr.configure(theme: ToastrTheme.dark);
@@ -418,8 +440,10 @@ Toastr.configure(theme: ToastrTheme.dark);
 ```dart
 Toastr.success(
   'File uploaded',
-  onTap: () => openFile(),
-  onDismiss: () => cleanupTempFiles(),
+  options: ToastrOptions(
+    onTap: () => openFile(),
+    onDismiss: () => cleanupTempFiles(),
+  ),
 );
 ```
 
@@ -428,13 +452,15 @@ Toastr.success(
 ```dart
 Toastr.blank(
   '',
-  content: Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      CircleAvatar(backgroundImage: NetworkImage(avatarUrl)),
-      SizedBox(width: 8),
-      Text('John liked your post'),
-    ],
+  options: ToastrOptions(
+    content: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CircleAvatar(backgroundImage: NetworkImage(avatarUrl)),
+        SizedBox(width: 8),
+        Text('John liked your post'),
+      ],
+    ),
   ),
 );
 ```
@@ -472,13 +498,15 @@ Toastr.custom(ToastrConfig(
 ```dart
 Toastr.info(
   'Wide toast',
-  maxWidth: 500,
-  margin: EdgeInsets.only(top: 60),
-  accentColor: Colors.purple,
-  containerDecoration: BoxDecoration(
-    color: Colors.indigo.shade900,
-    borderRadius: BorderRadius.circular(16),
-    border: Border.all(color: Colors.indigo.shade400),
+  options: ToastrOptions(
+    maxWidth: 500,
+    margin: EdgeInsets.only(top: 60),
+    accentColor: Colors.purple,
+    containerDecoration: BoxDecoration(
+      color: Colors.indigo.shade900,
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(color: Colors.indigo.shade400),
+    ),
   ),
 );
 ```
@@ -487,7 +515,7 @@ Toastr.info(
 
 ```dart
 // Smaller, denser layout — great for sidebars or data-heavy UIs
-Toastr.success('Row saved', compact: true);
+Toastr.success('Row saved', options: ToastrOptions(compact: true));
 
 // Global compact default
 Toastr.configure(compact: true);
@@ -497,7 +525,7 @@ Toastr.configure(compact: true);
 
 ```dart
 // Show a circular countdown ring instead of a linear bar
-Toastr.info('Auto-closing…', showCircularProgress: true, showProgressBar: false);
+Toastr.info('Auto-closing…', options: ToastrOptions(showCircularProgress: true, showProgressBar: false));
 ```
 
 ### Custom Icon Theme
@@ -506,7 +534,7 @@ Toastr.info('Auto-closing…', showCircularProgress: true, showProgressBar: fals
 // Override icon circle and checkmark colors independently
 Toastr.success(
   'Custom icon colors',
-  iconTheme: ToastrIconTheme(primary: Colors.purple, secondary: Colors.white),
+  options: ToastrOptions(iconTheme: ToastrIconTheme(primary: Colors.purple, secondary: Colors.white)),
 );
 ```
 
@@ -515,8 +543,10 @@ Toastr.success(
 ```dart
 Toastr.info(
   'Pill shape',
-  borderRadius: BorderRadius.circular(32),
-  gutter: 12, // spacing between stacked toasts
+  options: ToastrOptions(
+    borderRadius: BorderRadius.circular(32),
+    gutter: 12, // spacing between stacked toasts
+  ),
 );
 ```
 
@@ -605,7 +635,7 @@ Toastr.error('Error');
 Toastr.custom(config);
 ```
 
-No `init()`, no `navigatorKey`, no `builder` — just call the methods directly.
+No `init()`, no `navigatorKey` — just call the methods directly. For apps with nested navigators or go_router, add `builder: Toastr.builder` to `MaterialApp` for reliable overlay discovery.
 
 ## License 📄
 

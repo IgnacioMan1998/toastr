@@ -273,6 +273,29 @@ class Toastr {
     }
   }
 
+  /// A [TransitionBuilder] that provides an explicit [Overlay] for Toastr.
+  ///
+  /// Recommended for apps with nested navigators, go_router, or any setup
+  /// where the automatic overlay discovery may be unreliable. Pass it to
+  /// [MaterialApp.builder]:
+  ///
+  /// ```dart
+  /// MaterialApp(
+  ///   builder: Toastr.builder,
+  ///   home: const HomeScreen(),
+  /// )
+  /// ```
+  ///
+  /// The zero-setup mode (no `builder` needed) still works for most apps.
+  static TransitionBuilder get builder =>
+      (BuildContext context, Widget? child) => Overlay(
+            initialEntries: [
+              OverlayEntry(
+                builder: (_) => child ?? const SizedBox.shrink(),
+              ),
+            ],
+          );
+
   /// Show a custom toastr with full configuration options.
   ///
   /// Returns the toast ID.

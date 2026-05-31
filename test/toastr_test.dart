@@ -344,7 +344,7 @@ void main() {
     group('defaultConfig', () {
       test('has sensible defaults', () {
         final config = Toastr.defaultConfig;
-        expect(config.position, ToastrPosition.topRight);
+        expect(config.position, ToastrPosition.bottomCenter);
         expect(config.duration, const Duration(seconds: 5));
         expect(config.showMethod, ToastrShowMethod.fadeIn);
         expect(config.hideMethod, ToastrHideMethod.fadeOut);
