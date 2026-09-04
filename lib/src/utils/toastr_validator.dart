@@ -194,8 +194,7 @@ class ToastrValidator {
     }
 
     // Use base config or create safe defaults
-    final config =
-        baseConfig?.copyWith(
+    final config = baseConfig?.copyWith(
           type: type,
           message: secureMessage,
           title: secureTitle,
@@ -219,8 +218,7 @@ class ToastrValidator {
   /// Gets the recommended duration based on message length and type
   static Duration getRecommendedDuration(String message, ToastrType type) =>
       Duration(
-        seconds:
-            switch (type) {
+        seconds: switch (type) {
               ToastrType.error => 5, // Errors should stay longer
               ToastrType.warning => 4, // Warnings need attention
               ToastrType.success => 3, // Success can be shorter

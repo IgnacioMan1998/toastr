@@ -1,650 +1,119 @@
 # Toastr Flutter
 
-The **react-hot-toast** experience for Flutter. Spring animations, a Promise API, toast stacking, and zero setup — no `BuildContext`, no `init()`, no wrappers required.
+Toast notifications for Flutter with no `BuildContext` required, smooth animations, Promise API, and keyboard avoidance.
 
 [![pub package](https://img.shields.io/pub/v/toastr_flutter.svg)](https://pub.dev/packages/toastr_flutter)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-## Features ✨
-
-- **react-hot-toast animations**: Faithful recreation of enter/exit animations with spring curves
-- **Multiple notification types**: Success, Error, Warning, Info, Loading, Blank
-- **Flexible positioning**: Top/Bottom with Left/Center/Right alignment + Center (default: `bottomCenter`)
-- **Animated icons**: Checkmark draws in, X lines appear sequentially, spinner rotates — all with staggered delays
-- **Promise API**: Auto-transition loading → success/error based on `Future` result
-- **Highly customizable**: Colors, icons, duration, progress bars, and more
-- **`ToastrOptions`**: Clean single-object API for all optional parameters — no parameter explosion
-- **Custom text styles**: `titleStyle` and `messageStyle` let devs plug in their app's font and sizes
-- **Interactive**: Tap to dismiss, swipe-to-dismiss, and close button
-- **Dark theme**: Built-in dark theme support (`ToastrTheme.dark`)
-- **Custom content**: Pass any `Widget` as toast content
-- **Callbacks**: `onTap` and `onDismiss` callbacks for interactive toasts
-- **Compact mode**: Reduced-padding layout for dense UIs
-- **Circular progress**: Circular countdown ring as an alternative to the linear bar
-- **Keyboard avoidance**: Toast auto-slides above the soft keyboard
-- **Icon theme**: Per-toast icon color overrides via `ToastrIconTheme`
-- **Well tested**: 91 unit tests with comprehensive coverage
-- **Responsive**: Adaptive design for mobile, tablet, and desktop
-- **Zero setup**: No `BuildContext`, no `init()`, no `navigatorKey` — just call and go!
-- **Input validated**: Rate limiting and message validation keep notifications predictable
-
-## Why toastr_flutter?
-
-| Feature                               | toastr_flutter | fluttertoast           | toastification           |
-| ------------------------------------- | -------------- | ---------------------- | ------------------------ |
-| Zero setup — no context needed        | ✅             | ✅ (platform channels) | ❌ builder wrap required |
-| Promise API (loading → success/error) | ✅             | ❌                     | ❌                       |
-| Spring / react-hot-toast animations   | ✅             | ❌                     | partial                  |
-| Toast stacking + queue                | ✅             | ❌                     | ✅                       |
-| Custom widget content                 | ✅             | ❌                     | ✅                       |
-| Action buttons                        | ✅             | ❌                     | ✅                       |
-| Works on all platforms                | ✅             | ❌ (no Linux/macOS)    | ✅                       |
-
-## Installation
-
-Add this to your package's `pubspec.yaml` file:
+## Install
 
 ```yaml
 dependencies:
   toastr_flutter: ^2.5.0
 ```
 
-Then run:
-
 ```bash
 flutter pub get
 ```
 
-## Quick Start 🚀
-
-### Basic Usage
-
-Import the package and start showing toasts from **anywhere** — no `BuildContext` needed:
+## Quick start
 
 ```dart
 import 'package:toastr_flutter/toastr.dart';
 
-// That's it! No setup, no initialization, no context.
-Toastr.success('Operation completed!');
-Toastr.error('Something went wrong!');
-Toastr.warning('Please check your input');
-Toastr.info('Here is some information');
+Toastr.success('Profile saved');
+Toastr.error('Could not save profile');
+Toastr.warning('Check your connection');
+Toastr.info('A new version is available');
+```
 
-// Loading toast (stays until dismissed)
-final id = Toastr.loading('Saving...');
-// ... later
-Toastr.dismiss(id);
+No setup is required for most apps. For nested navigators, use:
 
-// Promise API — auto-transitions loading → success/error
-await Toastr.promise(
-  myFuture,
+```dart
+MaterialApp(builder: Toastr.builder, home: const HomeScreen());
+```
+
+## Promise API
+
+```dart
+final profile = await Toastr.promise(
+  api.saveProfile(),
+  loading: 'Saving profile...',
+  success: 'Profile saved',
+  error: 'Could not save profile',
+);
+```
+
+Or:
+
+```dart
+await api.saveProfile().withToastr(
   loading: 'Saving...',
-  success: 'Saved!',
-  error: 'Failed to save',
+  success: 'Saved',
+  error: 'Failed',
 );
-
-// Short alias
-Toastr.success('Done!');
 ```
 
-### Full Example
+`loading` and `promise` show a loader while the operation is pending.
 
-```dart
-import 'package:flutter/material.dart';
-import 'package:toastr_flutter/toastr.dart';
+## Appearance
 
-void main() => runApp(const MyApp());
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: const HomeScreen(),
-    );
-  }
-}
-
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Toastr Example')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: () => Toastr.success('Saved successfully!'),
-              child: const Text('Success'),
-            ),
-            ElevatedButton(
-              onPressed: () => Toastr.error('Failed to save!'),
-              child: const Text('Error'),
-            ),
-            ElevatedButton(
-              onPressed: () => Toastr.warning('Check your input'),
-              child: const Text('Warning'),
-            ),
-            ElevatedButton(
-              onPressed: () => Toastr.info('New update available'),
-              child: const Text('Info'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-```
-
-### MaterialApp Setup _(recommended for complex apps)_
-
-Zero-setup works for most apps. For **nested navigators**, **go_router**, or any multi-navigator setup, pass `Toastr.builder` to guarantee reliable overlay discovery:
-
-```dart
-MaterialApp(
-  builder: Toastr.builder, // ← add this line
-  home: const HomeScreen(),
-)
-```
-
-### All Available Methods
-
-```dart
-// Success notification (green)
-Toastr.success('Operation completed successfully!');
-
-// Error notification (red)
-Toastr.error('Something went wrong!');
-
-// Warning notification (orange)
-Toastr.warning('Please check your input');
-
-// Info notification (blue)
-Toastr.info('Here is some useful information');
-
-// Auto-detect type from message content
-Toastr.show('Success! Operation completed'); // Auto-detects as success
-
-// Loading toast — stays on screen until dismissed
-final id = Toastr.loading('Processing...');
-
-// Blank toast — no icon
-Toastr.blank('Plain message');
-
-// Promise API — loading → success/error automatically
-await Toastr.promise<Data>(
-  fetchData(),
-  loading: 'Fetching...',
-  success: 'Data loaded!',
-  error: 'Failed to fetch',
-);
-
-// Dismiss a specific toast by ID
-Toastr.dismiss(id);
-
-// Dismiss all toasts
-Toastr.dismiss();
-
-// Short alias — same API, shorter name
-Toastr.success('Saved!');
-Toastr.loading('Working...');
-await Toastr.promise(future, loading: '...', success: '...', error: '...');
-
-// Custom configuration
-Toastr.custom(ToastrConfig(...));
-```
-
-## Advanced Usage 🔧
-
-### Custom Configuration
-
-For complete control over appearance and behavior:
-
-```dart
-Toastr.custom(ToastrConfig(
-  type: ToastrType.success,
-  message: 'Custom styled notification',
-  title: 'Custom Title',
-  duration: Duration(seconds: 5),
-  position: ToastrPosition.topRight,
-  showMethod: ToastrShowMethod.fadeIn,
-  hideMethod: ToastrHideMethod.fadeOut,
-  showDuration: Duration(milliseconds: 300),
-  hideDuration: Duration(milliseconds: 1000),
-  showProgressBar: true,
-  showCloseButton: true,
-  preventDuplicates: true,
-));
-```
-
-### Method Parameters
-
-All helper methods accept a `title` named parameter and an optional `ToastrOptions` object for everything else:
+Semantic toasts use their type color by default. Built-in icons are opt-in:
 
 ```dart
 Toastr.success(
-  'Your message here',              // Required: message text
-  title: 'Optional Title',          // Optional: direct named param
+  'Profile saved',
+  options: ToastrOptions(showTypeIcons: true),
+);
+```
+
+Use the classic translucent-black surface when needed:
+
+```dart
+Toastr.info(
+  'Background sync complete',
+  options: ToastrOptions(useTypeColors: false),
+);
+```
+
+## Useful options
+
+```dart
+Toastr.error(
+  'Payment failed',
+  title: 'Try again',
   options: ToastrOptions(
-    duration: Duration(seconds: 3),
-    position: ToastrPosition.topRight,
-    showMethod: ToastrShowMethod.fadeIn,
-    hideMethod: ToastrHideMethod.fadeOut,
-    showDuration: Duration(milliseconds: 300),
-    hideDuration: Duration(milliseconds: 1000),
-    showProgressBar: false,
-    showCloseButton: false,
-    preventDuplicates: false,
-    titleStyle: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w800),
-    messageStyle: TextStyle(fontFamily: 'Poppins', fontSize: 14),
+    duration: Duration(seconds: 6),
+    position: ToastrPosition.bottomCenter,
+    showCloseButton: true,
   ),
 );
 ```
 
-### Global Configuration
-
-Change default settings for all toasts:
-
 ```dart
-Toastr.configure(
-  position: ToastrPosition.bottomCenter,
-  duration: Duration(seconds: 3),
-  showProgressBar: true,
-  showCloseButton: true,
-);
-```
-
-### Positioning Options
-
-Choose where your notifications appear:
-
-```dart
-ToastrPosition.topLeft      // Top-left corner
-ToastrPosition.topCenter    // Top-center
-ToastrPosition.topRight     // Top-right corner
-ToastrPosition.bottomLeft   // Bottom-left corner
-ToastrPosition.bottomCenter // Bottom-center (default)
-ToastrPosition.bottomRight  // Bottom-right corner
-ToastrPosition.center       // Center of screen
-```
-
-### Animation Options
-
-Customize how notifications appear and disappear:
-
-```dart
-// Show methods
-ToastrShowMethod.fadeIn      // Fade in (default)
-ToastrShowMethod.slideDown   // Slide from top
-ToastrShowMethod.slideUp     // Slide from bottom
-ToastrShowMethod.slideLeft   // Slide from right
-ToastrShowMethod.slideRight  // Slide from left
-ToastrShowMethod.show        // Instant
-
-// Hide methods
-ToastrHideMethod.fadeOut     // Fade out (default)
-ToastrHideMethod.slideUp     // Slide to top
-ToastrHideMethod.slideDown   // Slide to bottom
-ToastrHideMethod.slideLeft   // Slide to left
-ToastrHideMethod.slideRight  // Slide to right
-ToastrHideMethod.hide        // Instant
-```
-
-### Managing Notifications
-
-```dart
-// Clear all active notifications
-Toastr.clearAll();
-
-// Clear only the last notification
-Toastr.clearLast();
-```
-
-## API Reference 📚
-
-### Toastr Methods
-
-| Method                    | Description                                  |
-| ------------------------- | -------------------------------------------- |
-| `success(message, {...})` | Show green success notification              |
-| `error(message, {...})`   | Show red error notification                  |
-| `warning(message, {...})` | Show orange warning notification             |
-| `info(message, {...})`    | Show blue info notification                  |
-| `loading(message, {...})` | Show loading spinner (stays until dismissed) |
-| `blank(message, {...})`   | Show plain text toast without icon           |
-| `promise(future, {...})`  | Auto-transition loading → success/error      |
-| `show(message, {type})`   | Auto-detect type from message content        |
-| `custom(config)`          | Show with full custom config                 |
-| `dismiss([id])`           | Dismiss specific toast or all toasts         |
-| `configure({...})`        | Set global defaults                          |
-| `clearAll()`              | Clear all active notifications               |
-| `clearLast()`             | Clear only the last notification             |
-
-> **Tip**: All methods also available via the `Toastr` alias: `Toastr.success(...)`, `Toastr.promise(...)`, etc.
-
-### ToastrConfig Properties
-
-| Property               | Type               | Default      | Description                          |
-| ---------------------- | ------------------ | ------------ | ------------------------------------ |
-| `type`                 | `ToastrType`       | required     | success, error, warning, info        |
-| `message`              | `String`           | required     | Main message text                    |
-| `title`                | `String?`          | null         | Optional title text                  |
-| `duration`             | `Duration`         | 5 seconds    | How long to display                  |
-| `position`             | `ToastrPosition`   | bottomCenter | Where to position                    |
-| `showMethod`           | `ToastrShowMethod` | fadeIn       | Show animation type                  |
-| `hideMethod`           | `ToastrHideMethod` | fadeOut      | Hide animation type                  |
-| `showDuration`         | `Duration`         | 300ms        | Show animation duration              |
-| `hideDuration`         | `Duration`         | 1000ms       | Hide animation duration              |
-| `showProgressBar`      | `bool`             | false        | Show progress bar                    |
-| `showCloseButton`      | `bool`             | false        | Show close button                    |
-| `dismissible`          | `bool`             | true         | Allow tap to dismiss                 |
-| `preventDuplicates`    | `bool`             | false        | Prevent duplicate messages           |
-| `onTap`                | `VoidCallback?`    | null         | Callback when toast is tapped        |
-| `onDismiss`            | `VoidCallback?`    | null         | Callback when toast exits            |
-| `content`              | `Widget?`          | null         | Custom widget content                |
-| `maxWidth`             | `double`           | 350          | Maximum toast width                  |
-| `margin`               | `EdgeInsets?`      | null         | Custom margin from edges             |
-| `accentColor`          | `Color?`           | null         | Custom accent color                  |
-| `containerDecoration`  | `BoxDecoration?`   | null         | Full style override                  |
-| `theme`                | `ToastrTheme`      | light        | Color theme (light/dark)             |
-| `reverseOrder`         | `bool`             | false        | Stack order for new toasts           |
-| `compact`              | `bool`             | false        | Reduced-padding compact layout       |
-| `borderRadius`         | `BorderRadius?`    | null         | Custom border radius (default: 12px) |
-| `avoidKeyboard`        | `bool`             | true         | Slide above soft keyboard            |
-| `stackOverlap`         | `double?`          | null         | Vertical overlap between toasts      |
-| `showCircularProgress` | `bool`             | false        | Circular countdown indicator         |
-| `gutter`               | `double`           | 8            | Spacing between stacked toasts       |
-| `iconTheme`            | `ToastrIconTheme?` | null         | Custom icon primary/secondary colors |
-| `titleStyle`           | `TextStyle?`       | null         | Custom text style for title          |
-| `messageStyle`         | `TextStyle?`       | null         | Custom text style for message        |
-
-## Responsive Design 📱
-
-The package automatically adapts to different screen sizes:
-
-- **Mobile (< 768px)**: Compact layout with touch-friendly targets
-- **Tablet (768px - 1024px)**: Medium sizing with appropriate margins
-- **Desktop (> 1024px)**: Full-featured with optimal positioning
-
-## Examples 💡
-
-### Quick Notifications
-
-```dart
-// Simple toast from a button
-ElevatedButton(
-  onPressed: () => Toastr.success('Saved!'),
-  child: Text('Save'),
-)
-
-// Error with custom duration
-Toastr.error(
-  'Failed to save!',
-  options: ToastrOptions(duration: Duration(seconds: 10), showCloseButton: true),
-)
-
-// From a callback, async handler, service — anywhere!
-Future<void> fetchData() async {
-  try {
-    await api.getData();
-    Toastr.success('Data loaded');
-  } catch (e) {
-    Toastr.error('Failed to load data');
-  }
-}
-```
-
-### Loading & Promise
-
-```dart
-// Show a loading toast, update it when done
-final id = Toastr.loading('Uploading file...');
+final id = Toastr.loading('Uploading...');
 await uploadFile();
 Toastr.dismiss(id);
-Toastr.success('File uploaded!');
-
-// Or use promise() for automatic transitions
-final result = await Toastr.promise<User>(
-  authService.login(email, password),
-  loading: 'Signing in...',
-  success: 'Welcome back!',
-  error: 'Invalid credentials',
-);
-
-// Blank toast — just text, no icon
-Toastr.blank('Copied to clipboard');
-
-// Using the Toastr alias
-final loadId = Toastr.loading('Syncing...');
-await syncData();
-Toastr.dismiss(loadId);
 ```
 
-### Dark Theme
+## State management
 
 ```dart
-// Single toast
-Toastr.success('Saved!', options: ToastrOptions(theme: ToastrTheme.dark));
-
-// Global default
-Toastr.configure(theme: ToastrTheme.dark);
-```
-
-### Callbacks
-
-```dart
-Toastr.success(
-  'File uploaded',
-  options: ToastrOptions(
-    onTap: () => openFile(),
-    onDismiss: () => cleanupTempFiles(),
-  ),
+Future<void> save() => repository.save().withToastr(
+  loading: 'Saving...',
+  success: 'Saved',
+  error: 'Failed',
 );
 ```
 
-### Custom Content Widget
+## Demo
 
-```dart
-Toastr.blank(
-  '',
-  options: ToastrOptions(
-    content: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        CircleAvatar(backgroundImage: NetworkImage(avatarUrl)),
-        SizedBox(width: 8),
-        Text('John liked your post'),
-      ],
-    ),
-  ),
-);
+```bash
+cd example
+flutter run -d chrome
 ```
 
-### Custom Font / Text Style
+![Toastr Flutter notifications in action](screenshots/desktop02.png)
 
-```dart
-// Apply your app's font family and sizing to every toast
-Toastr.configure(
-  titleStyle: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w800),
-  messageStyle: TextStyle(fontFamily: 'Poppins', letterSpacing: 0.1),
-);
+## License
 
-// Or override per-toast
-Toastr.success(
-  'Saved!',
-  title: 'Success',
-  options: ToastrOptions(
-    titleStyle: TextStyle(fontFamily: 'Inter', fontSize: 16),
-    messageStyle: TextStyle(fontFamily: 'Inter', color: Colors.green.shade700),
-  ),
-);
-
-// Full config
-Toastr.custom(ToastrConfig(
-  type: ToastrType.info,
-  message: 'Notification',
-  titleStyle: TextStyle(fontFamily: 'Roboto', fontWeight: FontWeight.w900),
-  messageStyle: TextStyle(fontFamily: 'Roboto', fontSize: 12),
-));
-```
-
-### Custom Styling
-
-```dart
-Toastr.info(
-  'Wide toast',
-  options: ToastrOptions(
-    maxWidth: 500,
-    margin: EdgeInsets.only(top: 60),
-    accentColor: Colors.purple,
-    containerDecoration: BoxDecoration(
-      color: Colors.indigo.shade900,
-      borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: Colors.indigo.shade400),
-    ),
-  ),
-);
-```
-
-### Compact Mode
-
-```dart
-// Smaller, denser layout — great for sidebars or data-heavy UIs
-Toastr.success('Row saved', options: ToastrOptions(compact: true));
-
-// Global compact default
-Toastr.configure(compact: true);
-```
-
-### Circular Progress Indicator
-
-```dart
-// Show a circular countdown ring instead of a linear bar
-Toastr.info('Auto-closing…', options: ToastrOptions(showCircularProgress: true, showProgressBar: false));
-```
-
-### Custom Icon Theme
-
-```dart
-// Override icon circle and checkmark colors independently
-Toastr.success(
-  'Custom icon colors',
-  options: ToastrOptions(iconTheme: ToastrIconTheme(primary: Colors.purple, secondary: Colors.white)),
-);
-```
-
-### Custom Border Radius & Gutter
-
-```dart
-Toastr.info(
-  'Pill shape',
-  options: ToastrOptions(
-    borderRadius: BorderRadius.circular(32),
-    gutter: 12, // spacing between stacked toasts
-  ),
-);
-```
-
-### Advanced Notifications
-
-```dart
-Toastr.custom(ToastrConfig(
-  type: ToastrType.info,
-  title: 'Update Available',
-  message: 'A new version is available. Update now?',
-  duration: Duration(seconds: 10),
-  position: ToastrPosition.bottomCenter,
-  showProgressBar: true,
-  showCloseButton: true,
-  preventDuplicates: true,
-  showMethod: ToastrShowMethod.slideUp,
-  hideMethod: ToastrHideMethod.fadeOut,
-));
-```
-
-## Screenshots 📸
-
-<div align="center">
-
-### 🖥️ Desktop Experience
-
-<table>
-  <tr>
-    <td align="center" width="50%">
-      <b>Configuration Panel</b><br><br>
-      <img src="https://raw.githubusercontent.com/IgnacioMan1998/toastr/main/screenshots/desktop01.png" alt="Desktop Configuration Panel" 
-           style="border: 3px solid #6B7280; border-radius: 12px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); max-width: 100%; height: auto;">
-      <br><em>Comprehensive customization options</em>
-    </td>
-    <td align="center" width="50%">
-      <b>Toast Notifications</b><br><br>
-      <img src="https://raw.githubusercontent.com/IgnacioMan1998/toastr/main/screenshots/desktop02.png" alt="Desktop Toast Notifications" 
-           style="border: 3px solid #6B7280; border-radius: 12px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); max-width: 100%; height: auto;">
-      <br><em>Beautiful notifications in action</em>
-    </td>
-  </tr>
-</table>
-
-### 📱 Mobile Experience
-
-<table>
-  <tr>
-    <td align="center" width="50%">
-      <b>Mobile Interface</b><br><br>
-      <img src="https://raw.githubusercontent.com/IgnacioMan1998/toastr/main/screenshots/phone01.png" alt="Mobile Interface" 
-           style="border: 3px solid #6B7280; border-radius: 12px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); max-width: 100%; height: auto;">
-      <br><em>Responsive mobile design</em>
-    </td>
-    <td align="center" width="50%">
-      <b>Mobile Toasts</b><br><br>
-      <img src="https://raw.githubusercontent.com/IgnacioMan1998/toastr/main/screenshots/phone02.png" alt="Mobile Toast Notifications" 
-           style="border: 3px solid #6B7280; border-radius: 12px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); max-width: 100%; height: auto;">
-      <br><em>Perfect mobile adaptation</em>
-    </td>
-  </tr>
-</table>
-
-</div>
-
-> 🎨 **Responsive Design**: Automatically adapts to different screen sizes — from mobile phones to desktop computers with consistent behavior and beautiful animations.
-
-## Migration Guide 🔄
-
-### From v1.0.0+7 to v2.0.0
-
-**Breaking Change**: `BuildContext` is no longer needed. Remove `context` from all calls.
-
-**Before:**
-
-```dart
-Toastr.success(context, 'Message');
-Toastr.error(context, 'Error');
-Toastr.custom(context, config);
-```
-
-**After:**
-
-```dart
-Toastr.success('Message');
-Toastr.error('Error');
-Toastr.custom(config);
-```
-
-No `init()`, no `navigatorKey` — just call the methods directly. For apps with nested navigators or go_router, add `builder: Toastr.builder` to `MaterialApp` for reliable overlay discovery.
-
-## License 📄
-
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
-
-## Contributing 🤝
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
----
-
-Made with ❤️ by [Ignacio Manchu](https://github.com/IgnacioMan1998)
+Apache-2.0

@@ -89,6 +89,8 @@ class Toastr {
         iconTheme: options?.iconTheme,
         titleStyle: options?.titleStyle,
         messageStyle: options?.messageStyle,
+        useTypeColors: options?.useTypeColors,
+        showTypeIcons: options?.showTypeIcons,
       );
 
   static String _showWithOptions(
@@ -108,8 +110,7 @@ class Toastr {
   static ToastrType _detectTypeFromMessage(String message) {
     final lowerMessage = message.toLowerCase();
 
-    bool hasWord(String word) =>
-        RegExp('\\b$word\\b').hasMatch(lowerMessage);
+    bool hasWord(String word) => RegExp('\\b$word\\b').hasMatch(lowerMessage);
 
     if (lowerMessage.startsWith('success') ||
         hasWord('succeeded') ||
@@ -125,9 +126,7 @@ class Toastr {
       return ToastrType.error;
     }
 
-    if (hasWord('warning') ||
-        hasWord('caution') ||
-        hasWord('attention')) {
+    if (hasWord('warning') || hasWord('caution') || hasWord('attention')) {
       return ToastrType.warning;
     }
 
@@ -166,20 +165,27 @@ class Toastr {
   }
 
   /// Show a success toastr. Returns the toast ID.
-  static String success(String message, {String? title, ToastrOptions? options}) =>
-      _showWithOptions(ToastrType.success, message, title: title, options: options);
+  static String success(String message,
+          {String? title, ToastrOptions? options}) =>
+      _showWithOptions(ToastrType.success, message,
+          title: title, options: options);
 
   /// Show an error toastr. Returns the toast ID.
-  static String error(String message, {String? title, ToastrOptions? options}) =>
-      _showWithOptions(ToastrType.error, message, title: title, options: options);
+  static String error(String message,
+          {String? title, ToastrOptions? options}) =>
+      _showWithOptions(ToastrType.error, message,
+          title: title, options: options);
 
   /// Show a warning toastr. Returns the toast ID.
-  static String warning(String message, {String? title, ToastrOptions? options}) =>
-      _showWithOptions(ToastrType.warning, message, title: title, options: options);
+  static String warning(String message,
+          {String? title, ToastrOptions? options}) =>
+      _showWithOptions(ToastrType.warning, message,
+          title: title, options: options);
 
   /// Show an info toastr. Returns the toast ID.
   static String info(String message, {String? title, ToastrOptions? options}) =>
-      _showWithOptions(ToastrType.info, message, title: title, options: options);
+      _showWithOptions(ToastrType.info, message,
+          title: title, options: options);
 
   /// Show a loading toastr with an animated spinner.
   ///
@@ -191,9 +197,11 @@ class Toastr {
   /// await uploadFile();
   /// Toastr.dismiss(id);
   /// ```
-  static String loading(String message, {String? title, ToastrOptions? options}) =>
+  static String loading(String message,
+          {String? title, ToastrOptions? options}) =>
       _service.show(
-        _applyOptions(ToastrType.loading, message, options, title: title).copyWith(
+        _applyOptions(ToastrType.loading, message, options, title: title)
+            .copyWith(
           duration: const Duration(days: 365),
           showProgressBar: false,
           preventDuplicates: false,
@@ -202,8 +210,10 @@ class Toastr {
       );
 
   /// Show a blank toastr (plain text, no icon). Returns the toast ID.
-  static String blank(String message, {String? title, ToastrOptions? options}) =>
-      _showWithOptions(ToastrType.blank, message, title: title, options: options);
+  static String blank(String message,
+          {String? title, ToastrOptions? options}) =>
+      _showWithOptions(ToastrType.blank, message,
+          title: title, options: options);
 
   /// Show a toast that automatically tracks a [Future].
   ///
@@ -345,8 +355,13 @@ class Toastr {
     ToastrIconTheme? iconTheme,
     TextStyle? titleStyle,
     TextStyle? messageStyle,
+    bool? useTypeColors,
+    bool? showTypeIcons,
     int? maxVisible,
+    ToastrQueueStrategy? queueStrategy,
   }) {
+    assert(maxVisible == null || maxVisible > 0,
+        'maxVisible must be greater than zero');
     _defaultConfig = _defaultConfig.copyWith(
       position: position,
       duration: duration,
@@ -373,9 +388,14 @@ class Toastr {
       iconTheme: iconTheme,
       titleStyle: titleStyle,
       messageStyle: messageStyle,
+      useTypeColors: useTypeColors,
+      showTypeIcons: showTypeIcons,
     );
     if (maxVisible != null) {
       _service.maxVisible = maxVisible;
+    }
+    if (queueStrategy != null) {
+      _service.queueStrategy = queueStrategy;
     }
   }
 }

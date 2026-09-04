@@ -21,6 +21,8 @@ void main() {
       expect(config.showCloseButton, isFalse);
       expect(config.dismissible, isTrue);
       expect(config.preventDuplicates, isFalse);
+      expect(config.useTypeColors, isTrue);
+      expect(config.showTypeIcons, isFalse);
     });
 
     test('copyWith preserves unchanged values', () {
@@ -55,6 +57,16 @@ void main() {
       expect(copy.showCloseButton, isTrue);
       expect(copy.showProgressBar, isTrue);
       expect(copy.position, ToastrPosition.bottomCenter);
+      expect(copy.useTypeColors, isTrue);
+    });
+
+    test('copyWith overrides useTypeColors', () {
+      const original = ToastrConfig(
+        type: ToastrType.success,
+        message: 'Saved',
+      );
+      final copy = original.copyWith(useTypeColors: true);
+      expect(copy.useTypeColors, isTrue);
     });
 
     test('key generates correct duplicate key', () {
@@ -396,14 +408,15 @@ void main() {
         message: 'Test message',
       ),
       VoidCallback? onDismiss,
-    }) => MaterialApp(
-        home: Scaffold(
-          body: ToastrWidget(
-            config: config,
-            onDismiss: onDismiss,
+    }) =>
+        MaterialApp(
+          home: Scaffold(
+            body: ToastrWidget(
+              config: config,
+              onDismiss: onDismiss,
+            ),
           ),
-        ),
-      );
+        );
 
     testWidgets('renders message text', (tester) async {
       await tester.pumpWidget(buildTestWidget());
@@ -449,30 +462,28 @@ void main() {
       expect(find.byIcon(Icons.close_rounded), findsNothing);
     });
 
-    testWidgets('shows correct icon for each type', (tester) async {
+    testWidgets('does not render standard icons for toast types',
+        (tester) async {
       for (final type in ToastrType.values) {
         await tester.pumpWidget(buildTestWidget(
           config: ToastrConfig(type: type, message: 'Test'),
         ));
         await tester.pump(const Duration(milliseconds: 150));
-        if (type == ToastrType.blank) {
-          // Blank type has no icon — only SizedBox.shrink
-          expect(find.byType(Icon), findsNothing);
-        } else if (type == ToastrType.loading) {
-          // Loading type uses a custom border-based spinner (CustomPaint)
-          expect(find.byType(CustomPaint), findsWidgets);
-        } else {
-          // Success/error use custom painted icons, warning/info use Icon
-          if (type == ToastrType.warning) {
-            expect(find.byIcon(Icons.priority_high_rounded), findsOneWidget);
-          } else if (type == ToastrType.info) {
-            expect(find.byIcon(Icons.info_outline_rounded), findsOneWidget);
-          } else {
-            // success/error use CustomPaint icons
-            expect(find.byType(CustomPaint), findsWidgets);
-          }
-        }
+        expect(find.byIcon(Icons.priority_high_rounded), findsNothing);
+        expect(find.byIcon(Icons.info_outline_rounded), findsNothing);
       }
+    });
+
+    testWidgets('renders a type icon when explicitly enabled', (tester) async {
+      await tester.pumpWidget(buildTestWidget(
+        config: const ToastrConfig(
+          type: ToastrType.info,
+          message: 'Details available',
+          showTypeIcons: true,
+        ),
+      ));
+      await tester.pump(const Duration(milliseconds: 150));
+      expect(find.byIcon(Icons.info_outline_rounded), findsOneWidget);
     });
 
     testWidgets('tap dismisses when dismissible', (tester) async {
@@ -505,7 +516,7 @@ void main() {
       expect(find.text('Progress'), findsOneWidget);
     });
 
-    testWidgets('uses custom icon when provided', (tester) async {
+    testWidgets('does not render custom icons', (tester) async {
       await tester.pumpWidget(buildTestWidget(
         config: const ToastrConfig(
           type: ToastrType.success,
@@ -514,9 +525,9 @@ void main() {
         ),
       ));
       await tester.pump(const Duration(milliseconds: 150));
-      expect(find.byKey(const Key('custom-icon')), findsOneWidget);
+      expect(find.byKey(const Key('custom-icon')), findsNothing);
     });
-    testWidgets('loading type shows spinner', (tester) async {
+    testWidgets('loading type shows its message and spinner', (tester) async {
       await tester.pumpWidget(buildTestWidget(
         config: const ToastrConfig(
           type: ToastrType.loading,
@@ -524,9 +535,8 @@ void main() {
         ),
       ));
       await tester.pump(const Duration(milliseconds: 150));
-      // Loading uses custom-painted border spinner, not CircularProgressIndicator
-      expect(find.byType(CustomPaint), findsWidgets);
       expect(find.text('Loading...'), findsOneWidget);
+      expect(find.byType(CustomPaint), findsWidgets);
     });
 
     testWidgets('blank type shows no icon', (tester) async {
@@ -542,7 +552,7 @@ void main() {
       expect(find.byType(Icon), findsNothing);
     });
 
-    testWidgets('blank type with custom icon shows icon', (tester) async {
+    testWidgets('blank type does not render a custom icon', (tester) async {
       await tester.pumpWidget(buildTestWidget(
         config: const ToastrConfig(
           type: ToastrType.blank,
@@ -551,7 +561,7 @@ void main() {
         ),
       ));
       await tester.pump(const Duration(milliseconds: 150));
-      expect(find.byKey(const Key('emoji-icon')), findsOneWidget);
+      expect(find.byKey(const Key('emoji-icon')), findsNothing);
     });
   });
 
@@ -669,14 +679,15 @@ void main() {
 
   group('ToastrWidget new features', () {
     Widget buildApp({required ToastrConfig config}) => MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: ToastrWidget(config: config),
+          home: Scaffold(
+            body: Center(
+              child: ToastrWidget(config: config),
+            ),
           ),
-        ),
-      );
+        );
 
-    testWidgets('dark theme applies dark background', (tester) async {
+    testWidgets('semantic types use their color background in dark theme',
+        (tester) async {
       await tester.pumpWidget(buildApp(
         config: const ToastrConfig(
           type: ToastrType.success,
@@ -686,12 +697,13 @@ void main() {
       ));
       await tester.pump(const Duration(milliseconds: 350));
 
-      // Should have the dark background color
-      final container = tester.widgetList<AnimatedContainer>(
-        find.byType(AnimatedContainer),
-      ).first;
+      final container = tester
+          .widgetList<AnimatedContainer>(
+            find.byType(AnimatedContainer),
+          )
+          .first;
       final decoration = container.decoration as BoxDecoration?;
-      expect(decoration?.color, const Color(0xFF1C1917));
+      expect(decoration?.color, const Color(0xFF16A34A));
     });
 
     testWidgets('custom maxWidth is applied', (tester) async {
@@ -704,9 +716,11 @@ void main() {
       ));
       await tester.pump(const Duration(milliseconds: 350));
 
-      final container = tester.widgetList<AnimatedContainer>(
-        find.byType(AnimatedContainer),
-      ).first;
+      final container = tester
+          .widgetList<AnimatedContainer>(
+            find.byType(AnimatedContainer),
+          )
+          .first;
       expect(container.constraints?.maxWidth, 500);
     });
 
@@ -738,7 +752,9 @@ void main() {
         config: ToastrConfig(
           type: ToastrType.info,
           message: 'Tap me',
-          onTap: () { tapped = true; },
+          onTap: () {
+            tapped = true;
+          },
         ),
       ));
       await tester.pump(const Duration(milliseconds: 350));
@@ -748,7 +764,8 @@ void main() {
       expect(tapped, isTrue);
     });
 
-    testWidgets('onDismiss callback is called when toast exits', (tester) async {
+    testWidgets('onDismiss callback is called when toast exits',
+        (tester) async {
       bool dismissed = false;
       await tester.pumpWidget(buildApp(
         config: ToastrConfig(
@@ -762,7 +779,8 @@ void main() {
 
       await tester.tap(find.text('Dismiss me'));
       await tester.pump(); // process tap → starts exit animation
-      await tester.pump(const Duration(milliseconds: 500)); // exit animation completes
+      await tester
+          .pump(const Duration(milliseconds: 500)); // exit animation completes
       await tester.pump(); // .then() callback fires
       expect(dismissed, isTrue);
     });
@@ -780,9 +798,11 @@ void main() {
       ));
       await tester.pump(const Duration(milliseconds: 350));
 
-      final container = tester.widgetList<AnimatedContainer>(
-        find.byType(AnimatedContainer),
-      ).first;
+      final container = tester
+          .widgetList<AnimatedContainer>(
+            find.byType(AnimatedContainer),
+          )
+          .first;
       final decoration = container.decoration as BoxDecoration;
       expect(decoration.color, Colors.blue);
     });
@@ -797,9 +817,11 @@ void main() {
       ));
       await tester.pump(const Duration(milliseconds: 350));
 
-      final container = tester.widgetList<AnimatedContainer>(
-        find.byType(AnimatedContainer),
-      ).first;
+      final container = tester
+          .widgetList<AnimatedContainer>(
+            find.byType(AnimatedContainer),
+          )
+          .first;
       expect(container.margin, const EdgeInsets.all(20));
     });
   });
@@ -910,10 +932,14 @@ void main() {
   group('SwipeDismissDirection', () {
     test('has all expected values', () {
       expect(SwipeDismissDirection.values, hasLength(4));
-      expect(SwipeDismissDirection.values, contains(SwipeDismissDirection.horizontal));
-      expect(SwipeDismissDirection.values, contains(SwipeDismissDirection.vertical));
-      expect(SwipeDismissDirection.values, contains(SwipeDismissDirection.both));
-      expect(SwipeDismissDirection.values, contains(SwipeDismissDirection.none));
+      expect(SwipeDismissDirection.values,
+          contains(SwipeDismissDirection.horizontal));
+      expect(SwipeDismissDirection.values,
+          contains(SwipeDismissDirection.vertical));
+      expect(
+          SwipeDismissDirection.values, contains(SwipeDismissDirection.both));
+      expect(
+          SwipeDismissDirection.values, contains(SwipeDismissDirection.none));
     });
   });
 
@@ -1035,6 +1061,15 @@ void main() {
       Toastr.configure(maxVisible: 3);
       expect(ToastrService.instance.maxVisible, 3);
       Toastr.configure(maxVisible: 5);
+    });
+
+    test('configure sets queue strategy', () {
+      Toastr.configure(queueStrategy: ToastrQueueStrategy.dropOldest);
+      expect(
+        ToastrService.instance.queueStrategy,
+        ToastrQueueStrategy.dropOldest,
+      );
+      Toastr.configure(queueStrategy: ToastrQueueStrategy.queue);
     });
   });
 }

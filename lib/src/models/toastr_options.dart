@@ -46,6 +46,8 @@ class ToastrOptions {
     this.iconTheme,
     this.titleStyle,
     this.messageStyle,
+    this.useTypeColors,
+    this.showTypeIcons,
   });
 
   /// Optional title shown above the message.
@@ -115,10 +117,12 @@ class ToastrOptions {
   final SwipeDismissDirection? swipeDismissDirection;
 
   /// Custom enter animation. Receives the child and a 0→1 animation value.
-  final Widget Function(Widget child, Animation<double> animation)? enterAnimationBuilder;
+  final Widget Function(Widget child, Animation<double> animation)?
+      enterAnimationBuilder;
 
   /// Custom exit animation. Receives the child and a 0→1 animation value.
-  final Widget Function(Widget child, Animation<double> animation)? exitAnimationBuilder;
+  final Widget Function(Widget child, Animation<double> animation)?
+      exitAnimationBuilder;
 
   /// Use reduced padding, font, and icon sizes.
   final bool? compact;
@@ -148,4 +152,11 @@ class ToastrOptions {
   /// Custom [TextStyle] for the toast message.
   /// Merged on top of the default style — only set fields are overridden.
   final TextStyle? messageStyle;
+
+  /// Apply the notification type's color to the entire toast surface.
+  /// Enabled by default for success, error, warning, and info toasts.
+  final bool? useTypeColors;
+
+  /// Show the built-in icon for success, error, warning, and info toasts.
+  final bool? showTypeIcons;
 }

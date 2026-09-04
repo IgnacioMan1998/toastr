@@ -8,6 +8,19 @@ import '../models/toastr_type.dart';
 import '../utils/toastr_validator.dart';
 import '../widgets/toastr_widget.dart';
 
+/// Determines how a new toast is handled when [ToastrService.maxVisible]
+/// toasts are already on screen.
+enum ToastrQueueStrategy {
+  /// Keep the new toast in a first-in, first-out queue until space is free.
+  queue,
+
+  /// Ignore the new toast when the visible limit has been reached.
+  dropNewest,
+
+  /// Dismiss the oldest visible toast and display the new one immediately.
+  dropOldest,
+}
+
 /// Internal model for an active or queued toast.
 class _ToastEntry {
   _ToastEntry({required this.id, required this.config});
@@ -37,8 +50,11 @@ class ToastrService with WidgetsBindingObserver {
   /// Global instance for easy access
   static ToastrService get instance => _instance;
 
-  /// Maximum number of toasts visible on screen at once.
-  int maxVisible = 5;
+  /// Only one toast is visible at a time; later notifications are queued.
+  int maxVisible = 1;
+
+  /// Policy applied when [maxVisible] visible toasts are already displayed.
+  ToastrQueueStrategy queueStrategy = ToastrQueueStrategy.queue;
 
   final List<_ToastEntry> _activeToasts = [];
   final List<_ToastEntry> _queuedToasts = [];
@@ -182,31 +198,38 @@ class ToastrService with WidgetsBindingObserver {
 
     final secureConfig = _sanitizeConfig(config);
 
-    if (secureConfig.preventDuplicates && _duplicateKeys.contains(secureConfig.key)) {
+    if (secureConfig.preventDuplicates &&
+        _duplicateKeys.contains(secureConfig.key)) {
       return '';
     }
 
     final toastId = 'toast_${_idCounter++}';
     final entry = _ToastEntry(id: toastId, config: secureConfig);
 
+    if (_activeToasts.length >= ToastrSecurityConfig.maxActiveNotifications) {
+      _removeOldestToast(showNext: false);
+      _showToast(entry);
+    } else if (_activeToasts.isEmpty) {
+      _showToast(entry);
+    } else {
+      switch (queueStrategy) {
+        case ToastrQueueStrategy.queue:
+          _queuedToasts.add(entry);
+        case ToastrQueueStrategy.dropNewest:
+          return '';
+        case ToastrQueueStrategy.dropOldest:
+          _removeOldestToast(showNext: false);
+          _showToast(entry);
+      }
+    }
+
     if (secureConfig.preventDuplicates) {
       _duplicateKeys.add(secureConfig.key);
     }
-
     if (secureConfig.enableHapticFeedback) {
       _triggerHaptic(secureConfig.hapticFeedbackType);
     }
-
     _notificationCount++;
-
-    if (_activeToasts.length < maxVisible) {
-      _showToast(entry);
-    } else if (_activeToasts.length >= ToastrSecurityConfig.maxActiveNotifications) {
-      _removeOldestToast();
-      _showToast(entry);
-    } else {
-      _queuedToasts.add(entry);
-    }
 
     return toastId;
   }
@@ -231,7 +254,7 @@ class ToastrService with WidgetsBindingObserver {
   }
 
   /// Called when a toast should be removed (timer or widget dismiss).
-  void removeToast(String toastId) {
+  void removeToast(String toastId, {bool showNext = true}) {
     final idx = _activeToasts.indexWhere((e) => e.id == toastId);
     if (idx == -1) return;
 
@@ -244,7 +267,7 @@ class ToastrService with WidgetsBindingObserver {
       _duplicateKeys.remove(entry.config.key);
     }
 
-    if (_queuedToasts.isNotEmpty && _activeToasts.length < maxVisible) {
+    if (showNext && _queuedToasts.isNotEmpty && _activeToasts.isEmpty) {
       final next = _queuedToasts.removeAt(0);
       _showToast(next);
     }
@@ -261,7 +284,14 @@ class ToastrService with WidgetsBindingObserver {
       removeToast(id);
       return;
     }
-    _queuedToasts.removeWhere((e) => e.id == id);
+    final queuedIdx = _queuedToasts.indexWhere((e) => e.id == id);
+    if (queuedIdx != -1) {
+      final entry = _queuedToasts.removeAt(queuedIdx);
+      if (entry.config.preventDuplicates) {
+        _duplicateKeys.remove(entry.config.key);
+      }
+      _removeContainerIfEmpty();
+    }
   }
 
   /// Update an existing toast identified by [id] with a new [config].
@@ -352,12 +382,15 @@ class ToastrService with WidgetsBindingObserver {
     return _notificationCount > 50;
   }
 
-  void _removeOldestToast() {
+  void _removeOldestToast({bool showNext = true}) {
     if (_activeToasts.isNotEmpty) {
       final idx = _activeToasts.indexWhere(
         (e) => e.config.type != ToastrType.loading,
       );
-      removeToast(idx != -1 ? _activeToasts[idx].id : _activeToasts.first.id);
+      removeToast(
+        idx != -1 ? _activeToasts[idx].id : _activeToasts.first.id,
+        showNext: showNext,
+      );
     }
   }
 
@@ -448,12 +481,14 @@ class _ToastrContainer extends StatelessWidget {
 
         final column = Column(
           mainAxisSize: MainAxisSize.min,
-          children: orderedToasts.map((entry) => _StackedToastrWidget(
-              key: ValueKey(entry.id),
-              toastId: entry.id,
-              config: entry.config,
-              service: service,
-            )).toList(),
+          children: orderedToasts
+              .map((entry) => _StackedToastrWidget(
+                    key: ValueKey(entry.id),
+                    toastId: entry.id,
+                    config: entry.config,
+                    service: service,
+                  ))
+              .toList(),
         );
 
         switch (position) {

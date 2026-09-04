@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- `String` helpers: `toastrSuccess`, `toastrError`, `toastrWarning`, `toastrInfo`, and `toastrLoading`.
+- `Future.withToastr()` as a concise Promise API.
+- `ToastrQueueStrategy` with `queue`, `dropNewest`, and `dropOldest` policies.
+- Semantic tap actions for dismissible toasts and toast action buttons.
+- Full semantic-color surfaces by default; set `useTypeColors: false` for a
+  translucent black toast surface.
+- Optional built-in icons for success, error, warning, and info through
+  `showTypeIcons: true`.
+
 ## [2.5.0] - 2026-05-25
 
 ### Added

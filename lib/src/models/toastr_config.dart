@@ -32,6 +32,8 @@ class ToastrConfig {
     this.customIcon,
     this.backgroundColor,
     this.textColor,
+    this.useTypeColors = true,
+    this.showTypeIcons = false,
     this.showDuration = const Duration(milliseconds: 300),
     this.hideDuration = const Duration(milliseconds: 1000),
     this.position = ToastrPosition.topRight,
@@ -97,6 +99,16 @@ class ToastrConfig {
 
   /// Custom text color
   final Color? textColor;
+
+  /// Whether the toast type's color is applied to the whole toast surface.
+  ///
+  /// Enabled by default for semantic toast types. Set to `false` for the
+  /// translucent black surface.
+  final bool useTypeColors;
+
+  /// Whether to show the built-in icon for success, error, warning, and info
+  /// toasts. Disabled by default.
+  final bool showTypeIcons;
 
   /// Animation duration for show
   final Duration showDuration;
@@ -221,6 +233,8 @@ class ToastrConfig {
     Widget? customIcon,
     Color? backgroundColor,
     Color? textColor,
+    bool? useTypeColors,
+    bool? showTypeIcons,
     Duration? showDuration,
     Duration? hideDuration,
     ToastrPosition? position,
@@ -257,55 +271,57 @@ class ToastrConfig {
     ToastrIconTheme? iconTheme,
     TextStyle? titleStyle,
     TextStyle? messageStyle,
-  }) => ToastrConfig(
-    type: type ?? this.type,
-    message: message ?? this.message,
-    title: title ?? this.title,
-    duration: duration ?? this.duration,
-    extendedTimeout: extendedTimeout ?? this.extendedTimeout,
-    dismissible: dismissible ?? this.dismissible,
-    showCloseButton: showCloseButton ?? this.showCloseButton,
-    customIcon: customIcon ?? this.customIcon,
-    backgroundColor: backgroundColor ?? this.backgroundColor,
-    textColor: textColor ?? this.textColor,
-    showDuration: showDuration ?? this.showDuration,
-    hideDuration: hideDuration ?? this.hideDuration,
-    position: position ?? this.position,
-    showMethod: showMethod ?? this.showMethod,
-    hideMethod: hideMethod ?? this.hideMethod,
-    showEasing: showEasing ?? this.showEasing,
-    hideEasing: hideEasing ?? this.hideEasing,
-    showProgressBar: showProgressBar ?? this.showProgressBar,
-    preventDuplicates: preventDuplicates ?? this.preventDuplicates,
-    duplicateKey: duplicateKey ?? this.duplicateKey,
-    onTap: onTap ?? this.onTap,
-    onDismiss: onDismiss ?? this.onDismiss,
-    content: content ?? this.content,
-    maxWidth: maxWidth ?? this.maxWidth,
-    margin: margin ?? this.margin,
-    accentColor: accentColor ?? this.accentColor,
-    containerDecoration: containerDecoration ?? this.containerDecoration,
-    theme: theme ?? this.theme,
-    reverseOrder: reverseOrder ?? this.reverseOrder,
-    action: action ?? this.action,
-    enableHapticFeedback: enableHapticFeedback ?? this.enableHapticFeedback,
-    hapticFeedbackType: hapticFeedbackType ?? this.hapticFeedbackType,
-    swipeDismissDirection:
-        swipeDismissDirection ?? this.swipeDismissDirection,
-    enterAnimationBuilder:
-        enterAnimationBuilder ?? this.enterAnimationBuilder,
-    exitAnimationBuilder:
-        exitAnimationBuilder ?? this.exitAnimationBuilder,
-    compact: compact ?? this.compact,
-    borderRadius: borderRadius ?? this.borderRadius,
-    avoidKeyboard: avoidKeyboard ?? this.avoidKeyboard,
-    stackOverlap: stackOverlap ?? this.stackOverlap,
-    showCircularProgress: showCircularProgress ?? this.showCircularProgress,
-    gutter: gutter ?? this.gutter,
-    iconTheme: iconTheme ?? this.iconTheme,
-    titleStyle: titleStyle ?? this.titleStyle,
-    messageStyle: messageStyle ?? this.messageStyle,
-  );
+  }) =>
+      ToastrConfig(
+        type: type ?? this.type,
+        message: message ?? this.message,
+        title: title ?? this.title,
+        duration: duration ?? this.duration,
+        extendedTimeout: extendedTimeout ?? this.extendedTimeout,
+        dismissible: dismissible ?? this.dismissible,
+        showCloseButton: showCloseButton ?? this.showCloseButton,
+        customIcon: customIcon ?? this.customIcon,
+        backgroundColor: backgroundColor ?? this.backgroundColor,
+        textColor: textColor ?? this.textColor,
+        useTypeColors: useTypeColors ?? this.useTypeColors,
+        showTypeIcons: showTypeIcons ?? this.showTypeIcons,
+        showDuration: showDuration ?? this.showDuration,
+        hideDuration: hideDuration ?? this.hideDuration,
+        position: position ?? this.position,
+        showMethod: showMethod ?? this.showMethod,
+        hideMethod: hideMethod ?? this.hideMethod,
+        showEasing: showEasing ?? this.showEasing,
+        hideEasing: hideEasing ?? this.hideEasing,
+        showProgressBar: showProgressBar ?? this.showProgressBar,
+        preventDuplicates: preventDuplicates ?? this.preventDuplicates,
+        duplicateKey: duplicateKey ?? this.duplicateKey,
+        onTap: onTap ?? this.onTap,
+        onDismiss: onDismiss ?? this.onDismiss,
+        content: content ?? this.content,
+        maxWidth: maxWidth ?? this.maxWidth,
+        margin: margin ?? this.margin,
+        accentColor: accentColor ?? this.accentColor,
+        containerDecoration: containerDecoration ?? this.containerDecoration,
+        theme: theme ?? this.theme,
+        reverseOrder: reverseOrder ?? this.reverseOrder,
+        action: action ?? this.action,
+        enableHapticFeedback: enableHapticFeedback ?? this.enableHapticFeedback,
+        hapticFeedbackType: hapticFeedbackType ?? this.hapticFeedbackType,
+        swipeDismissDirection:
+            swipeDismissDirection ?? this.swipeDismissDirection,
+        enterAnimationBuilder:
+            enterAnimationBuilder ?? this.enterAnimationBuilder,
+        exitAnimationBuilder: exitAnimationBuilder ?? this.exitAnimationBuilder,
+        compact: compact ?? this.compact,
+        borderRadius: borderRadius ?? this.borderRadius,
+        avoidKeyboard: avoidKeyboard ?? this.avoidKeyboard,
+        stackOverlap: stackOverlap ?? this.stackOverlap,
+        showCircularProgress: showCircularProgress ?? this.showCircularProgress,
+        gutter: gutter ?? this.gutter,
+        iconTheme: iconTheme ?? this.iconTheme,
+        titleStyle: titleStyle ?? this.titleStyle,
+        messageStyle: messageStyle ?? this.messageStyle,
+      );
 
   /// Generates a key for duplicate detection
   String get key => duplicateKey ?? '$type:$title:$message';

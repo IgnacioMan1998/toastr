@@ -42,7 +42,8 @@ class ToastrWidget extends StatefulWidget {
   State<ToastrWidget> createState() => _ToastrWidgetState();
 }
 
-class _ToastrWidgetState extends State<ToastrWidget> with TickerProviderStateMixin {
+class _ToastrWidgetState extends State<ToastrWidget>
+    with TickerProviderStateMixin {
   // --- Toast enter/exit animation controllers ---
   late AnimationController _enterController;
   late Animation<double> _enterScale;
@@ -356,12 +357,15 @@ class _ToastrWidgetState extends State<ToastrWidget> with TickerProviderStateMix
       return SizedBox(
         width: 20,
         height: 20,
-        child: Center(child: _LoaderIcon(primary: _iconPrimary(), secondary: _iconSecondary())),
+        child: Center(
+            child: _LoaderIcon(
+                primary: _iconPrimary(), secondary: _iconSecondary())),
       );
     }
 
     // Success/Error → IndicatorWrapper: LoaderIcon underneath + StatusWrapper on top
-    if (widget.config.type == ToastrType.success || widget.config.type == ToastrType.error) {
+    if (widget.config.type == ToastrType.success ||
+        widget.config.type == ToastrType.error) {
       return SizedBox(
         width: 20,
         height: 20,
@@ -369,7 +373,8 @@ class _ToastrWidgetState extends State<ToastrWidget> with TickerProviderStateMix
           alignment: Alignment.center,
           children: [
             // LoaderIcon always underneath (visible briefly before status appears)
-            const _LoaderIcon(primary: Color(0xFF616161), secondary: Color(0xFFE0E0E0)),
+            const _LoaderIcon(
+                primary: Color(0xFF616161), secondary: Color(0xFFE0E0E0)),
             // StatusWrapper (absolute positioned) with animated icon on top
             Positioned.fill(
               child: _buildAnimatedStatusIcon(),
@@ -588,25 +593,47 @@ class _ToastrWidgetState extends State<ToastrWidget> with TickerProviderStateMix
   }
 
   Color _iconPrimary() {
-    if (widget.config.iconTheme?.primary != null) return widget.config.iconTheme!.primary!;
+    if (widget.config.iconTheme?.primary != null) {
+      return widget.config.iconTheme!.primary!;
+    }
+    if (widget.config.useTypeColors) {
+      return Colors.white;
+    }
+    if (widget.config.theme == ToastrTheme.dark) {
+      return const Color(0xFFA8A29E);
+    }
+    return const Color(0xFF737373);
+  }
+
+  Color _typeColor() {
     switch (widget.config.type) {
-      case ToastrType.success: return const Color(0xFF61D345);
-      case ToastrType.error: return const Color(0xFFFF4B4B);
-      case ToastrType.warning: return const Color(0xFFF59E0B);
-      case ToastrType.info: return const Color(0xFF3B82F6);
-      case ToastrType.loading: return const Color(0xFF616161);
-      case ToastrType.blank: return const Color(0xFF9CA3AF);
+      case ToastrType.success:
+        return const Color(0xFF16A34A);
+      case ToastrType.error:
+        return const Color(0xFFDC2626);
+      case ToastrType.warning:
+        return const Color(0xFFD97706);
+      case ToastrType.info:
+        return const Color(0xFF2563EB);
+      case ToastrType.loading:
+        return const Color(0xFF475569);
+      case ToastrType.blank:
+        return const Color(0xFF737373);
     }
   }
 
   Color _iconSecondary() {
-    if (widget.config.iconTheme?.secondary != null) return widget.config.iconTheme!.secondary!;
+    if (widget.config.iconTheme?.secondary != null) {
+      return widget.config.iconTheme!.secondary!;
+    }
+    if (widget.config.useTypeColors) {
+      return _typeColor();
+    }
     switch (widget.config.type) {
-      case ToastrType.success:
-      case ToastrType.error:
+      case ToastrType.loading:
+        return const Color(0xFFE0E0E0);
+      default:
         return Colors.white;
-      case ToastrType.loading: return const Color(0xFFE0E0E0);
-      default: return Colors.white;
     }
   }
 
@@ -618,13 +645,23 @@ class _ToastrWidgetState extends State<ToastrWidget> with TickerProviderStateMix
   @override
   Widget build(BuildContext context) {
     final isDark = widget.config.theme == ToastrTheme.dark;
-    final bgColor = widget.config.backgroundColor ?? (isDark ? const Color(0xFF1C1917) : const Color(0xFFFFFFFF));
-    final textColor = widget.config.textColor ?? (isDark ? const Color(0xFFF5F5F4) : const Color(0xFF363636));
-    final closeColor = isDark ? const Color(0xFF78716C) : const Color(0xFFD1D5DB);
+    final isColorized =
+        widget.config.useTypeColors && widget.config.type != ToastrType.blank;
+    final bgColor = widget.config.backgroundColor ??
+        (isColorized ? _typeColor() : const Color(0xCC000000));
+    final textColor =
+        widget.config.textColor ?? (isColorized ? Colors.white : Colors.white);
+    final closeColor = isColorized
+        ? Colors.white.withValues(alpha: 0.75)
+        : Colors.white.withValues(alpha: 0.65);
 
     final swipeDir = widget.config.swipeDismissDirection;
-    final canSwipeH = widget.config.dismissible && (swipeDir == SwipeDismissDirection.horizontal || swipeDir == SwipeDismissDirection.both);
-    final canSwipeV = widget.config.dismissible && (swipeDir == SwipeDismissDirection.vertical || swipeDir == SwipeDismissDirection.both);
+    final canSwipeH = widget.config.dismissible &&
+        (swipeDir == SwipeDismissDirection.horizontal ||
+            swipeDir == SwipeDismissDirection.both);
+    final canSwipeV = widget.config.dismissible &&
+        (swipeDir == SwipeDismissDirection.vertical ||
+            swipeDir == SwipeDismissDirection.both);
 
     Widget toast = GestureDetector(
       onHorizontalDragUpdate: canSwipeH
@@ -661,27 +698,24 @@ class _ToastrWidgetState extends State<ToastrWidget> with TickerProviderStateMix
         onExit: (_) => _onHover(false),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          transform: canSwipeV ? Matrix4.translationValues(0, _dragOffset, 0) : Matrix4.translationValues(_dragOffset, 0, 0),
+          transform: canSwipeV
+              ? Matrix4.translationValues(0, _dragOffset, 0)
+              : Matrix4.translationValues(_dragOffset, 0, 0),
           constraints: BoxConstraints(maxWidth: widget.config.maxWidth),
-          margin: widget.config.margin ?? const EdgeInsets.symmetric(vertical: 4),
-          decoration: widget.config.containerDecoration ?? BoxDecoration(
-            color: bgColor,
-            borderRadius: widget.config.borderRadius ?? BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Color.fromRGBO(0, 0, 0, isDark ? 0.3 : 0.1),
-                blurRadius: 10,
-                offset: const Offset(0, 3),
+          margin:
+              widget.config.margin ?? const EdgeInsets.symmetric(vertical: 4),
+          decoration: widget.config.containerDecoration ??
+              BoxDecoration(
+                color: bgColor,
+                borderRadius:
+                    widget.config.borderRadius ?? BorderRadius.circular(12),
+                border: Border.all(
+                  color: Color.fromRGBO(0, 0, 0, isDark ? 0.18 : 0.07),
+                ),
               ),
-              BoxShadow(
-                color: Color.fromRGBO(0, 0, 0, isDark ? 0.2 : 0.05),
-                blurRadius: 3,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
           child: ClipRRect(
-            borderRadius: widget.config.borderRadius ?? BorderRadius.circular(12),
+            borderRadius:
+                widget.config.borderRadius ?? BorderRadius.circular(12),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -693,52 +727,69 @@ class _ToastrWidgetState extends State<ToastrWidget> with TickerProviderStateMix
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      _buildIcon(),
+                      if (widget.config.type == ToastrType.loading ||
+                          (widget.config.showTypeIcons &&
+                              (widget.config.type == ToastrType.success ||
+                                  widget.config.type == ToastrType.error ||
+                                  widget.config.type == ToastrType.warning ||
+                                  widget.config.type == ToastrType.info))) ...[
+                        _buildIcon(),
+                        const SizedBox(width: 8),
+                      ],
                       Flexible(
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
+                            horizontal: 8,
                             vertical: 4,
                           ),
-                          child: widget.config.content ?? Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              if (widget.config.title != null) ...[
-                                Text(
-                                  widget.config.title!,
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w700,
-                                    height: 1.3,
-                                    decoration: TextDecoration.none,
-                                  ).merge(widget.config.titleStyle).copyWith(
-                                    color: widget.config.titleStyle?.color ?? textColor,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 2),
-                              ],
-                              Text(
-                                widget.config.message,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w400,
-                                  color: widget.config.title != null
-                                      ? textColor.withValues(alpha: 0.75)
-                                      : textColor,
-                                  height: 1.3,
-                                  decoration: TextDecoration.none,
-                                ).merge(widget.config.messageStyle).copyWith(
-                                  color: widget.config.messageStyle?.color ??
-                                      (widget.config.title != null
+                          child: widget.config.content ??
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (widget.config.title != null) ...[
+                                    Text(
+                                      widget.config.title!,
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700,
+                                        height: 1.3,
+                                        decoration: TextDecoration.none,
+                                      )
+                                          .merge(widget.config.titleStyle)
+                                          .copyWith(
+                                            color: widget
+                                                    .config.titleStyle?.color ??
+                                                textColor,
+                                          ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 2),
+                                  ],
+                                  Text(
+                                    widget.config.message,
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w400,
+                                      color: widget.config.title != null
                                           ? textColor.withValues(alpha: 0.75)
-                                          : textColor),
-                                ),
+                                          : textColor,
+                                      height: 1.3,
+                                      decoration: TextDecoration.none,
+                                    )
+                                        .merge(widget.config.messageStyle)
+                                        .copyWith(
+                                          color: widget
+                                                  .config.messageStyle?.color ??
+                                              (widget.config.title != null
+                                                  ? textColor.withValues(
+                                                      alpha: 0.75)
+                                                  : textColor),
+                                        ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
                         ),
                       ),
                       if (widget.config.action != null)
@@ -790,7 +841,8 @@ class _ToastrWidgetState extends State<ToastrWidget> with TickerProviderStateMix
       if (widget.config.exitAnimationBuilder != null) {
         toast = AnimatedBuilder(
           animation: _exitController,
-          builder: (context, child) => widget.config.exitAnimationBuilder!(child!, _exitController),
+          builder: (context, child) =>
+              widget.config.exitAnimationBuilder!(child!, _exitController),
           child: toast,
         );
       } else {
@@ -817,6 +869,8 @@ class _ToastrWidgetState extends State<ToastrWidget> with TickerProviderStateMix
     return Semantics(
       label: semanticLabel,
       liveRegion: true,
+      button: widget.config.dismissible,
+      onTap: widget.config.dismissible ? _dismiss : null,
       child: Material(color: Colors.transparent, child: toast),
     );
   }
@@ -840,27 +894,32 @@ class _ToastrWidgetState extends State<ToastrWidget> with TickerProviderStateMix
   Widget _buildActionButton(Color textColor) {
     final action = widget.config.action!;
     final accentColor = action.textColor ?? _getAccentColor();
-    final bgColor = action.backgroundColor ?? accentColor.withValues(alpha: 0.12);
+    final bgColor =
+        action.backgroundColor ?? accentColor.withValues(alpha: 0.12);
     return Padding(
       padding: const EdgeInsets.only(left: 10),
-      child: GestureDetector(
-        onTap: () {
-          action.onPressed();
-          if (action.dismissOnPressed) _dismiss();
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Text(
-            action.label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: accentColor,
-              decoration: TextDecoration.none,
+      child: Semantics(
+        button: true,
+        label: action.label,
+        child: GestureDetector(
+          onTap: () {
+            action.onPressed();
+            if (action.dismissOnPressed) _dismiss();
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: bgColor,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              action.label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: accentColor,
+                decoration: TextDecoration.none,
+              ),
             ),
           ),
         ),
@@ -951,7 +1010,8 @@ class _LoaderIcon extends StatefulWidget {
   State<_LoaderIcon> createState() => _LoaderIconState();
 }
 
-class _LoaderIconState extends State<_LoaderIcon> with SingleTickerProviderStateMixin {
+class _LoaderIconState extends State<_LoaderIcon>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override

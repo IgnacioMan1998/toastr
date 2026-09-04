@@ -37,7 +37,9 @@ class ToastrDemoScreen extends StatefulWidget {
 
 class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
   final _titleController = TextEditingController();
-  final _messageController = TextEditingController(text: 'This is a sample notification message');
+  final _messageController = TextEditingController(
+    text: 'This is a sample notification message',
+  );
 
   ToastrType _selectedType = ToastrType.success;
   ToastrPosition _selectedPosition = ToastrPosition.topRight;
@@ -50,9 +52,11 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
 
   bool _showProgressBar = false;
   bool _showCloseButton = false;
+  bool _useTypeColors = true;
+  bool _showTypeIcons = false;
   bool _preventDuplicates = false;
-  bool _enableHapticFeedback = false;
-  SwipeDismissDirection _swipeDismissDirection = SwipeDismissDirection.horizontal;
+  SwipeDismissDirection _swipeDismissDirection =
+      SwipeDismissDirection.horizontal;
 
   void _showToast() {
     final config = ToastrConfig(
@@ -71,8 +75,9 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
           : const Duration(milliseconds: 100),
       showProgressBar: _showProgressBar,
       showCloseButton: _showCloseButton,
+      useTypeColors: _useTypeColors,
+      showTypeIcons: _showTypeIcons,
       preventDuplicates: _preventDuplicates,
-      enableHapticFeedback: _enableHapticFeedback,
       swipeDismissDirection: _swipeDismissDirection,
     );
 
@@ -124,9 +129,8 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                         label: 'Success',
                         icon: Icons.check,
                         color: const Color(0xFF16A34A),
-                        onTap: () => Toastr.success(
-                          'Operation completed successfully!',
-                        ),
+                        onTap: () =>
+                            Toastr.success('Operation completed successfully!'),
                       ),
                       _QuickActionChip(
                         label: 'Error',
@@ -134,7 +138,6 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                         color: const Color(0xFFDC2626),
                         onTap: () => Toastr.error(
                           'Something went wrong. Please try again.',
-                          title: 'Error',
                         ),
                       ),
                       _QuickActionChip(
@@ -143,7 +146,6 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                         color: const Color(0xFFD97706),
                         onTap: () => Toastr.warning(
                           'Please check your input before continuing.',
-                          title: 'Warning',
                         ),
                       ),
                       _QuickActionChip(
@@ -152,7 +154,6 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                         color: const Color(0xFF2563EB),
                         onTap: () => Toastr.info(
                           'Here is some useful information for you.',
-                          title: 'Info',
                         ),
                       ),
                       _QuickActionChip(
@@ -223,25 +224,14 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                         ),
                       ),
                       _QuickActionChip(
-                        label: 'Haptic',
-                        icon: Icons.vibration_rounded,
-                        color: const Color(0xFF7C3AED),
-                        onTap: () => Toastr.success(
-                          'Saved with haptic feedback!',
-                          options: ToastrOptions(
-                            enableHapticFeedback: true,
-                            hapticFeedbackType: HapticFeedbackType.heavy,
-                          ),
-                        ),
-                      ),
-                      _QuickActionChip(
                         label: 'Swipe Vertical',
                         icon: Icons.swap_vert_rounded,
                         color: const Color(0xFF059669),
                         onTap: () => Toastr.info(
                           'Swipe up or down to dismiss!',
                           options: ToastrOptions(
-                            swipeDismissDirection: SwipeDismissDirection.vertical,
+                            swipeDismissDirection:
+                                SwipeDismissDirection.vertical,
                           ),
                         ),
                       ),
@@ -266,77 +256,14 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                           options: ToastrOptions(
                             enterAnimationBuilder: (child, animation) =>
                                 ScaleTransition(
-                              scale: animation,
-                              child: FadeTransition(
-                                opacity: animation,
-                                child: child,
-                              ),
-                            ),
+                                  scale: animation,
+                                  child: FadeTransition(
+                                    opacity: animation,
+                                    child: child,
+                                  ),
+                                ),
                           ),
                         ),
-                      ),
-                      _QuickActionChip(
-                        label: 'Stack 5',
-                        icon: Icons.layers_rounded,
-                        color: const Color(0xFF0891B2),
-                        onTap: () {
-                          for (var i = 1; i <= 5; i++) {
-                            Future.delayed(
-                              Duration(milliseconds: i * 200),
-                              () => Toastr.info('Toast #$i'),
-                            );
-                          }
-                        },
-                      ),
-                      _QuickActionChip(
-                        label: 'Queue (max 3)',
-                        icon: Icons.queue_rounded,
-                        color: const Color(0xFFCA8A04),
-                        onTap: () {
-                          Toastr.configure(maxVisible: 3);
-                          for (var i = 1; i <= 6; i++) {
-                            Future.delayed(
-                              Duration(milliseconds: i * 150),
-                              () => Toastr.success('Queued toast #$i'),
-                            );
-                          }
-                          Future.delayed(
-                            const Duration(seconds: 8),
-                            () => Toastr.configure(maxVisible: 5),
-                          );
-                        },
-                      ),
-                      _QuickActionChip(
-                        label: 'Icon Theme',
-                        icon: Icons.palette_rounded,
-                        color: const Color(0xFF0D9488),
-                        onTap: () => Toastr.success(
-                          'Custom colored checkmark!',
-                          options: ToastrOptions(
-                            iconTheme: ToastrIconTheme(
-                              primary: const Color(0xFF8B5CF6),
-                              secondary: const Color(0xFFFDE047),
-                            ),
-                          ),
-                        ),
-                      ),
-                      _QuickActionChip(
-                        label: 'Gutter Stack',
-                        icon: Icons.vertical_distribute_rounded,
-                        color: const Color(0xFFEA580C),
-                        onTap: () {
-                          Toastr.configure(gutter: 2);
-                          for (var i = 1; i <= 3; i++) {
-                            Future.delayed(
-                              Duration(milliseconds: i * 300),
-                              () => Toastr.info('Tight stack #$i'),
-                            );
-                          }
-                          Future.delayed(
-                            const Duration(seconds: 5),
-                            () => Toastr.configure(gutter: 8),
-                          );
-                        },
                       ),
                       _QuickActionChip(
                         label: 'Compact',
@@ -351,23 +278,24 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                         label: 'Full Featured',
                         icon: Icons.star_rounded,
                         color: const Color(0xFFE11D48),
-                        onTap: () => Toastr.custom(ToastrConfig(
-                          type: ToastrType.success,
-                          message: 'Item moved to trash',
-                          title: 'Deleted',
-                          showProgressBar: true,
-                          showCloseButton: true,
-                          enableHapticFeedback: true,
-                          hapticFeedbackType: HapticFeedbackType.medium,
-                          swipeDismissDirection:
-                              SwipeDismissDirection.horizontal,
-                          action: ToastrAction(
-                            label: 'Undo',
-                            onPressed: () => Toastr.info('Restored!'),
-                            textColor: Colors.white,
-                            backgroundColor: const Color(0xFF16A34A),
+                        onTap: () => Toastr.custom(
+                          ToastrConfig(
+                            type: ToastrType.success,
+                            message: 'Item moved to trash',
+                            title: 'Deleted',
+                            showProgressBar: true,
+                            showCloseButton: true,
+                            useTypeColors: true,
+                            swipeDismissDirection:
+                                SwipeDismissDirection.horizontal,
+                            action: ToastrAction(
+                              label: 'Undo',
+                              onPressed: () => Toastr.info('Restored!'),
+                              textColor: Colors.white,
+                              backgroundColor: const Color(0xFF16A34A),
+                            ),
                           ),
-                        )),
+                        ),
                       ),
                     ],
                   ),
@@ -469,8 +397,7 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                         min: 100,
                         max: 10000,
                         suffix: 'ms',
-                        onChanged: (v) =>
-                            setState(() => _timeout = v.round()),
+                        onChanged: (v) => setState(() => _timeout = v.round()),
                       ),
                       _SliderField(
                         label: 'Show speed',
@@ -502,16 +429,34 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                       SwitchListTile(
                         title: const Text('Progress bar'),
                         value: _showProgressBar,
-                        onChanged: (v) =>
-                            setState(() => _showProgressBar = v),
+                        onChanged: (v) => setState(() => _showProgressBar = v),
                         dense: true,
                         contentPadding: EdgeInsets.zero,
                       ),
                       SwitchListTile(
                         title: const Text('Close button'),
                         value: _showCloseButton,
-                        onChanged: (v) =>
-                            setState(() => _showCloseButton = v),
+                        onChanged: (v) => setState(() => _showCloseButton = v),
+                        dense: true,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      SwitchListTile(
+                        title: const Text('Use type colors'),
+                        subtitle: const Text(
+                          'Apply the type color to the toast background',
+                        ),
+                        value: _useTypeColors,
+                        onChanged: (v) => setState(() => _useTypeColors = v),
+                        dense: true,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      SwitchListTile(
+                        title: const Text('Show type icons'),
+                        subtitle: const Text(
+                          'Show icons for success, error, warning, and info',
+                        ),
+                        value: _showTypeIcons,
+                        onChanged: (v) => setState(() => _showTypeIcons = v),
                         dense: true,
                         contentPadding: EdgeInsets.zero,
                       ),
@@ -520,14 +465,6 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                         value: _preventDuplicates,
                         onChanged: (v) =>
                             setState(() => _preventDuplicates = v),
-                        dense: true,
-                        contentPadding: EdgeInsets.zero,
-                      ),
-                      SwitchListTile(
-                        title: const Text('Haptic feedback'),
-                        value: _enableHapticFeedback,
-                        onChanged: (v) =>
-                            setState(() => _enableHapticFeedback = v),
                         dense: true,
                         contentPadding: EdgeInsets.zero,
                       ),
@@ -724,10 +661,12 @@ class _DropdownField<T extends Enum> extends StatelessWidget {
         isDense: true,
       ),
       items: items
-          .map((e) => DropdownMenuItem(
-                value: e,
-                child: Text(e.name, style: const TextStyle(fontSize: 14)),
-              ))
+          .map(
+            (e) => DropdownMenuItem(
+              value: e,
+              child: Text(e.name, style: const TextStyle(fontSize: 14)),
+            ),
+          )
           .toList(),
       onChanged: onChanged,
     );

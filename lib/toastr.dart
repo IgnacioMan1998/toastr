@@ -1,5 +1,16 @@
 // Export all public APIs
-export 'src/models/toastr_config.dart' show ToastrConfig, ToastrPosition, ToastrShowMethod, ToastrHideMethod, ToastrTheme, SwipeDismissDirection, HapticFeedbackType, ToastrAction, ToastrIconTheme;
+export 'src/extensions/toastr_extensions.dart';
+export 'src/models/toastr_config.dart'
+    show
+        ToastrConfig,
+        ToastrPosition,
+        ToastrShowMethod,
+        ToastrHideMethod,
+        ToastrTheme,
+        SwipeDismissDirection,
+        HapticFeedbackType,
+        ToastrAction,
+        ToastrIconTheme;
 export 'src/models/toastr_options.dart';
 export 'src/models/toastr_type.dart';
 export 'src/services/toastr_service.dart';
