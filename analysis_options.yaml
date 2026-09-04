@@ -60,6 +60,7 @@ analyzer:
   exclude:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
+    - build/**
   
   errors:
     # Treat missing required parameters as errors
