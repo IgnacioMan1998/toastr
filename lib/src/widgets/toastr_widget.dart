@@ -107,20 +107,20 @@ class _ToastrWidgetState extends State<ToastrWidget>
     // from: translate3d(0, factor*-200%, 0) scale(.6) opacity:.5
     // to:   translate3d(0, 0, 0) scale(1) opacity:1
     _enterController = AnimationController(
-      duration: const Duration(milliseconds: 350),
+      duration: const Duration(milliseconds: 220),
       vsync: this,
     );
-    const enterCurve = Cubic(0.21, 1.02, 0.73, 1.0);
-    _enterScale = Tween<double>(begin: 0.6, end: 1.0).animate(
+    const enterCurve = Curves.easeOutCubic;
+    _enterScale = Tween<double>(begin: 0.96, end: 1.0).animate(
       CurvedAnimation(parent: _enterController, curve: enterCurve),
     );
-    _enterOpacity = Tween<double>(begin: 0.5, end: 1.0).animate(
+    _enterOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _enterController, curve: enterCurve),
     );
     // factor * -200% means: top toasts slide down from above (-200%),
     // bottom toasts slide up from below (200%)
     _enterTranslateY = Tween<double>(
-      begin: factor * -200.0,
+      begin: factor * -12.0,
       end: 0.0,
     ).animate(CurvedAnimation(parent: _enterController, curve: enterCurve));
 
@@ -551,14 +551,15 @@ class _ToastrWidgetState extends State<ToastrWidget>
   Widget _buildCloseButton(Color closeColor) {
     if (!widget.config.showCloseButton) return const SizedBox.shrink();
 
-    return GestureDetector(
-      onTap: _dismiss,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 6),
-        child: Icon(
-          Icons.close_rounded,
-          size: 16,
-          color: closeColor,
+    return Semantics(
+      button: true,
+      label: 'Dismiss notification',
+      child: GestureDetector(
+        onTap: _dismiss,
+        child: SizedBox(
+          width: 44,
+          height: 44,
+          child: Icon(Icons.close_rounded, size: 18, color: closeColor),
         ),
       ),
     );
@@ -608,13 +609,13 @@ class _ToastrWidgetState extends State<ToastrWidget>
   Color _typeColor() {
     switch (widget.config.type) {
       case ToastrType.success:
-        return const Color(0xFF16A34A);
+        return const Color(0xFF42A875);
       case ToastrType.error:
-        return const Color(0xFFDC2626);
+        return const Color(0xFFE06B63);
       case ToastrType.warning:
-        return const Color(0xFFD97706);
+        return const Color(0xFFE5A34A);
       case ToastrType.info:
-        return const Color(0xFF2563EB);
+        return const Color(0xFF5C92DC);
       case ToastrType.loading:
         return const Color(0xFF475569);
       case ToastrType.blank:
@@ -644,7 +645,6 @@ class _ToastrWidgetState extends State<ToastrWidget>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.config.theme == ToastrTheme.dark;
     final isColorized =
         widget.config.useTypeColors && widget.config.type != ToastrType.blank;
     final bgColor = widget.config.backgroundColor ??
@@ -710,7 +710,9 @@ class _ToastrWidgetState extends State<ToastrWidget>
                 borderRadius:
                     widget.config.borderRadius ?? BorderRadius.circular(12),
                 border: Border.all(
-                  color: Color.fromRGBO(0, 0, 0, isDark ? 0.18 : 0.07),
+                  color: isColorized
+                      ? Colors.white.withValues(alpha: 0.32)
+                      : Colors.white.withValues(alpha: 0.22),
                 ),
               ),
           child: ClipRRect(

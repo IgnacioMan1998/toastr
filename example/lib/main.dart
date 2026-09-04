@@ -54,6 +54,7 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
   bool _showCloseButton = false;
   bool _useTypeColors = true;
   bool _showTypeIcons = false;
+  bool _compact = false;
   bool _preventDuplicates = false;
   SwipeDismissDirection _swipeDismissDirection =
       SwipeDismissDirection.horizontal;
@@ -77,6 +78,7 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
       showCloseButton: _showCloseButton,
       useTypeColors: _useTypeColors,
       showTypeIcons: _showTypeIcons,
+      compact: _compact,
       preventDuplicates: _preventDuplicates,
       swipeDismissDirection: _swipeDismissDirection,
     );
@@ -88,6 +90,13 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final previewColor = switch (_selectedType) {
+      ToastrType.success => const Color(0xFF42A875),
+      ToastrType.error => const Color(0xFFE06B63),
+      ToastrType.warning => const Color(0xFFE5A34A),
+      ToastrType.info => const Color(0xFF5C92DC),
+      _ => const Color(0xCC000000),
+    };
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -312,10 +321,40 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Configuration',
+                    'Customize',
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  _ConfigCard(
+                    title: 'Preview',
+                    icon: Icons.visibility_outlined,
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: _compact ? 14 : 18,
+                          vertical: _compact ? 10 : 14,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _useTypeColors
+                              ? previewColor
+                              : const Color(0xCC000000),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Text(
+                          _messageController.text.isEmpty
+                              ? 'Sample notification'
+                              : _messageController.text,
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 12),
 
@@ -335,6 +374,7 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                       const SizedBox(height: 12),
                       TextField(
                         controller: _messageController,
+                        onChanged: (_) => setState(() {}),
                         decoration: const InputDecoration(
                           labelText: 'Message',
                           border: OutlineInputBorder(),
@@ -457,6 +497,16 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                         ),
                         value: _showTypeIcons,
                         onChanged: (v) => setState(() => _showTypeIcons = v),
+                        dense: true,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      SwitchListTile(
+                        title: const Text('Compact'),
+                        subtitle: const Text(
+                          'Use a smaller layout for short messages',
+                        ),
+                        value: _compact,
+                        onChanged: (v) => setState(() => _compact = v),
                         dense: true,
                         contentPadding: EdgeInsets.zero,
                       ),
