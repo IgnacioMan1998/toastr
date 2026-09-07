@@ -729,7 +729,8 @@ class _ToastrWidgetState extends State<ToastrWidget>
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (widget.config.type == ToastrType.loading ||
+                      if (widget.config.customIcon != null ||
+                          widget.config.type == ToastrType.loading ||
                           (widget.config.showTypeIcons &&
                               (widget.config.type == ToastrType.success ||
                                   widget.config.type == ToastrType.error ||

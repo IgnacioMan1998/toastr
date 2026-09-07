@@ -516,7 +516,8 @@ void main() {
       expect(find.text('Progress'), findsOneWidget);
     });
 
-    testWidgets('does not render custom icons', (tester) async {
+    testWidgets('renders a custom icon regardless of showTypeIcons',
+        (tester) async {
       await tester.pumpWidget(buildTestWidget(
         config: const ToastrConfig(
           type: ToastrType.success,
@@ -525,7 +526,7 @@ void main() {
         ),
       ));
       await tester.pump(const Duration(milliseconds: 150));
-      expect(find.byKey(const Key('custom-icon')), findsNothing);
+      expect(find.byKey(const Key('custom-icon')), findsOneWidget);
     });
     testWidgets('loading type shows its message and spinner', (tester) async {
       await tester.pumpWidget(buildTestWidget(
@@ -552,7 +553,7 @@ void main() {
       expect(find.byType(Icon), findsNothing);
     });
 
-    testWidgets('blank type does not render a custom icon', (tester) async {
+    testWidgets('blank type renders a custom icon', (tester) async {
       await tester.pumpWidget(buildTestWidget(
         config: const ToastrConfig(
           type: ToastrType.blank,
@@ -561,7 +562,7 @@ void main() {
         ),
       ));
       await tester.pump(const Duration(milliseconds: 150));
-      expect(find.byKey(const Key('emoji-icon')), findsNothing);
+      expect(find.byKey(const Key('emoji-icon')), findsOneWidget);
     });
   });
 
@@ -1060,7 +1061,29 @@ void main() {
     test('configure sets maxVisible', () {
       Toastr.configure(maxVisible: 3);
       expect(ToastrService.instance.maxVisible, 3);
-      Toastr.configure(maxVisible: 5);
+      Toastr.configure(maxVisible: 1);
+    });
+
+    testWidgets('maxVisible allows the configured number of active toasts',
+        (tester) async {
+      await tester.pumpWidget(const MaterialApp(home: Scaffold()));
+      final service = ToastrService.instance
+        ..clearAll()
+        ..maxVisible = 3
+        ..queueStrategy = ToastrQueueStrategy.queue;
+
+      for (var index = 0; index < 3; index++) {
+        service.show(ToastrConfig(
+          type: ToastrType.info,
+          message: 'Toast $index',
+        ));
+      }
+      await tester.pump();
+
+      expect(service.activeCount, 3);
+      service
+        ..clearAll()
+        ..maxVisible = 1;
     });
 
     test('configure sets queue strategy', () {

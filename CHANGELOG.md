@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.5.2] - 2026-09-06
 
 ### Added
 
@@ -34,6 +34,11 @@ This release modernizes the default toast experience while preserving simple
 opt-in controls. Review visual snapshots after upgrading: enable
 `showTypeIcons` if your UI relies on built-in icons, or set
 `useTypeColors: false` if it relies on the previous neutral surface.
+
+### Fixed
+
+- `maxVisible` again allows the configured number of simultaneous toasts.
+- `customIcon` is rendered for every toast type, including blank toasts.
 
 ## [2.5.0] - 2026-05-25
 

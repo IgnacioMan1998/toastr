@@ -209,7 +209,7 @@ class ToastrService with WidgetsBindingObserver {
     if (_activeToasts.length >= ToastrSecurityConfig.maxActiveNotifications) {
       _removeOldestToast(showNext: false);
       _showToast(entry);
-    } else if (_activeToasts.isEmpty) {
+    } else if (_activeToasts.length < maxVisible) {
       _showToast(entry);
     } else {
       switch (queueStrategy) {
@@ -267,7 +267,9 @@ class ToastrService with WidgetsBindingObserver {
       _duplicateKeys.remove(entry.config.key);
     }
 
-    if (showNext && _queuedToasts.isNotEmpty && _activeToasts.isEmpty) {
+    if (showNext &&
+        _queuedToasts.isNotEmpty &&
+        _activeToasts.length < maxVisible) {
       final next = _queuedToasts.removeAt(0);
       _showToast(next);
     }

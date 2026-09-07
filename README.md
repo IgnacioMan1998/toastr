@@ -8,7 +8,7 @@ Toast notifications for Flutter with no `BuildContext` required, smooth animatio
 
 ```yaml
 dependencies:
-  toastr_flutter: ^2.5.0
+  toastr_flutter: ^2.5.2
 ```
 
 ```bash
