@@ -13,10 +13,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Future.withToastr()` as a concise Promise API.
 - `ToastrQueueStrategy` with `queue`, `dropNewest`, and `dropOldest` policies.
 - Semantic tap actions for dismissible toasts and toast action buttons.
-- Full semantic-color surfaces by default; set `useTypeColors: false` for a
-  translucent black toast surface.
-- Optional built-in icons for success, error, warning, and info through
-  `showTypeIcons: true`.
+
+### Changed
+
+- **Migration to a clearer default experience:** semantic toasts now use their
+  type color as the full surface. Use `useTypeColors: false` to keep the
+  translucent-black appearance.
+- Built-in success, error, warning, and info icons are now opt-in. Add
+  `showTypeIcons: true` when an icon is desired.
+- Toasts are presented one at a time by default, with later notifications
+  queued. Use `Toastr.configure(queueStrategy: ...)` to choose how new
+  notifications are handled while a toast is visible.
+- Refined the entry animation for a faster, lighter transition.
+- Updated the default success, error, warning, and info colors for stronger
+  contrast and a more consistent visual system.
+
+### Migration
+
+This release modernizes the default toast experience while preserving simple
+opt-in controls. Review visual snapshots after upgrading: enable
+`showTypeIcons` if your UI relies on built-in icons, or set
+`useTypeColors: false` if it relies on the previous neutral surface.
 
 ## [2.5.0] - 2026-05-25
 

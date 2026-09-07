@@ -91,10 +91,10 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final previewColor = switch (_selectedType) {
-      ToastrType.success => const Color(0xFF42A875),
-      ToastrType.error => const Color(0xFFE06B63),
-      ToastrType.warning => const Color(0xFFE5A34A),
-      ToastrType.info => const Color(0xFF5C92DC),
+      ToastrType.success => const Color(0xFF217A46),
+      ToastrType.error => const Color(0xFFB3261E),
+      ToastrType.warning => const Color(0xFF8A4B00),
+      ToastrType.info => const Color(0xFF1D5FA7),
       _ => const Color(0xCC000000),
     };
 

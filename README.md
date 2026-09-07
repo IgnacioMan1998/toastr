@@ -75,6 +75,36 @@ Toastr.info(
 );
 ```
 
+## Migration
+
+This release updates the default presentation to make notifications easier to
+scan: semantic types use full-color surfaces, built-in type icons are opt-in,
+and toasts are shown one at a time by default.
+
+If your app relied on the previous appearance, make the choice explicit:
+
+```dart
+Toastr.configure(
+  useTypeColors: false, // Keep the translucent-black surface.
+  showTypeIcons: true,  // Restore built-in type icons.
+);
+```
+
+When several notifications are created together, choose their handling policy:
+
+```dart
+Toastr.configure(queueStrategy: ToastrQueueStrategy.queue);
+```
+
+Available policies are `queue`, `dropNewest`, and `dropOldest`.
+
+## String helpers
+
+```dart
+'Profile saved'.toastrSuccess();
+'Check your connection'.toastrWarning();
+```
+
 ## Useful options
 
 ```dart
