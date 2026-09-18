@@ -8,7 +8,7 @@ Toast notifications for Flutter with no `BuildContext` required, smooth animatio
 
 ```yaml
 dependencies:
-  toastr_flutter: ^2.5.2
+  toastr_flutter: ^2.5.3
 ```
 
 ```bash
@@ -55,25 +55,24 @@ await api.saveProfile().withToastr(
 
 `loading` and `promise` show a loader while the operation is pending.
 
-## Appearance
+## Preset toasts
 
-Semantic toasts use their type color by default. Built-in icons are opt-in:
+Preset toasts keep a focused API: `message` is required and the common
+semantic controls are named optional parameters.
 
 ```dart
-Toastr.success(
-  'Profile saved',
-  options: ToastrOptions(showTypeIcons: true),
+Toastr.warning(
+  'Review the required fields',
+  title: 'Attention',
+  position: ToastrPosition.topRight,
+  duration: const Duration(seconds: 6),
+  showProgressBar: true,
+  showCloseButton: true,
 );
 ```
 
-Use the classic translucent-black surface when needed:
-
-```dart
-Toastr.info(
-  'Background sync complete',
-  options: ToastrOptions(useTypeColors: false),
-);
-```
+For colors, animations, actions, custom content, gestures, and every other
+advanced setting, use `Toastr.custom(ToastrConfig(...))`.
 
 ## Migration
 
@@ -105,16 +104,20 @@ Available policies are `queue`, `dropNewest`, and `dropOldest`.
 'Check your connection'.toastrWarning();
 ```
 
-## Useful options
+## Custom toasts
 
 ```dart
-Toastr.error(
-  'Payment failed',
-  title: 'Try again',
-  options: ToastrOptions(
-    duration: Duration(seconds: 6),
-    position: ToastrPosition.bottomCenter,
-    showCloseButton: true,
+Toastr.custom(
+  ToastrConfig(
+    type: ToastrType.error,
+    message: 'Payment failed',
+    title: 'Try again',
+    useTypeColors: false,
+    showTypeIcons: true,
+    action: ToastrAction(
+      label: 'Retry',
+      onPressed: retryPayment,
+    ),
   ),
 );
 ```

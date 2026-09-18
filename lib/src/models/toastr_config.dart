@@ -435,9 +435,11 @@ enum HapticFeedbackType {
 /// Action button configuration for toasts.
 ///
 /// ```dart
-/// Toastr.success('Deleted',
+/// Toastr.custom(ToastrConfig(
+///   type: ToastrType.success,
+///   message: 'Deleted',
 ///   action: ToastrAction(label: 'Undo', onPressed: () => restore()),
-/// );
+/// ));
 /// ```
 class ToastrAction {
   /// Creates a toast action button.
@@ -471,9 +473,11 @@ class ToastrAction {
 /// (circle/background) and secondary (checkmark/line) color overrides.
 ///
 /// ```dart
-/// Toastr.success('Done!',
+/// Toastr.custom(ToastrConfig(
+///   type: ToastrType.success,
+///   message: 'Done!',
 ///   iconTheme: ToastrIconTheme(primary: Colors.green, secondary: Colors.white),
-/// );
+/// ));
 /// ```
 class ToastrIconTheme {
   /// Creates an icon theme with optional primary and secondary colors.

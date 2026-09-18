@@ -704,7 +704,7 @@ void main() {
           )
           .first;
       final decoration = container.decoration as BoxDecoration?;
-      expect(decoration?.color, const Color(0xFF217A46));
+      expect(decoration?.color, const Color(0xFF166534));
     });
 
     testWidgets('custom maxWidth is applied', (tester) async {

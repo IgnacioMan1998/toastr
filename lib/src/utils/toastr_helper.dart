@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../models/toastr_config.dart';
-import '../models/toastr_options.dart';
 import '../models/toastr_type.dart';
 import '../services/toastr_service.dart';
 
@@ -11,7 +10,10 @@ import '../services/toastr_service.dart';
 ///
 /// ```dart
 /// Toastr.success('Operation completed!');
-/// Toastr.error('Something went wrong!', ToastrOptions(position: ToastrPosition.bottomCenter));
+/// Toastr.error(
+///   'Something went wrong!',
+///   position: ToastrPosition.bottomCenter,
+/// );
 /// Toastr.loading('Please wait...');
 /// Toastr.promise(myFuture, loading: 'Loading...', success: 'Done!', error: 'Failed');
 /// ```
@@ -45,61 +47,60 @@ class Toastr {
   // Internal helpers
   // ---------------------------------------------------------------------------
 
-  /// Applies [options] on top of [_defaultConfig] for the given [type]/[message].
-  /// [title] overrides [ToastrOptions.title] when both are provided.
-  static ToastrConfig _applyOptions(
+  /// Creates a semantic toast from the supported preset parameters.
+  ///
+  /// Full appearance and behaviour customization belongs to [custom] through
+  /// [ToastrConfig].
+  static ToastrConfig _presetConfig(
     ToastrType type,
     String message,
-    ToastrOptions? options, {
+    {
     String? title,
+    Duration? duration,
+    ToastrPosition? position,
+    bool? showProgressBar,
+    bool? showCloseButton,
+    bool? preventDuplicates,
+    VoidCallback? onTap,
+    VoidCallback? onDismiss,
   }) =>
       _defaultConfig.copyWith(
         type: type,
         message: message,
-        title: title ?? options?.title,
-        duration: options?.duration,
-        position: options?.position,
-        showMethod: options?.showMethod,
-        hideMethod: options?.hideMethod,
-        showDuration: options?.showDuration,
-        hideDuration: options?.hideDuration,
-        showProgressBar: options?.showProgressBar,
-        showCloseButton: options?.showCloseButton,
-        preventDuplicates: options?.preventDuplicates,
-        onTap: options?.onTap,
-        onDismiss: options?.onDismiss,
-        content: options?.content,
-        maxWidth: options?.maxWidth,
-        margin: options?.margin,
-        accentColor: options?.accentColor,
-        containerDecoration: options?.containerDecoration,
-        theme: options?.theme,
-        action: options?.action,
-        enableHapticFeedback: options?.enableHapticFeedback,
-        hapticFeedbackType: options?.hapticFeedbackType,
-        swipeDismissDirection: options?.swipeDismissDirection,
-        enterAnimationBuilder: options?.enterAnimationBuilder,
-        exitAnimationBuilder: options?.exitAnimationBuilder,
-        compact: options?.compact,
-        borderRadius: options?.borderRadius,
-        avoidKeyboard: options?.avoidKeyboard,
-        stackOverlap: options?.stackOverlap,
-        showCircularProgress: options?.showCircularProgress,
-        gutter: options?.gutter,
-        iconTheme: options?.iconTheme,
-        titleStyle: options?.titleStyle,
-        messageStyle: options?.messageStyle,
-        useTypeColors: options?.useTypeColors,
-        showTypeIcons: options?.showTypeIcons,
+        title: title,
+        duration: duration,
+        position: position,
+        showProgressBar: showProgressBar,
+        showCloseButton: showCloseButton,
+        preventDuplicates: preventDuplicates,
+        onTap: onTap,
+        onDismiss: onDismiss,
       );
 
-  static String _showWithOptions(
+  static String _showPreset(
     ToastrType type,
     String message, {
     String? title,
-    ToastrOptions? options,
+    Duration? duration,
+    ToastrPosition? position,
+    bool? showProgressBar,
+    bool? showCloseButton,
+    bool? preventDuplicates,
+    VoidCallback? onTap,
+    VoidCallback? onDismiss,
   }) =>
-      _service.show(_applyOptions(type, message, options, title: title));
+      _service.show(_presetConfig(
+        type,
+        message,
+        title: title,
+        duration: duration,
+        position: position,
+        showProgressBar: showProgressBar,
+        showCloseButton: showCloseButton,
+        preventDuplicates: preventDuplicates,
+        onTap: onTap,
+        onDismiss: onDismiss,
+      ));
 
   /// Auto-detect toast type from message content.
   ///
@@ -145,47 +146,70 @@ class Toastr {
     String message, {
     ToastrType? type,
     String? title,
-    ToastrOptions? options,
-  }) {
-    final toastType = type ?? _detectTypeFromMessage(message);
-    switch (toastType) {
-      case ToastrType.success:
-        return success(message, title: title, options: options);
-      case ToastrType.error:
-        return error(message, title: title, options: options);
-      case ToastrType.warning:
-        return warning(message, title: title, options: options);
-      case ToastrType.info:
-        return info(message, title: title, options: options);
-      case ToastrType.loading:
-        return loading(message, title: title, options: options);
-      case ToastrType.blank:
-        return blank(message, title: title, options: options);
-    }
-  }
+    Duration? duration,
+    ToastrPosition? position,
+    bool? showProgressBar,
+    bool? showCloseButton,
+    bool? preventDuplicates,
+    VoidCallback? onTap,
+    VoidCallback? onDismiss,
+  }) =>
+      _showPreset(
+        type ?? _detectTypeFromMessage(message),
+        message,
+        title: title,
+        duration: duration,
+        position: position,
+        showProgressBar: showProgressBar,
+        showCloseButton: showCloseButton,
+        preventDuplicates: preventDuplicates,
+        onTap: onTap,
+        onDismiss: onDismiss,
+      );
 
   /// Show a success toastr. Returns the toast ID.
   static String success(String message,
-          {String? title, ToastrOptions? options}) =>
-      _showWithOptions(ToastrType.success, message,
-          title: title, options: options);
+          {String? title, Duration? duration, ToastrPosition? position,
+          bool? showProgressBar, bool? showCloseButton,
+          bool? preventDuplicates, VoidCallback? onTap,
+          VoidCallback? onDismiss}) =>
+      _showPreset(ToastrType.success, message, title: title, duration: duration,
+          position: position, showProgressBar: showProgressBar,
+          showCloseButton: showCloseButton, preventDuplicates: preventDuplicates,
+          onTap: onTap, onDismiss: onDismiss);
 
   /// Show an error toastr. Returns the toast ID.
   static String error(String message,
-          {String? title, ToastrOptions? options}) =>
-      _showWithOptions(ToastrType.error, message,
-          title: title, options: options);
+          {String? title, Duration? duration, ToastrPosition? position,
+          bool? showProgressBar, bool? showCloseButton,
+          bool? preventDuplicates, VoidCallback? onTap,
+          VoidCallback? onDismiss}) =>
+      _showPreset(ToastrType.error, message, title: title, duration: duration,
+          position: position, showProgressBar: showProgressBar,
+          showCloseButton: showCloseButton, preventDuplicates: preventDuplicates,
+          onTap: onTap, onDismiss: onDismiss);
 
   /// Show a warning toastr. Returns the toast ID.
   static String warning(String message,
-          {String? title, ToastrOptions? options}) =>
-      _showWithOptions(ToastrType.warning, message,
-          title: title, options: options);
+          {String? title, Duration? duration, ToastrPosition? position,
+          bool? showProgressBar, bool? showCloseButton,
+          bool? preventDuplicates, VoidCallback? onTap,
+          VoidCallback? onDismiss}) =>
+      _showPreset(ToastrType.warning, message, title: title, duration: duration,
+          position: position, showProgressBar: showProgressBar,
+          showCloseButton: showCloseButton, preventDuplicates: preventDuplicates,
+          onTap: onTap, onDismiss: onDismiss);
 
   /// Show an info toastr. Returns the toast ID.
-  static String info(String message, {String? title, ToastrOptions? options}) =>
-      _showWithOptions(ToastrType.info, message,
-          title: title, options: options);
+  static String info(String message,
+          {String? title, Duration? duration, ToastrPosition? position,
+          bool? showProgressBar, bool? showCloseButton,
+          bool? preventDuplicates, VoidCallback? onTap,
+          VoidCallback? onDismiss}) =>
+      _showPreset(ToastrType.info, message, title: title, duration: duration,
+          position: position, showProgressBar: showProgressBar,
+          showCloseButton: showCloseButton, preventDuplicates: preventDuplicates,
+          onTap: onTap, onDismiss: onDismiss);
 
   /// Show a loading toastr with an animated spinner.
   ///
@@ -198,22 +222,30 @@ class Toastr {
   /// Toastr.dismiss(id);
   /// ```
   static String loading(String message,
-          {String? title, ToastrOptions? options}) =>
+          {String? title, ToastrPosition? position, bool? showCloseButton,
+          VoidCallback? onTap, VoidCallback? onDismiss}) =>
       _service.show(
-        _applyOptions(ToastrType.loading, message, options, title: title)
+        _presetConfig(ToastrType.loading, message, title: title,
+                position: position, showCloseButton: showCloseButton,
+                onTap: onTap, onDismiss: onDismiss)
             .copyWith(
           duration: const Duration(days: 365),
           showProgressBar: false,
           preventDuplicates: false,
-          showCloseButton: options?.showCloseButton ?? false,
+          showCloseButton: showCloseButton ?? false,
         ),
       );
 
   /// Show a blank toastr (plain text, no icon). Returns the toast ID.
   static String blank(String message,
-          {String? title, ToastrOptions? options}) =>
-      _showWithOptions(ToastrType.blank, message,
-          title: title, options: options);
+          {String? title, Duration? duration, ToastrPosition? position,
+          bool? showProgressBar, bool? showCloseButton,
+          bool? preventDuplicates, VoidCallback? onTap,
+          VoidCallback? onDismiss}) =>
+      _showPreset(ToastrType.blank, message, title: title, duration: duration,
+          position: position, showProgressBar: showProgressBar,
+          showCloseButton: showCloseButton, preventDuplicates: preventDuplicates,
+          onTap: onTap, onDismiss: onDismiss);
 
   /// Show a toast that automatically tracks a [Future].
   ///
@@ -251,7 +283,7 @@ class Toastr {
   }) async {
     final toastId = Toastr.loading(
       loading,
-      options: position != null ? ToastrOptions(position: position) : null,
+      position: position,
     );
 
     try {

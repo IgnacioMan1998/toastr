@@ -11,7 +11,6 @@ export 'src/models/toastr_config.dart'
         HapticFeedbackType,
         ToastrAction,
         ToastrIconTheme;
-export 'src/models/toastr_options.dart';
 export 'src/models/toastr_type.dart';
 export 'src/services/toastr_service.dart';
 export 'src/utils/toastr_helper.dart';
