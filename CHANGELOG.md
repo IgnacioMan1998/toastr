@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.4] - 2026-10-25
+
+### Changed
+
+- Refined the default semantic palette to use clear, conventional colors:
+  success `#2E7D32`, error `#C24141`, warning `#9A6700`, and info `#2563A8`.
+- Restored the original neutral `blank` toast surface: white background, dark
+  text, a subtle gray border, and a light close button.
+- Updated the example and installation snippet to match this release.
+
+### Fixed
+
+- Rapid consecutive notifications are displayed in first-in, first-out order
+  when the queue strategy is enabled.
+- When an overlay is unmounted during a toast animation, the service now
+  cancels stale timers and clears obsolete queue state so later notifications
+  render in the replacement overlay.
+
+### Tests
+
+- Added regression coverage for rapid consecutive toasts and overlay cleanup
+  during an in-progress animation.
+
 ## [2.5.3] - 2026-09-17
 
 ### Breaking changes
