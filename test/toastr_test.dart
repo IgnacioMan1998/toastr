@@ -1114,6 +1114,79 @@ void main() {
       Toastr.configure(queueStrategy: ToastrQueueStrategy.queue);
     });
   });
+
+  group('ToastrService queue and overlay lifecycle', () {
+    testWidgets('shows rapid consecutive toasts in first-in, first-out order',
+        (tester) async {
+      await tester.pumpWidget(const MaterialApp(home: Scaffold()));
+      final service = ToastrService.instance
+        ..clearAll()
+        ..maxVisible = 1
+        ..queueStrategy = ToastrQueueStrategy.queue;
+
+      final first = service.show(const ToastrConfig(
+        type: ToastrType.info,
+        message: 'First toast',
+        duration: Duration(seconds: 2),
+      ));
+      final second = service.show(const ToastrConfig(
+        type: ToastrType.info,
+        message: 'Second toast',
+        duration: Duration(seconds: 2),
+      ));
+      final third = service.show(const ToastrConfig(
+        type: ToastrType.info,
+        message: 'Third toast',
+        duration: Duration(seconds: 2),
+      ));
+      await tester.pump();
+
+      expect(service.activeCount, 1);
+      expect(find.text('First toast'), findsOneWidget);
+
+      service.dismiss(first);
+      await tester.pump();
+      expect(find.text('Second toast'), findsOneWidget);
+
+      service.dismiss(second);
+      await tester.pump();
+      expect(find.text('Third toast'), findsOneWidget);
+
+      service.dismiss(third);
+      await tester.pump();
+      expect(service.activeCount, 0);
+    });
+
+    testWidgets('recovers after its overlay is disposed mid-animation',
+        (tester) async {
+      await tester.pumpWidget(const MaterialApp(home: Scaffold()));
+      final service = ToastrService.instance
+        ..clearAll()
+        ..maxVisible = 1;
+
+      service.show(const ToastrConfig(
+        type: ToastrType.info,
+        message: 'Leaving screen',
+        duration: Duration(seconds: 2),
+      ));
+      await tester.pump(const Duration(milliseconds: 50));
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+      expect(tester.takeException(), isNull);
+
+      await tester.pumpWidget(const MaterialApp(home: Scaffold()));
+      service.show(const ToastrConfig(
+        type: ToastrType.info,
+        message: 'New screen toast',
+        duration: Duration(seconds: 2),
+      ));
+      await tester.pump();
+
+      expect(find.text('New screen toast'), findsOneWidget);
+      service.clearAll();
+    });
+  });
 }
 
 void _noOp() {}

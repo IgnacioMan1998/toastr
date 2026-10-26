@@ -61,6 +61,7 @@ class ToastrService with WidgetsBindingObserver {
   final Set<String> _duplicateKeys = {};
 
   OverlayEntry? _containerEntry;
+  bool _containerEntryWasMounted = false;
 
   // Fix 3: cache the OverlayState to avoid a full tree traversal on every show().
   WeakReference<OverlayState>? _cachedOverlay;
@@ -160,16 +161,47 @@ class ToastrService with WidgetsBindingObserver {
 
   void _ensureContainerInserted() {
     if (_containerEntry != null) return;
-    _containerEntry = OverlayEntry(
+    final entry = OverlayEntry(
       builder: (_) => _ToastrContainer(service: this),
     );
-    _overlay.insert(_containerEntry!);
+    entry.addListener(() {
+      if (identical(_containerEntry, entry) && entry.mounted) {
+        _containerEntryWasMounted = true;
+      }
+    });
+    _containerEntry = entry;
+    _containerEntryWasMounted = false;
+    _overlay.insert(entry);
+  }
+
+  /// Discards notifications owned by an overlay that has been unmounted.
+  ///
+  /// A service instance can outlive a [MaterialApp], for example in tests or
+  /// when an app shell is rebuilt. In that case its [OverlayEntry] is no
+  /// longer mounted, so retaining active or queued notifications would prevent
+  /// the next toast from being inserted into the new overlay.
+  void _discardUnmountedOverlayState() {
+    final entry = _containerEntry;
+    if (entry == null || !_containerEntryWasMounted || entry.mounted) return;
+
+    for (final toast in _activeToasts) {
+      toast.timer?.cancel();
+    }
+    _activeToasts.clear();
+    _queuedToasts.clear();
+    _duplicateKeys.clear();
+    _timerStartTimes.clear();
+    _pausedTimerRemaining.clear();
+    _containerEntry = null;
+    _containerEntryWasMounted = false;
+    _cachedOverlay = null;
   }
 
   void _removeContainerIfEmpty() {
     if (_activeToasts.isEmpty && _queuedToasts.isEmpty) {
       _containerEntry?.remove();
       _containerEntry = null;
+      _containerEntryWasMounted = false;
     }
   }
 
@@ -182,6 +214,7 @@ class ToastrService with WidgetsBindingObserver {
   /// Returns a unique toast ID that can be used to [dismiss] or [update] it.
   String show(ToastrConfig config) {
     _ensureLifecycleRegistered();
+    _discardUnmountedOverlayState();
 
     if (!ToastrValidator.isValidConfig(config)) {
       ToastrValidator.logSecurityEvent(
