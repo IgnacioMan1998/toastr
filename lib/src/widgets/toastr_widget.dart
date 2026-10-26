@@ -645,15 +645,19 @@ class _ToastrWidgetState extends State<ToastrWidget>
 
   @override
   Widget build(BuildContext context) {
-    final isColorized =
-        widget.config.useTypeColors && widget.config.type != ToastrType.blank;
+    final isBlank = widget.config.type == ToastrType.blank;
+    final isColorized = widget.config.useTypeColors && !isBlank;
     final bgColor = widget.config.backgroundColor ??
-        (isColorized ? _typeColor() : const Color(0xCC000000));
-    final textColor =
-        widget.config.textColor ?? (isColorized ? Colors.white : Colors.white);
-    final closeColor = isColorized
-        ? Colors.white.withValues(alpha: 0.75)
-        : Colors.white.withValues(alpha: 0.65);
+        (isBlank
+            ? const Color(0xFFFFFFFF)
+            : (isColorized ? _typeColor() : const Color(0xCC000000)));
+    final textColor = widget.config.textColor ??
+        (isBlank ? const Color(0xFF1E293B) : Colors.white);
+    final closeColor = isBlank
+        ? const Color(0xFFCBD5E1)
+        : (isColorized
+            ? Colors.white.withValues(alpha: 0.75)
+            : Colors.white.withValues(alpha: 0.65));
 
     final swipeDir = widget.config.swipeDismissDirection;
     final canSwipeH = widget.config.dismissible &&
@@ -710,9 +714,11 @@ class _ToastrWidgetState extends State<ToastrWidget>
                 borderRadius:
                     widget.config.borderRadius ?? BorderRadius.circular(12),
                 border: Border.all(
-                  color: isColorized
-                      ? Colors.white.withValues(alpha: 0.32)
-                      : Colors.white.withValues(alpha: 0.22),
+                  color: isBlank
+                      ? const Color(0xFFE2E8F0)
+                      : (isColorized
+                          ? Colors.white.withValues(alpha: 0.32)
+                          : Colors.white.withValues(alpha: 0.22)),
                 ),
               ),
           child: ClipRRect(

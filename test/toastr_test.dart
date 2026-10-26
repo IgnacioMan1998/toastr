@@ -707,6 +707,25 @@ void main() {
       expect(decoration?.color, const Color(0xFF2E7D32));
     });
 
+    testWidgets('blank type preserves its original light surface',
+        (tester) async {
+      await tester.pumpWidget(buildApp(
+        config: const ToastrConfig(
+          type: ToastrType.blank,
+          message: 'Neutral toast',
+        ),
+      ));
+      await tester.pump(const Duration(milliseconds: 350));
+
+      final container = tester
+          .widgetList<AnimatedContainer>(
+            find.byType(AnimatedContainer),
+          )
+          .first;
+      final decoration = container.decoration as BoxDecoration?;
+      expect(decoration?.color, const Color(0xFFFFFFFF));
+    });
+
     testWidgets('custom maxWidth is applied', (tester) async {
       await tester.pumpWidget(buildApp(
         config: const ToastrConfig(
