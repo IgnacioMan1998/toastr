@@ -91,10 +91,10 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final previewColor = switch (_selectedType) {
-      ToastrType.success => const Color(0xFF166534),
-      ToastrType.error => const Color(0xFFB91C1C),
-      ToastrType.warning => const Color(0xFFB45309),
-      ToastrType.info => const Color(0xFF1D4ED8),
+      ToastrType.success => const Color(0xFF2E7D32),
+      ToastrType.error => const Color(0xFFC24141),
+      ToastrType.warning => const Color(0xFF9A6700),
+      ToastrType.info => const Color(0xFF2563A8),
       _ => const Color(0xCC000000),
     };
 
@@ -137,14 +137,14 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                       _QuickActionChip(
                         label: 'Success',
                         icon: Icons.check,
-                        color: const Color(0xFF166534),
+                        color: const Color(0xFF2E7D32),
                         onTap: () =>
                             Toastr.success('Operation completed successfully!'),
                       ),
                       _QuickActionChip(
                         label: 'Error',
                         icon: Icons.cancel_outlined,
-                        color: const Color(0xFFB91C1C),
+                        color: const Color(0xFFC24141),
                         onTap: () => Toastr.error(
                           'Something went wrong. Please try again.',
                         ),
@@ -152,7 +152,7 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                       _QuickActionChip(
                         label: 'Warning',
                         icon: Icons.warning_amber_rounded,
-                        color: const Color(0xFFB45309),
+                        color: const Color(0xFF9A6700),
                         onTap: () => Toastr.warning(
                           'Please check your input before continuing.',
                         ),
@@ -160,7 +160,7 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                       _QuickActionChip(
                         label: 'Info',
                         icon: Icons.info_outlined,
-                        color: const Color(0xFF1D4ED8),
+                        color: const Color(0xFF2563A8),
                         onTap: () => Toastr.info(
                           'Here is some useful information for you.',
                         ),
@@ -249,7 +249,7 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                       _QuickActionChip(
                         label: 'No Swipe',
                         icon: Icons.block_rounded,
-                        color: const Color(0xFFB91C1C),
+                        color: const Color(0xFFC24141),
                         onTap: () => Toastr.custom(
                           ToastrConfig(
                             type: ToastrType.warning,
@@ -308,7 +308,7 @@ class _ToastrDemoScreenState extends State<ToastrDemoScreen> {
                               label: 'Undo',
                               onPressed: () => Toastr.info('Restored!'),
                               textColor: Colors.white,
-                              backgroundColor: const Color(0xFF166534),
+                              backgroundColor: const Color(0xFF2E7D32),
                             ),
                           ),
                         ),

@@ -609,13 +609,13 @@ class _ToastrWidgetState extends State<ToastrWidget>
   Color _typeColor() {
     switch (widget.config.type) {
       case ToastrType.success:
-        return const Color(0xFF166534);
+        return const Color(0xFF2E7D32);
       case ToastrType.error:
-        return const Color(0xFFB91C1C);
+        return const Color(0xFFC24141);
       case ToastrType.warning:
-        return const Color(0xFFB45309);
+        return const Color(0xFF9A6700);
       case ToastrType.info:
-        return const Color(0xFF1D4ED8);
+        return const Color(0xFF2563A8);
       case ToastrType.loading:
         return const Color(0xFF475569);
       case ToastrType.blank:
