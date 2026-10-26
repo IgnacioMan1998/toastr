@@ -1162,13 +1162,12 @@ void main() {
       await tester.pumpWidget(const MaterialApp(home: Scaffold()));
       final service = ToastrService.instance
         ..clearAll()
-        ..maxVisible = 1;
-
-      service.show(const ToastrConfig(
-        type: ToastrType.info,
-        message: 'Leaving screen',
-        duration: Duration(seconds: 2),
-      ));
+        ..maxVisible = 1
+        ..show(const ToastrConfig(
+          type: ToastrType.info,
+          message: 'Leaving screen',
+          duration: Duration(seconds: 2),
+        ));
       await tester.pump(const Duration(milliseconds: 50));
 
       await tester.pumpWidget(const SizedBox.shrink());
